@@ -122,7 +122,6 @@ fpath=(~/.zsh/completions $fpath)
 autoload -U compinit && compinit
 
 # Python
-alias python="python3"
 alias pyclean="find . | grep -E '(__pycache__|\.pyc|\.pyo$)' | xargs rm -rf"
 alias pyenv=". venv/bin/activate"
 alias newpyenv="virtualenv venv"
