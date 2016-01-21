@@ -94,7 +94,7 @@ alias lss='ls -laGFh'
 
 # shell navigation
 alias godev='cd ~/Development/'
-alias gogov='cd ~/Documents/GOV312L'
+alias gogov='cd ~/Documents/8\ -\ Spring\ 2016/GOV312L'
 alias gormotr='cd ~/Development/rmotr'
 alias gohome='cd ~'
 alias godesk='cd ~/Desktop'
@@ -105,10 +105,8 @@ alias gua='git add -u'
 alias gcm="git commit -m"
 alias gmv="git mv"
 
-# user programs
-alias python="python3"
-alias pip="pip3.5"
 
+# color less
 export LESS='-R'
 export LESSOPEN='|~/.lessfilter %s'
 
@@ -123,5 +121,12 @@ alias git='hub'
 fpath=(~/.zsh/completions $fpath) 
 autoload -U compinit && compinit
 
+# Python
+alias python="python3"
+alias pyclean="find . | grep -E '(__pycache__|\.pyc|\.pyo$)' | xargs rm -rf"
+alias pyenv=". venv/bin/activate"
+alias newpyenv="virtualenv venv"
+alias pyignore="echo '*.swp\n*.pyc\n__pycache__\ntmp*\nvenv\n' > .gitignore"
+
 # GOV312L
-alias GOV312L_R="sh ~/Documents/GOV312L/gov312L_reading.sh"
+alias GOV312L_R="sh ~/Documents/8\ -\ Spring\ 2016/GOV312L/gov312L_reading.sh"
