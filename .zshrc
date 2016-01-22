@@ -133,3 +133,8 @@ alias GOV312L_R="sh ~/Documents/8\ -\ Spring\ 2016/GOV312L/gov312L_reading.sh"
 
 # CS105 PHPSQL
 alias gophp="ssh -t scottnm@linux.cs.utexas.edu '. ~/.bashrc && gophp ; bash'"
+
+# SSHing
+alias sshmb="ssh scottmunro@192.168.0.15"
+alias sshdesk="echo 'SSHDESK NOT SETUP'"
+alias sshlab="ssh scottnm@linux.cs.utexas.edu"
