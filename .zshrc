@@ -1,3 +1,5 @@
+alias reshell=". ~/.zshrc"
+
 export PS1="\[\033[36m\]\u\[\033[m\]@\[\033[32m\]\h:\[\033[33;1m\]\w\[\033[m\]\$ "
 
 export CLICOLOR=1
@@ -105,7 +107,6 @@ alias gua='git add -u'
 alias gcm="git commit -m"
 alias gmv="git mv"
 
-
 # color less
 export LESS='-R'
 export LESSOPEN='|~/.lessfilter %s'
@@ -129,3 +130,6 @@ alias pyignore="echo '*.swp\n*.pyc\n__pycache__\ntmp*\nvenv\n' > .gitignore"
 
 # GOV312L
 alias GOV312L_R="sh ~/Documents/8\ -\ Spring\ 2016/GOV312L/gov312L_reading.sh"
+
+# CS105 PHPSQL
+alias gophp="ssh -t scottnm@linux.cs.utexas.edu '. ~/.bashrc && gophp ; bash'"
