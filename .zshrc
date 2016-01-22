@@ -113,7 +113,6 @@ export LESSOPEN='|~/.lessfilter %s'
 
 # CTRL-b d to detach a tmux session
 alias tmuxrestore="tmux a #0"
-eval $(thefuck --alias)
 
 # Hub auto completions
 fpath=(~/.zsh/completions $fpath) 
