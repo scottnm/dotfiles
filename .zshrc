@@ -133,7 +133,7 @@ alias gophp="ssh -t scottnm@linux.cs.utexas.edu 'cd /u/z/users/cs105/scottnm ; z
 
 # SSHing
 alias sshmb="ssh scottmunro@192.168.0.15"
-alias sshdesk="echo 'SSHDESK NOT SETUP'"
+alias sshdesk="ssh scottmunro@192.168.0.20"
 alias sshlab="ssh scottnm@linux.cs.utexas.edu"
 
 # Lab specific
