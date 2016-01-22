@@ -115,9 +115,6 @@ export LESSOPEN='|~/.lessfilter %s'
 alias tmuxrestore="tmux a #0"
 eval $(thefuck --alias)
 
-# hub alias
-alias git='hub'
-
 # Hub auto completions
 fpath=(~/.zsh/completions $fpath) 
 autoload -U compinit && compinit
@@ -138,3 +135,11 @@ alias gophp="ssh -t scottnm@linux.cs.utexas.edu '. ~/.bashrc && gophp ; bash'"
 alias sshmb="ssh scottmunro@192.168.0.15"
 alias sshdesk="echo 'SSHDESK NOT SETUP'"
 alias sshlab="ssh scottnm@linux.cs.utexas.edu"
+
+# Lab specific
+shopt -s expand_aliases
+alias chkquota="chkquota && du -a ~/ | sort -n -r | head -n 10"
+
+# Desktop specific
+
+# Laptop specific
