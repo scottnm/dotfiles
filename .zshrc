@@ -138,6 +138,7 @@ alias sshlab="ssh scottnm@linux.cs.utexas.edu"
 # Lab specific
 alias chkquota="chkquota && du -a ~/ | sort -n -r | head -n 10"
 alias gogame="cd ~/Documents/CS354R/A1/"
+alias ogreclean="rm -rf .deps Makefile Makefile.in Ogre.log aclocal.m4 autom4te.cache compile config.guess config.h config.h.in config.log config.status config.sub configure depcomp install-sh libtool ltmain.sh m4 missing ogre.cfg stamp-h1"
 
 # Desktop specific
 
