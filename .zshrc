@@ -124,6 +124,9 @@ alias pyenv=". venv/bin/activate"
 alias newpyenv="virtualenv venv"
 alias pyignore="echo '*.swp\n*.pyc\n__pycache__\ntmp*\nvenv\n' > .gitignore"
 
+# Lua
+alias love="/Applications/love.app/Contents/MacOS/love"
+
 # GOV312L
 alias GOV312L_R="sh ~/Documents/8\ -\ Spring\ 2016/GOV312L/gov312L_reading.sh"
 
@@ -143,3 +146,4 @@ alias ogreclean="rm -rf .deps Makefile Makefile.in Ogre.log aclocal.m4 autom4te.
 # Desktop specific
 
 # Laptop specific
+alias findremove="echo 'perl -pi -w -e 's/PATTERN/REPLACE/g;' FILE'"
