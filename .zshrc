@@ -137,6 +137,7 @@ alias sshlab="ssh scottnm@linux.cs.utexas.edu"
 
 # Lab specific
 alias chkquota="chkquota && du -a ~/ | sort -n -r | head -n 10"
+alias gogame="cd ~/Documents/CS354R/A1/"
 
 # Desktop specific
 
