@@ -149,3 +149,5 @@ alias ogreclean="make clean; rm -rf .deps Makefile Makefile.in Ogre.log aclocal.
 
 # Laptop specific
 alias findremove="echo 'perl -pi -w -e 's/PATTERN/REPLACE/g;' FILE'"
+export PATH=$PATH:/Library/TeX/Distributions/.DefaultTeX/Contents/Programs/texbin
+
