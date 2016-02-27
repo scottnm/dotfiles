@@ -17,3 +17,52 @@ set ruler               " show row/column number
 
 autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0
 execute pathogen#infect()
+
+set nocompatible
+
+filetype off
+set rtp+=$HOME/.vim/bundle/vundle.vim
+
+call vundle#begin()
+Plugin 'Vundle/vundle.vim'
+Plugin 'Valloric/YouCompleteMe'
+call vundle#end()
+
+filetype plugin indent on
+syntax on
+
+set shiftwidth=4 tabstop=8 softtabstop=4
+
+set autoindent
+set smartindent
+set laststatus=2
+set backspace=2
+set number
+set hidden
+set ignorecase
+set smartcase
+set incsearch
+set showmatch
+set mat=0
+set wildmenu
+set wildmode=list:longest,full
+set autoread
+set smarttab
+set lazyredraw
+set magic
+set expandtab
+
+" The <Leader> substitute character.
+let mapleader=","
+
+" Quicker OS clipboard copy/paste
+nmap <Leader>y "*y
+vmap <Leader>y "*y
+nmap <Leader>d "*d
+vmap <Leader>d "*d
+nmap <Leader>p "*p
+vmap <Leader>p "*p
+nmap <Leader>P "*P
+vmap <Leader>P "*P
+nmap <Leader>x "*x
+vmap <Leader>x "*x

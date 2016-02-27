@@ -1,3 +1,6 @@
+[[ $- != *i* ]] && return
+[[ -z "$TMUX" ]] && exec tmux
+
 alias reshell=". ~/.zshrc"
 
 export PS1="\[\033[36m\]\u\[\033[m\]@\[\033[32m\]\h:\[\033[33;1m\]\w\[\033[m\]\$ "
@@ -143,7 +146,8 @@ alias sshlab="ssh scottnm@linux.cs.utexas.edu"
 # Lab specific
 alias chkquota="chkquota && du -a ~/ | sort -n -r | head -n 10"
 alias gogame="cd ~/Documents/CS354R/A2/appdirectory"
-alias ogreclean="make clean; rm -rf .deps Makefile Makefile.in Ogre.log aclocal.m4 autom4te.cache compile config.guess config.h config.h.in config.log config.status config.sub configure depcomp install-sh libtool ltmain.sh m4 missing ogre.cfg stamp-h1"
+alias cleanogre="make clean; rm -rf .deps Makefile Makefile.in Ogre.log aclocal.m4 autom4te.cache compile config.guess config.h config.h.in config.log config.status config.sub configure depcomp install-sh libtool ltmain.sh m4 missing ogre.cfg stamp-h1"
+alias lsogre="ls --ignore='.deps Makefile Makefile.in Ogre.log aclocal.m4 autom4te.cache compile config.guess config.h config.h.in config.log config.status config.sub configure depcomp install-sh libtool ltmain.sh m4 missing ogre.cfg stamp-h1'"
 
 # Desktop specific
 
