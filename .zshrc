@@ -1,5 +1,5 @@
-[[ $- != *i* ]] && return
-[[ -z "$TMUX" ]] && exec tmux
+# [[ $- != *i* ]] && return
+# [[ -z "$TMUX" ]] && exec tmux
 
 alias reshell=". ~/.zshrc"
 alias remux="tmux source ~/.tmux.conf"
