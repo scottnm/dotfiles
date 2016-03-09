@@ -18,6 +18,8 @@ set ruler               " show row/column number
 autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0
 execute pathogen#infect()
 
+" YOU COMPLETE ME JUNK
+
 set nocompatible
 
 filetype off
