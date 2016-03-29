@@ -3,12 +3,13 @@ syntax on               " syntax highlighting
 filetype indent on      " activates indenting for files
 set autoindent          " auto indenting
 set relativenumber      " relative line numbers
-colorscheme desert      " colorscheme desert
 set nobackup            " get rid of anoying ~file
 set tabstop=4           " tabs are size 4
 set shiftwidth=4        " indents are size 4
 set expandtab           " turn tabs into spaces
+colorscheme desert      " desert color scheme
 
+" unmap arrow keys
 map <Up> <NOP>
 map <Down> <NOP>
 map <Left> <NOP>
@@ -30,15 +31,8 @@ Plugin 'Vundle/vundle.vim'
 Plugin 'Valloric/YouCompleteMe'
 call vundle#end()
 
-filetype plugin indent on
-syntax on
-
-set shiftwidth=4 tabstop=8 softtabstop=4
-
-set autoindent
 set smartindent
 set laststatus=2
-set backspace=2
 set number
 set hidden
 set ignorecase
@@ -51,8 +45,8 @@ set wildmode=list:longest,full
 set autoread
 set smarttab
 set lazyredraw
+set ttyfast
 set magic
-set expandtab
 
 " The <Leader> substitute character.
 let mapleader=","
