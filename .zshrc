@@ -144,6 +144,7 @@ alias gophp="ssh -t scottnm@linux.cs.utexas.edu 'cd /u/z/users/cs105/scottnm ; z
 alias sshmb="ssh scottmunro@192.168.0.15"
 alias sshdesk="ssh scottmunro@192.168.0.20"
 alias sshlab="ssh scottnm@linux.cs.utexas.edu"
+alias sshceedgui="ssh -X scottnm@garcia-navarro.cs.utexas.edu"
 
 # Lab specific
 alias chkquota="chkquota && du -a ~/ | sort -n -r | head -n 10"
