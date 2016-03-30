@@ -32,6 +32,9 @@ Plugin 'Valloric/YouCompleteMe'
 call vundle#end()
 
 set smartindent
+set cindent
+set cinkeys-=0#
+set indentkeys-=0#
 set laststatus=2
 set number
 set hidden
