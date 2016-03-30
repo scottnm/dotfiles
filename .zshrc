@@ -152,6 +152,7 @@ alias gogame="cd ~/Documents/CS354R/A3/appdirectory"
 alias cleanogre="make clean; rm -rf .deps Makefile Makefile.in Ogre.log aclocal.m4 autom4te.cache compile config.guess config.h config.h.in config.log config.status config.sub configure depcomp install-sh libtool ltmain.sh m4 missing ogre.cfg stamp-h1"
 alias lsogre="ls --ignore='.deps Makefile Makefile.in Ogre.log aclocal.m4 autom4te.cache compile config.guess config.h config.h.in config.log config.status config.sub configure depcomp install-sh libtool ltmain.sh m4 missing ogre.cfg stamp-h1'"
 alias ogrehome="cd /lusr/opt/ogre-1.9/share/OGRE"
+alias labgitdag="~/Development/tools/git-cola/bin/git-dag"
 
 # Desktop specific
 
