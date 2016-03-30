@@ -1,0 +1,3 @@
+[submodule "dotfiles"]
+	path = daynindotfiles
+	url = https://github.com/daynin/dotfiles

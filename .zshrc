@@ -144,6 +144,7 @@ alias gophp="ssh -t scottnm@linux.cs.utexas.edu 'cd /u/z/users/cs105/scottnm ; z
 alias sshmb="ssh scottmunro@192.168.0.15"
 alias sshdesk="ssh scottmunro@192.168.0.20"
 alias sshlab="ssh scottnm@linux.cs.utexas.edu"
+alias sshceedgui="ssh -X scottnm@garcia-navarro.cs.utexas.edu"
 
 # Lab specific
 alias chkquota="chkquota && du -a ~/ | sort -n -r | head -n 10"
@@ -151,6 +152,7 @@ alias gogame="cd ~/Documents/CS354R/A3/appdirectory"
 alias cleanogre="make clean; rm -rf .deps Makefile Makefile.in Ogre.log aclocal.m4 autom4te.cache compile config.guess config.h config.h.in config.log config.status config.sub configure depcomp install-sh libtool ltmain.sh m4 missing ogre.cfg stamp-h1"
 alias lsogre="ls --ignore='.deps Makefile Makefile.in Ogre.log aclocal.m4 autom4te.cache compile config.guess config.h config.h.in config.log config.status config.sub configure depcomp install-sh libtool ltmain.sh m4 missing ogre.cfg stamp-h1'"
 alias ogrehome="cd /lusr/opt/ogre-1.9/share/OGRE"
+alias labgitdag="~/Development/tools/git-cola/bin/git-dag"
 
 # Desktop specific
 
