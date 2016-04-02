@@ -1,0 +1,8 @@
+tpope/vim-obsession
+vundle
+pathogen
+tmux
+tmux-plugin-manager
+tmux-resurrect
+youcompleteme with clang bindings
+Nerdtree

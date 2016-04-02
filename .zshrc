@@ -1,6 +1,11 @@
+# [[ $- != *i* ]] && return
+# [[ -z "$TMUX" ]] && exec tmux
+
 alias reshell=". ~/.zshrc"
+alias remux="tmux source ~/.tmux.conf"
 
 export PS1="\[\033[36m\]\u\[\033[m\]@\[\033[32m\]\h:\[\033[33;1m\]\w\[\033[m\]\$ "
+export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
 export CLICOLOR=1
 export LSCOLORS=ExFxBxDxCxegedabagacad
@@ -103,9 +108,11 @@ alias godesk='cd ~/Desktop'
 
 # git shortcuts
 alias gstat='git status'
+unalias gsta
 alias gua='git add -u'
 alias gcm="git commit -m"
 alias gmv="git mv"
+alias gtree="git log --graph --oneline --all"
 
 # color less
 export LESS='-R'
@@ -124,6 +131,9 @@ alias pyenv=". venv/bin/activate"
 alias newpyenv="virtualenv venv"
 alias pyignore="echo '*.swp\n*.pyc\n__pycache__\ntmp*\nvenv\n' > .gitignore"
 
+# Lua
+alias love="/Applications/love.app/Contents/MacOS/love"
+
 # GOV312L
 alias GOV312L_R="sh ~/Documents/8\ -\ Spring\ 2016/GOV312L/gov312L_reading.sh"
 
@@ -134,10 +144,22 @@ alias gophp="ssh -t scottnm@linux.cs.utexas.edu 'cd /u/z/users/cs105/scottnm ; z
 alias sshmb="ssh scottmunro@192.168.0.15"
 alias sshdesk="ssh scottmunro@192.168.0.20"
 alias sshlab="ssh scottnm@linux.cs.utexas.edu"
+alias sshceedgui="ssh -X scottnm@garcia-navarro.cs.utexas.edu"
 
 # Lab specific
 alias chkquota="chkquota && du -a ~/ | sort -n -r | head -n 10"
+alias gogame="cd ~/Documents/CS354R/A3/appdirectory"
+alias cleanogre="make clean; rm -rf .deps Makefile Makefile.in Ogre.log aclocal.m4 autom4te.cache compile config.guess config.h config.h.in config.log config.status config.sub configure depcomp install-sh libtool ltmain.sh m4 missing ogre.cfg stamp-h1"
+alias lsogre="ls --ignore='.deps Makefile Makefile.in Ogre.log aclocal.m4 autom4te.cache compile config.guess config.h config.h.in config.log config.status config.sub configure depcomp install-sh libtool ltmain.sh m4 missing ogre.cfg stamp-h1'"
+alias ogrehome="cd /lusr/opt/ogre-1.9/share/OGRE"
+alias labgitdag="~/Development/tools/git-cola/bin/git-dag"
 
 # Desktop specific
 
 # Laptop specific
+alias findremove="echo 'perl -pi -w -e 's/PATTERN/REPLACE/g;' FILE'"
+export PATH=$PATH:/Library/TeX/Distributions/.DefaultTeX/Contents/Programs/texbin
+
+# Archiving
+alias tarchive="tar -cvzf"
+alias untarchive="tar -xvzf"
