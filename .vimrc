@@ -8,6 +8,9 @@ set tabstop=4 shiftwidth=4 expandtab " tabs are size 4, indents size 4, tabs int
 set incsearch showmatch              " search options
 set lazyredraw ttyfast               " faster rendering 
 syntax on                            " syntax highlighting
+set cindent                          " prevent the # mark from unindenting
+set cinkeys-=0#
+set indentkeys-=0#
 
 " unmap arrow keys
 map <Up> <NOP>
