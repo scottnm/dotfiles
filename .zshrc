@@ -97,6 +97,7 @@ source $ZSH/oh-my-zsh.sh
 # shell commands
 alias clear="clear && clear && clear && clear && clear"
 alias make="sh ~/colormake.sh"
+alias emphmake="make 2>&1 | grep --color -iP \"\^|warning:|error:|\""
 alias lss='ls -laGFh'
 
 # shell navigation
