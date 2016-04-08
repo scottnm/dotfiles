@@ -29,6 +29,7 @@ set rtp+=$HOME/.vim/bundle/vundle.vim
 call vundle#begin()
 Plugin 'Vundle/vundle.vim'
 Plugin 'Valloric/YouCompleteMe'
+Plugin 'itchyny/lightline.vim'
 call vundle#end()
 
 set laststatus=2
