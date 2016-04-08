@@ -102,10 +102,8 @@ alias emphmake="make 2>&1 | grep --color -iP \"\^|warning:|error:|\""
 alias lss='ls -laGFh'
 
 # shell navigation
+alias goconfig='cd ~/Development/dotfiles'
 alias godev='cd ~/Development/'
-alias gogov='cd ~/Documents/8\ -\ Spring\ 2016/GOV312L'
-alias gormotr='cd ~/Development/rmotr'
-alias gohome='cd ~'
 alias godesk='cd ~/Desktop'
 
 # git shortcuts
@@ -150,7 +148,7 @@ alias sshceedgui="ssh -X scottnm@garcia-navarro.cs.utexas.edu"
 
 # Lab specific
 alias chkquota="chkquota && du -a ~/ | sort -n -r | head -n 10"
-alias gogame="cd ~/Documents/CS354R/A3/appdirectory"
+alias gogame="cd ~/Documents/CS354R/A4-JRPG/appdirectory"
 alias cleanogre="make clean; rm -rf .deps Makefile Makefile.in Ogre.log aclocal.m4 autom4te.cache compile config.guess config.h config.h.in config.log config.status config.sub configure depcomp install-sh libtool ltmain.sh m4 missing ogre.cfg stamp-h1"
 alias lsogre="ls --ignore='.deps Makefile Makefile.in Ogre.log aclocal.m4 autom4te.cache compile config.guess config.h config.h.in config.log config.status config.sub configure depcomp install-sh libtool ltmain.sh m4 missing ogre.cfg stamp-h1'"
 alias ogrehome="cd /lusr/opt/ogre-1.9/share/OGRE"
