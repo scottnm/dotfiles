@@ -10,3 +10,6 @@
 
 # c++ ignore
 *.o
+
+# java
+*.class
