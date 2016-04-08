@@ -1,3 +1,6 @@
 [submodule "dotfiles"]
 	path = daynindotfiles
 	url = https://github.com/daynin/dotfiles
+[submodule "gnome-terminal-colors-monokai"]
+	path = gnome-terminal-colors-monokai
+	url = https://github.com/pricco/gnome-terminal-colors-monokai
