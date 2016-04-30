@@ -21,6 +21,7 @@ export TERM=xterm-256color
 ZSH_THEME="robbyrussell"
 # ZSH_THEME="miloshadzic"
 # ZSH_THEME="theunraveler"
+# ZSH_THEME="bira"
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
