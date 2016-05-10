@@ -12,12 +12,16 @@ export LSCOLORS=ExFxBxDxCxegedabagacad
 
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
+export TERM=xterm-256color
 
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
 ZSH_THEME="robbyrussell"
+# ZSH_THEME="miloshadzic"
+# ZSH_THEME="theunraveler"
+# ZSH_THEME="bira"
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -96,14 +100,13 @@ source $ZSH/oh-my-zsh.sh
 
 # shell commands
 alias clear="clear && clear && clear && clear && clear"
-alias make="sh ~/colormake.sh"
+alias make="sh ~/.colormake.sh"
+alias emphmake="make 2>&1 | grep --color -iP \"\^|warning:|error:|\""
 alias lss='ls -laGFh'
 
 # shell navigation
+alias goconfig='cd ~/Development/dotfiles'
 alias godev='cd ~/Development/'
-alias gogov='cd ~/Documents/8\ -\ Spring\ 2016/GOV312L'
-alias gormotr='cd ~/Development/rmotr'
-alias gohome='cd ~'
 alias godesk='cd ~/Desktop'
 
 # git shortcuts
@@ -143,12 +146,12 @@ alias gophp="ssh -t scottnm@linux.cs.utexas.edu 'cd /u/z/users/cs105/scottnm ; z
 # SSHing
 alias sshmb="ssh scottmunro@192.168.0.15"
 alias sshdesk="ssh scottmunro@192.168.0.20"
-alias sshlab="ssh scottnm@linux.cs.utexas.edu"
+alias sshlab="~/.sshlab.sh"
 alias sshceedgui="ssh -X scottnm@garcia-navarro.cs.utexas.edu"
 
 # Lab specific
 alias chkquota="chkquota && du -a ~/ | sort -n -r | head -n 10"
-alias gogame="cd ~/Documents/CS354R/A3/appdirectory"
+alias gogame="cd ~/Documents/CS354R/A4-JRPG/appdirectory"
 alias cleanogre="make clean; rm -rf .deps Makefile Makefile.in Ogre.log aclocal.m4 autom4te.cache compile config.guess config.h config.h.in config.log config.status config.sub configure depcomp install-sh libtool ltmain.sh m4 missing ogre.cfg stamp-h1"
 alias lsogre="ls --ignore='.deps Makefile Makefile.in Ogre.log aclocal.m4 autom4te.cache compile config.guess config.h config.h.in config.log config.status config.sub configure depcomp install-sh libtool ltmain.sh m4 missing ogre.cfg stamp-h1'"
 alias ogrehome="cd /lusr/opt/ogre-1.9/share/OGRE"

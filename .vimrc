@@ -1,5 +1,6 @@
 set backspace=2                      " backspace in insert mode works like normal editor
 filetype indent on                   " activates indenting for files
+filetype plugin on
 set autoindent smartindent           " auto and smart indenting
 set relativenumber number            " relative line numbers
 set ignorecase smartcase             " case preferences
@@ -24,11 +25,11 @@ execute pathogen#infect()
 
 " YOU COMPLETE ME
 set nocompatible
-filetype off
 set rtp+=$HOME/.vim/bundle/vundle.vim
 call vundle#begin()
 Plugin 'Vundle/vundle.vim'
 Plugin 'Valloric/YouCompleteMe'
+Plugin 'itchyny/lightline.vim'
 call vundle#end()
 
 set laststatus=2
@@ -38,4 +39,13 @@ set wildmenu
 set wildmode=list:longest,full
 set autoread
 set magic
-filetype indent on
+
+let mapleader="-"
+
+let g:lightline = {
+      \ 'colorscheme': 'wombat',
+      \ }
+
+if !has('gui_running')
+  set t_Co=256
+endif
