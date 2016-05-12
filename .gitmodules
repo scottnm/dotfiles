@@ -4,3 +4,6 @@
 [submodule "gnome-terminal-colors-monokai"]
 	path = gnome-terminal-colors-monokai
 	url = https://github.com/pricco/gnome-terminal-colors-monokai
+[submodule "rainbow_parentheses.vim"]
+	path = rainbow_parentheses.vim
+	url = https://github.com/kien/rainbow_parentheses.vim.git

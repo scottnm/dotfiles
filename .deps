@@ -7,3 +7,4 @@ tmux-resurrect
 youcompleteme with clang bindings
 Nerdtree
 vimtex plugin (http://www.vim.org/scripts/script.php?script_id=3230)
+rainbow-parens (https://github.com/kien/rainbow_parentheses.vim.git)
