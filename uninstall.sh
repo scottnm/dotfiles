@@ -1,3 +1,5 @@
+rm $HOME/.git-commit-template.txt
+
 rm $HOME/.vimrc
 
 rm $HOME/.colormake.sh

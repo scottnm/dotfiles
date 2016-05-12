@@ -1,3 +1,5 @@
+ln -s $HOME/Development/dotfiles/.git-commit-template.txt $HOME/.git-commit-template.txt
+
 ln -s $HOME/Development/dotfiles/.vimrc $HOME/.vimrc
 
 ln -s $HOME/Development/dotfiles/.colormake.sh $HOME/.colormake.sh
