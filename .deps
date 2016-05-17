@@ -1,10 +1,12 @@
-tpope/vim-obsession
-vundle
-pathogen
+vim-plug
+    plugins
+
+    tpope/vim-obsession
+    youcompleteme with clang bindings
+    Nerdtree
+    vimtex plugin (http://www.vim.org/scripts/script.php?script_id=3230)
+    rainbow-parens (https://github.com/kien/rainbow_parentheses.vim.git)
+
 tmux
 tmux-plugin-manager
 tmux-resurrect
-youcompleteme with clang bindings
-Nerdtree
-vimtex plugin (http://www.vim.org/scripts/script.php?script_id=3230)
-rainbow-parens (https://github.com/kien/rainbow_parentheses.vim.git)

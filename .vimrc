@@ -1,5 +1,6 @@
 let mapleader="-"
 
+set ruler                            " show row/column number
 set backspace=2                      " backspace in insert mode works like normal editor
 filetype indent on                   " activates indenting for files
 filetype plugin on
@@ -19,19 +20,36 @@ map <Up> <NOP>
 map <Down> <NOP>
 map <Left> <NOP>
 map <Right> <NOP>
-set ruler               " show row/column number
+
+" shortcuts
+nnoremap <C-t> :tabnew<CR>|              " ctrl-t to open up a new tab
+nnoremap <Tab> :tabnext<CR>|             " tab goes to the next tab 
+nnoremap <S-Tab> :tabprev<CR>|           " shift tab goes to prev tab
+inoremap <C-w> <c-o>:update<CR>|         " ctrl save
+nnoremap <C-w> :update<CR>|              " ctrl save
+
+" Syntax corrections
+au BufRead, BufNewFile *.pde setfiletype java " fix processing syntax highlighting
 
 autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0
 
 " Plugins 
-execute pathogen#infect()
 set nocompatible
-set rtp+=$HOME/.vim/bundle/vundle.vim
-call vundle#begin()
-Plugin 'Vundle/vundle.vim'
-Plugin 'itchyny/lightline.vim'
-Bundle "willpragnell/vim-reprocessed"
-call vundle#end()
+if empty(glob('~/.vim/autoload/plug.vim'))
+   silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+       \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+   autocmd VimEnter * PlugInstall | source $MYVIMRC
+endif
+call plug#begin() 
+Plug 'itchyny/lightline.vim'
+Plug 'flazz/vim-colorschemes'
+Plug 'kien/rainbow_parentheses.vim'
+Plug 'qualiabyte/vim-colorstepper'
+Plug 'scrooloose/nerdtree'
+Plug 'scrooloose/syntastic'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-sensible'
+call plug#end()
 
 let g:lightline = {
       \ 'colorscheme': 'wombat',
