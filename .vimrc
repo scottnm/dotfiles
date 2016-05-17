@@ -25,8 +25,8 @@ map <Right> <NOP>
 nnoremap <C-t> :tabnew<CR>|              " ctrl-t to open up a new tab
 nnoremap <Tab> :tabnext<CR>|             " tab goes to the next tab 
 nnoremap <S-Tab> :tabprev<CR>|           " shift tab goes to prev tab
-inoremap <C-w> <c-o>:update<CR>|         " ctrl save
-nnoremap <C-w> :update<CR>|              " ctrl save
+inoremap <C-u> <c-o>:update<CR>|         " ctrl save
+nnoremap <C-u> :update<CR>|              " ctrl save
 
 " Syntax corrections
 au BufRead, BufNewFile *.pde setfiletype java " fix processing syntax highlighting
@@ -84,3 +84,10 @@ au VimEnter * RainbowParenthesesToggle
 au Syntax * RainbowParenthesesLoadRound
 au Syntax * RainbowParenthesesLoadSquare
 au Syntax * RainbowParenthesesLoadBraces
+
+" ColorStepper Keys
+nmap <F6> <Plug>ColorstepPrev
+nmap <F7> <Plug>ColorstepNext
+nmap <S-F7> <Plug>ColorstepReload
+
+color evening 
