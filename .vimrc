@@ -6,7 +6,7 @@ filetype indent on                   " activates indenting for files
 filetype plugin on
 set relativenumber number            " relative line numbers
 set ignorecase smartcase             " case preferences
-set nobackup                         " get rid of anoying ~file
+set nobackup
 set tabstop=4 shiftwidth=4 expandtab " tabs are size 4, indents size 4, tabs into spaces
 set incsearch showmatch              " search options
 set lazyredraw ttyfast               " faster rendering 
