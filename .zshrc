@@ -105,16 +105,8 @@ alias emphmake="make 2>&1 | grep --color -iP \"\^|warning:|error:|\""
 alias lss='ls -laGFh'
 
 # shell navigation
-alias goconfig='cd ~/Development/dotfiles'
-alias godev='cd ~/Development/'
-alias godesk='cd ~/Desktop'
-
-# git shortcuts
-alias gstat='git status'
-unalias gsta
-alias gua='git add -u'
-alias gcm="git commit -m"
-alias gmv="git mv"
+alias goconfig='cd ~/dev/dotfiles'
+alias godev='cd ~/dev/'
 alias gtree="git log --graph --oneline --all"
 
 # color less
@@ -134,28 +126,10 @@ alias pyenv=". venv/bin/activate"
 alias newpyenv="virtualenv venv"
 alias pyignore="echo '*.swp\n*.pyc\n__pycache__\ntmp*\nvenv\n' > .gitignore"
 
-# Lua
-alias love="/Applications/love.app/Contents/MacOS/love"
-
-# GOV312L
-alias GOV312L_R="sh ~/Documents/8\ -\ Spring\ 2016/GOV312L/gov312L_reading.sh"
-
-# CS105 PHPSQL
-alias gophp="ssh -t scottnm@linux.cs.utexas.edu 'cd /u/z/users/cs105/scottnm ; zsh'"
-
-# SSHing
-alias sshmb="ssh scottmunro@192.168.0.15"
-alias sshdesk="ssh scottmunro@192.168.0.20"
-alias sshlab="~/.sshlab.sh"
-alias sshceedgui="ssh -X scottnm@garcia-navarro.cs.utexas.edu"
-
 # Lab specific
 alias chkquota="chkquota && du -a ~/ | sort -n -r | head -n 10"
-alias gogame="cd ~/Documents/CS354R/A4-JRPG/appdirectory"
-alias cleanogre="make clean; rm -rf .deps Makefile Makefile.in Ogre.log aclocal.m4 autom4te.cache compile config.guess config.h config.h.in config.log config.status config.sub configure depcomp install-sh libtool ltmain.sh m4 missing ogre.cfg stamp-h1"
-alias lsogre="ls --ignore='.deps Makefile Makefile.in Ogre.log aclocal.m4 autom4te.cache compile config.guess config.h config.h.in config.log config.status config.sub configure depcomp install-sh libtool ltmain.sh m4 missing ogre.cfg stamp-h1'"
 alias ogrehome="cd /lusr/opt/ogre-1.9/share/OGRE"
-alias labgitdag="~/Development/tools/git-cola/bin/git-dag"
+alias labgitdag="~/dev/tools/git-cola/bin/git-dag"
 
 # Desktop specific
 
