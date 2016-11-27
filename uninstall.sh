@@ -1,4 +1,4 @@
-rm $HOME/.git-commit-template.txt
+rm $HOME/.git-commit-template
 
 rm $HOME/.vimrc
 
