@@ -15,7 +15,7 @@ set cindent                          " prevent the # mark from unindenting
 set cinkeys-=0#
 set indentkeys-=0#
 
-" unmap arrow keys
+" unmap arrow keys to encourage good vim practices
 map <Up> <NOP>
 map <Down> <NOP>
 map <Left> <NOP>
@@ -49,7 +49,6 @@ Plug 'scrooloose/nerdtree'
 Plug 'scrooloose/syntastic'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-sensible'
-" Plug 'Valloric/YouCompleteMe'
 call plug#end()
 
 let g:lightline = {
