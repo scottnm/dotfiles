@@ -1,11 +1,13 @@
-ln -s "$HOME/dev/dotfiles/.git-commit-template.txt" "$HOME/.git-commit-template.txt"
+CONFIGDIR="$HOME"/dev/dotfiles/config
 
-ln -s "$HOME/dev/dotfiles/.vimrc" "$HOME/.vimrc"
+ln -s "$CONFIGDIR/.git-commit-template" "$HOME/.git-commit-template"
 
-ln -s "$HOME/dev/dotfiles/.colormake.sh" "$HOME/.colormake.sh"
+ln -s "$CONFIGDIR/.vimrc" "$HOME/.vimrc"
 
-ln -s "$HOME/dev/dotfiles/.zshrc" "$HOME/.zshrc"
+ln -s "$CONFIGDIR/.colormake.sh" "$HOME/.colormake.sh"
 
-ln -s "$HOME/dev/dotfiles/.tmux.conf" "$HOME/.tmux.conf"
+ln -s "$CONFIGDIR/.sshlab.sh" "$HOME/.sshlab.sh"
 
-ln -s "$HOME/dev/dotfiles/.gitignore_global" "$HOME/.gitignore_global" && git config --global core.excludesfile ~/.gitignore_global
+ln -s "$CONFIGDIR/.zshrc" "$HOME/.zshrc"
+
+ln -s "$CONFIGDIR/.gitignore_global" "$HOME/.gitignore_global" && git config --global core.excludesfile ~/.gitignore_global
