@@ -4,6 +4,8 @@ rm $HOME/.vimrc
 
 rm $HOME/.colormake.sh
 
+rm $HOME/.sshlab.sh
+
 rm $HOME/.zshrc
 
 rm $HOME/.gitignore_global
