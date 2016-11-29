@@ -111,7 +111,7 @@ alias gowin='cd /mnt/c/Users/Scott\ Munro/'
 alias gogame='cd /mnt/c/Users/Scott\ Munro/Documents/FilibustersGame'
 alias goschool='cd /mnt/c/Users/Scott\ Munro/Documents/School/'
 alias gtree="git log --graph --oneline --all"
-alias golab="ssh scottnm@linux.cs.utexas.edu"
+alias golab="~/.sshlab.sh"
 alias goenv='cd /mnt/c/Users/Scott\ Munro/Documents/School/AET326/8_FinalProject'
 
 # color less
