@@ -1,0 +1,2 @@
+[alias]
+	hubclone = !sh -c 'git clone https://scottnm@github.com/$0'
