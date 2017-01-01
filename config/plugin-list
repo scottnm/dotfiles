@@ -10,3 +10,6 @@ Vim
 Tmux
 	tmux-plugin-manager
 	tmux-resurrect
+
+Misc-tools
+    clink for cmd (http://mridgers.github.io/clink/)
