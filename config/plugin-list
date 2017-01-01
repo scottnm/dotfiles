@@ -11,5 +11,6 @@ Tmux
 	tmux-plugin-manager
 	tmux-resurrect
 
-Misc-tools
+Windows tools
     clink for cmd (http://mridgers.github.io/clink/)
+    cmder for better console emulation (http://cmder.net/)
