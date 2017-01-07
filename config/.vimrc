@@ -22,11 +22,10 @@ map <Left> <NOP>
 map <Right> <NOP>
 
 " shortcuts
-nnoremap <C-t> :tabnew<CR>|              " ctrl-t to open up a new tab
-nnoremap <Tab> :tabnext<CR>|             " tab goes to the next tab 
-nnoremap <S-Tab> :tabprev<CR>|           " shift tab goes to prev tab
-inoremap <C-u> <c-o>:update<CR>|         " ctrl save
-nnoremap <C-u> :update<CR>|              " ctrl save
+nnoremap   <C-c>  :!build<CR>|                " build project
+nnoremap   <C-e>  :!run<CR>|                  " run project
+nnoremap   <C-d>  :!debug<CR>|                " debug project
+nnoremap   <Tab>  :bnext<CR>|                 " swap to next buffer
 
 " Syntax corrections
 au BufRead, BufNewFile *.pde setfiletype java " fix processing syntax highlighting
