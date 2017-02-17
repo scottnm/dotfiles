@@ -131,6 +131,8 @@ alias pyclean="find . | grep -E '(__pycache__|\.pyc|\.pyo$)' | xargs rm -rf"
 alias pyenv=". venv/bin/activate"
 alias newpyenv="virtualenv venv"
 alias pyignore="echo '*.swp\n*.pyc\n__pycache__\ntmp*\nvenv\n' > .gitignore"
+alias py3=python3
+alias py2=python2
 
 # Lab specific
 alias chkquota="chkquota && du -a ~/ | sort -n -r | head -n 10"
