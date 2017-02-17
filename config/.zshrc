@@ -110,6 +110,7 @@ alias godev='cd ~/dev/'
 alias gowin='cd /mnt/c/Users/Scott\ Munro/'
 alias gogame='cd /mnt/c/Users/Scott\ Munro/Dev/RealchairRacing/RealchairRacing'
 alias goschool='cd /mnt/c/Users/Scott\ Munro/Documents/School/'
+alias goswe='cd ~/Work/SWE/2-Netflix/src'
 alias gtree="git log --graph --oneline --all"
 alias golab="~/.sshlab.sh"
 alias goenv='cd /mnt/c/Users/Scott\ Munro/Documents/School/AET326/8_FinalProject'

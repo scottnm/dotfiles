@@ -1,13 +1,13 @@
 let mapleader="-"
 
 set ruler                            " show row/column number
-set backspace=2                      " backspace in insert mode works like normal editor
+set backspace=2                      " backspace works in insert mode
 filetype indent on                   " activates indenting for files
 filetype plugin on
 set relativenumber number            " relative line numbers
 set ignorecase smartcase             " case preferences
 set nobackup
-set tabstop=4 shiftwidth=4 expandtab " tabs are size 4, indents size 4, tabs into spaces
+set tabstop=4 shiftwidth=4 expandtab " tabs & indents size 4, tabkey = spaces
 set incsearch showmatch              " search options
 set lazyredraw ttyfast               " faster rendering 
 syntax on                            " syntax highlighting
@@ -28,7 +28,7 @@ nnoremap   <C-d>  :!debug<CR>|                " debug project
 nnoremap   <Tab>  :bnext<CR>|                 " swap to next buffer
 
 " Syntax corrections
-au BufRead, BufNewFile *.pde setfiletype java " fix processing syntax highlighting
+au BufRead, BufNewFile *.pde setfiletype java " processing syntax highlighting
 
 autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0
 
@@ -103,4 +103,10 @@ let g:syntastic_cpp_compiler_options = ' -std=c++11 -stdlib=libc++'
 " Git settings
 autocmd Filetype gitcommit setlocal spell textwidth=72
 
-color evening 
+color evening
+" show when I run over 80 columns
+set colorcolumn=81
+hi ColorColumn ctermbg=darkgray
+highlight OverLength ctermbg=red ctermfg=white guibg=#392929
+match OverLength /\%81v.\+/
+
