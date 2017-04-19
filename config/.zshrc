@@ -6,6 +6,7 @@ alias remux="tmux source ~/.tmux.conf"
 
 export PS1="\[\033[36m\]\u\[\033[m\]@\[\033[32m\]\h:\[\033[33;1m\]\w\[\033[m\]\$ "
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+export PYTHONPATH=/home/smunro/dev/vennfridge
 
 export CLICOLOR=1
 export LSCOLORS=ExFxBxDxCxegedabagacad
@@ -13,6 +14,12 @@ export LSCOLORS=ExFxBxDxCxegedabagacad
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
 export TERM=xterm-256color
+
+###########
+# Exports #
+###########
+
+export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
 
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
@@ -96,7 +103,9 @@ source $ZSH/oh-my-zsh.sh
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 
-# THE REAL BANANAS
+####################
+# THE REAL BANANAS #
+####################
 
 # shell commands
 alias clear="clear && clear && clear && clear && clear"
@@ -111,7 +120,7 @@ alias gowin='cd /mnt/c/Users/Scott\ Munro/'
 alias gowindev='cd /mnt/c/Users/Scott\ Munro/Dev/'
 alias gogame='cd /mnt/c/Users/Scott\ Munro/Dev/RealchairRacing/RealchairRacing'
 alias goschool='cd /mnt/c/Users/Scott\ Munro/Documents/School/'
-alias goswe='cd ~/Work/SWE/2-Netflix/src'
+alias goswe='cd ~/dev/vennfridge'
 alias gtree="git log --graph --oneline --all"
 alias golab="~/.sshlab.sh"
 alias goenv='cd /mnt/c/Users/Scott\ Munro/Documents/School/AET326/8_FinalProject'
@@ -130,10 +139,12 @@ autoload -U compinit && compinit
 # Python
 alias pyclean="find . | grep -E '(__pycache__|\.pyc|\.pyo$)' | xargs rm -rf"
 alias pyenv=". venv/bin/activate"
-alias newpyenv="virtualenv venv"
-alias pyignore="echo '*.swp\n*.pyc\n__pycache__\ntmp*\nvenv\n' > .gitignore"
-alias py3=python3
+alias newpyenv="virtualenv -p python3 venv"
+alias pyignore="echo '*.swp\n*.pyc\n__pycache__\ntmp*\nvenv\n' >> .gitignore"
+alias python=python3.5
+alias py3=python3.5
 alias py2=python2
+alias pip=pip3
 
 # Lab specific
 alias chkquota="chkquota && du -a ~/ | sort -n -r | head -n 10"

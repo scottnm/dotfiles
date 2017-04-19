@@ -1,5 +1,3 @@
-let mapleader="-"
-
 set ruler                            " show row/column number
 set backspace=2                      " backspace works in insert mode
 filetype indent on                   " activates indenting for files
@@ -43,10 +41,10 @@ call plug#begin()
 Plug 'itchyny/lightline.vim'
 Plug 'flazz/vim-colorschemes'
 Plug 'kien/rainbow_parentheses.vim'
-Plug 'qualiabyte/vim-colorstepper'
+" Plug 'qualiabyte/vim-colorstepper'
 Plug 'scrooloose/nerdtree'
 Plug 'scrooloose/syntastic'
-Plug 'tpope/vim-fugitive'
+" Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-sensible'
 call plug#end()
 
@@ -99,6 +97,9 @@ let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
 let g:syntastic_cpp_compiler_options = ' -std=c++11 -stdlib=libc++'
+let g:syntastic_python_python_exec = '/usr/bin/python3.5'
+let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': [],'passive_filetypes': [] }
+
 
 " Git settings
 autocmd Filetype gitcommit setlocal spell textwidth=72
@@ -109,4 +110,3 @@ set colorcolumn=81
 hi ColorColumn ctermbg=darkgray
 highlight OverLength ctermbg=red ctermfg=white guibg=#392929
 match OverLength /\%81v.\+/
-
