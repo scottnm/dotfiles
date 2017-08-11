@@ -10,3 +10,26 @@ function Get-GitPull { & git pull $args }
 New-Alias -Name gpl -Value Get-GitPull -Force -Option AllScope
 function Get-GitCheckout { & git checkout $args }
 New-Alias -Name gco -Value Get-GitCheckout -Force -Option AllScope
+
+function prompt {
+	$host.ui.rawui.WindowTitle = $(get-location)
+
+	Write-Host("")
+
+	$status_string = " $(get-location) "
+
+	if(Test-Path .git) {
+        $status_string += "::"
+		git branch | foreach {
+			if ($_ -match "^\*(.*)"){
+				$status_string += $matches[1]
+			}
+		}
+	}
+
+    $status_string += "
+    > "
+
+	Write-Host ($status_string) -nonewline -foregroundcolor yellow
+	return " "
+}
