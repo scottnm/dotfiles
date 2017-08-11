@@ -1,0 +1,82 @@
+set shell=powershell
+set shellcmdflag=-command
+
+set ruler                            " show row/column number
+set backspace=2                      " backspace works in insert mode
+filetype indent on                   " activates indenting for files
+filetype plugin on
+set relativenumber number            " relative line numbers
+set ignorecase smartcase             " case preferences
+set nobackup
+set tabstop=4 shiftwidth=4 expandtab " tabs & indents size 4, tabkey = spaces
+set incsearch showmatch              " search options
+set lazyredraw ttyfast               " faster rendering 
+syntax on                            " syntax highlighting
+set cindent                          " prevent the # mark from unindenting
+set cinkeys-=0#
+set indentkeys-=0#
+
+" unmap arrow keys to encourage good vim practices
+map <Up> <NOP>
+map <Down> <NOP>
+map <Left> <NOP>
+map <Right> <NOP>
+
+" shortcuts
+nnoremap   <C-c>  :!build<CR>|                " build project
+nnoremap   <C-e>  :!run<CR>|                  " run project
+nnoremap   <C-d>  :!debug<CR>|                " debug project
+nnoremap   <Tab>  :bnext<CR>|                 " swap to next buffer
+
+" Syntax corrections
+au BufRead, BufNewFile *.pde setfiletype java " processing syntax highlighting
+
+autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0
+
+" Plugins 
+set nocompatible
+call plug#begin() 
+Plug 'kien/rainbow_parentheses.vim'
+Plug 'tpope/vim-sensible'
+call plug#end()
+
+if !has('gui_running')
+  set t_Co=256
+endif
+
+let g:rbpt_colorpairs = [
+    \ ['brown',       'RoyalBlue3'],
+    \ ['Darkblue',    'SeaGreen3'],
+    \ ['darkgray',    'DarkOrchid3'],
+    \ ['darkgreen',   'firebrick3'],
+    \ ['darkcyan',    'RoyalBlue3'],
+    \ ['darkred',     'SeaGreen3'],
+    \ ['darkmagenta', 'DarkOrchid3'],
+    \ ['brown',       'firebrick3'],
+    \ ['gray',        'RoyalBlue3'],
+    \ ['black',       'SeaGreen3'],
+    \ ['darkmagenta', 'DarkOrchid3'],
+    \ ['Darkblue',    'firebrick3'],
+    \ ['darkgreen',   'RoyalBlue3'],
+    \ ['darkcyan',    'SeaGreen3'],
+    \ ['darkred',     'DarkOrchid3'],
+    \ ['red',         'firebrick3'],
+    \ ]
+
+let g:rbpt_max = 16
+let g:rbpt_loadcmd_toggle = 0
+au VimEnter * RainbowParenthesesToggle
+au Syntax * RainbowParenthesesLoadRound
+au Syntax * RainbowParenthesesLoadSquare
+au Syntax * RainbowParenthesesLoadBraces
+
+
+" Git settings
+autocmd Filetype gitcommit setlocal spell textwidth=72
+
+color evening
+" show when I run over 80 columns
+set colorcolumn=121
+hi ColorColumn ctermbg=darkgray
+highlight OverLength ctermbg=red ctermfg=white guibg=#392929
+match OverLength /\%121v.\+/
