@@ -1,6 +1,10 @@
+
+
+function Get-GitDiff { & git diff $args }
+New-Alias -Name gd -Value Get-GitDiff -Force -Option AllScope
 function Get-GitStatus { & git status -sb $args }
 New-Alias -Name gst -Value Get-GitStatus -Force -Option AllScope
-function Get-GitCommit { & git commit -ev $args }
+function Get-GitCommit { & git commit $args }
 New-Alias -Name gc -Value Get-GitCommit -Force -Option AllScope
 function Get-GitAdd { & git add --all $args }
 New-Alias -Name ga -Value Get-GitAdd -Force -Option AllScope
