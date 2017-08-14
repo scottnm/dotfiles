@@ -1,5 +1,10 @@
+Set-PSReadlineOption -BellStyle None
+New-Alias -Name grep -Value select-string -Force -Option AllScope
 
-
+function Update-PShell { & . $PROFILE }
+New-Alias -Name upshell -Value Update-PShell -Force -Option AllScope
+function Go-Src { & cd z:\os\src }
+New-Alias -Name gosrc -Value Go-Src -Force -Option AllScope
 function Get-GitDiff { & git diff $args }
 New-Alias -Name gd -Value Get-GitDiff -Force -Option AllScope
 function Get-GitStatus { & git status -sb $args }
@@ -11,7 +16,7 @@ New-Alias -Name ga -Value Get-GitAdd -Force -Option AllScope
 function Get-GitPush { & git push $args }
 New-Alias -Name gp -Value Get-GitPush -Force -Option AllScope
 function Get-GitPull { & git pull $args }
-New-Alias -Name gpl -Value Get-GitPull -Force -Option AllScope
+New-Alias -Name gl -Value Get-GitPull -Force -Option AllScope
 function Get-GitCheckout { & git checkout $args }
 New-Alias -Name gco -Value Get-GitCheckout -Force -Option AllScope
 
