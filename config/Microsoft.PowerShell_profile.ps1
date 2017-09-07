@@ -3,8 +3,6 @@ New-Alias -Name grep -Value select-string -Force -Option AllScope
 
 function Update-PShell { & . $PROFILE }
 New-Alias -Name upshell -Value Update-PShell -Force -Option AllScope
-function Go-Src { & cd z:\os\src }
-New-Alias -Name gosrc -Value Go-Src -Force -Option AllScope
 function Get-GitDiff { & git diff $args }
 New-Alias -Name gd -Value Get-GitDiff -Force -Option AllScope
 function Get-GitStatus { & git status -sb $args }
