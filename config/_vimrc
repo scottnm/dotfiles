@@ -1,6 +1,10 @@
+set noswapfile
 set noeb vb t_vb=
 set shell=powershell
 set shellcmdflag=-command
+if has('gui_running')
+    set guifont=Consolas:h11:cANSI:qDRAFT
+endif
 
 set ruler                            " show row/column number
 set backspace=2                      " backspace works in insert mode
@@ -10,7 +14,7 @@ set relativenumber number            " relative line numbers
 set ignorecase smartcase             " case preferences
 set nobackup
 set tabstop=4 shiftwidth=4 expandtab " tabs & indents size 4, tabkey = spaces
-set incsearch showmatch              " search options
+set incsearch hlsearch showmatch     " search options
 set lazyredraw ttyfast               " faster rendering 
 syntax on                            " syntax highlighting
 set cindent                          " prevent the # mark from unindenting
@@ -23,11 +27,17 @@ map <Down> <NOP>
 map <Left> <NOP>
 map <Right> <NOP>
 
+" comment formatting
+setlocal textwidth=120
+au FileType c,cpp setlocal comments^=:///
+
 " shortcuts
-nnoremap   <C-c>  :!build<CR>|                " build project
-nnoremap   <C-e>  :!run<CR>|                  " run project
-nnoremap   <C-d>  :!debug<CR>|                " debug project
-nnoremap   <Tab>  :bnext<CR>|                 " swap to next buffer
+nnoremap   <C-p>  :bprev<CR>|                " prev buffer
+nnoremap   <C-n>  :bnext<CR>|                " next buffer
+nnoremap   <C-h>  :noh<CR>|                  " clear search
+nnoremap   <C-f>  gq|                        " format
+vnoremap   <C-f>  gq|                        " visual format
+nnoremap   <C-s>  :%s/\s\+$//gc<CR>|         " Delete trailing whitespace with confirmation
 
 " Syntax corrections
 au BufRead, BufNewFile *.pde setfiletype java " processing syntax highlighting
@@ -37,7 +47,7 @@ autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0
 " Git settings
 autocmd Filetype gitcommit setlocal spell textwidth=72
 
-" show when I run over 80 columns
+" show when I run over 120 columns
 set colorcolumn=121
 hi ColorColumn ctermbg=darkgray
 highlight OverLength ctermbg=red ctermfg=white guibg=#392929
