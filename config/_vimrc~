@@ -1,3 +1,4 @@
+set noeb vb t_vb=
 set shell=powershell
 set shellcmdflag=-command
 
@@ -41,5 +42,3 @@ set colorcolumn=121
 hi ColorColumn ctermbg=darkgray
 highlight OverLength ctermbg=red ctermfg=white guibg=#392929
 match OverLength /\%121v.\+/
-
-let $cpptemplate = 'c:\templates\t.cpp'
