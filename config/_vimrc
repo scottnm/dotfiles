@@ -23,10 +23,8 @@ map <Left> <NOP>
 map <Right> <NOP>
 
 " shortcuts
-nnoremap   <C-c>  :!build<CR>|                " build project
-nnoremap   <C-e>  :!run<CR>|                  " run project
-nnoremap   <C-d>  :!debug<CR>|                " debug project
-nnoremap   <Tab>  :bnext<CR>|                 " swap to next buffer
+nnoremap   <C-n>  :bn<CR>|                " next buffer
+nnoremap   <C-p>  :bp<CR>|                " prev buffer
 
 " Syntax corrections
 au BufRead, BufNewFile *.pde setfiletype java " processing syntax highlighting
