@@ -1,3 +1,13 @@
+Function Edit-Profile
+{
+    vim $profile
+}
+
+Function Edit-Vimrc
+{
+    vim $HOME\_vimrc
+}
+
 ###############
 # GIT ALIASES #
 ###############
@@ -18,6 +28,7 @@ function gst
     }
     return $status
 }
+
 function gstr { gst --no-renames --no-breaks }
 function update-current-git-repo { $_=gst }
 function gc { & git commit -ev $args }
