@@ -42,6 +42,7 @@ nnoremap   <C-h>  :noh<CR>|                  " clear search
 nnoremap   <C-f>  gq|                        " format
 vnoremap   <C-f>  gq|                        " visual format
 nnoremap   <C-s>  :%s/\s\+$//gc<CR>|         " Delete trailing whitespace with confirmation
+nnoremap   <C-l>  :ls<CR>|                   " List the buffers
 
 autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0
 
@@ -55,3 +56,6 @@ hi ColorColumn ctermbg=darkgray
 " match OverLength /\%121v.\+/
 
 color elflord
+
+" :ls to get buffers
+" :b<N> to switch to the buffer
