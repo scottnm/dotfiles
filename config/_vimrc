@@ -1,4 +1,8 @@
+set nobackup
+set nowritebackup
+set noundofile
 set noswapfile
+
 set shell=powershell
 set shellcmdflag=-command
 
@@ -35,7 +39,6 @@ au FileType c,cpp setlocal comments^=:///
 nnoremap   <C-p>  :bprev<CR>|                " prev buffer
 nnoremap   <C-n>  :bnext<CR>|                " next buffer
 nnoremap   <C-h>  :noh<CR>|                  " clear search
-nnoremap   <C-h>  :noh<CR>|                  " clear search
 nnoremap   <C-f>  gq|                        " format
 vnoremap   <C-f>  gq|                        " visual format
 nnoremap   <C-s>  :%s/\s\+$//gc<CR>|         " Delete trailing whitespace with confirmation
@@ -50,3 +53,5 @@ set colorcolumn=121
 hi ColorColumn ctermbg=darkgray
 " highlight OverLength ctermbg=red ctermfg=white guibg=#392929
 " match OverLength /\%121v.\+/
+
+color elflord
