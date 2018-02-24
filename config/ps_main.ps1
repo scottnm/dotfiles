@@ -1,3 +1,13 @@
+Function Edit-Profile
+{
+    vim $profile
+}
+
+Function Edit-Vimrc
+{
+    vim $HOME\_vimrc
+}
+
 ###############
 # GIT ALIASES #
 ###############
@@ -18,6 +28,8 @@ function gst
     }
     return $status
 }
+
+function gstr { gst --no-renames --no-breaks }
 function update-current-git-repo { $_=gst }
 function gc { & git commit -ev $args }
 function ga { & git add --all $args }
@@ -25,6 +37,8 @@ function gp { & git push $args }
 function gl { & git pull $args }
 function gco { & git checkout $args; & update-current-git-repo }
 function gue { & git checkout -- $args }
+function gd { & git diff $args }
+function gdc { & git diff --cached $args }
 
 ########
 # MISC #
@@ -32,4 +46,8 @@ function gue { & git checkout -- $args }
 new-alias pd pushd -Force -Option AllScope
 function grep($files, $pattern) { dir -recurse $files | select-string $pattern }
 function gohosts { & pushd c:\windows\system32\drivers\etc }
-& update-current-git-repo
+
+$env:DevPath = $env:HOMEDRIVE + $env:HOMEPATH + "\Dev";
+$env:SideProfilePath = $env:DevPath + "\dotfiles\config\ps_side.ps1"
+
+. $env:SideProfilePath

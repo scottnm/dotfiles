@@ -1,5 +1,8 @@
+set nobackup
+set nowritebackup
+set noundofile
 set noswapfile
-set noeb vb t_vb=
+
 set shell=powershell
 set shellcmdflag=-command
 if has('gui_running')
@@ -15,7 +18,7 @@ set ignorecase smartcase             " case preferences
 set nobackup
 set tabstop=4 shiftwidth=4 expandtab " tabs & indents size 4, tabkey = spaces
 set incsearch hlsearch showmatch     " search options
-set lazyredraw ttyfast               " faster rendering 
+set lazyredraw ttyfast               " faster rendering
 syntax on                            " syntax highlighting
 set cindent                          " prevent the # mark from unindenting
 set cinkeys-=0#
@@ -38,9 +41,7 @@ nnoremap   <C-h>  :noh<CR>|                  " clear search
 nnoremap   <C-f>  gq|                        " format
 vnoremap   <C-f>  gq|                        " visual format
 nnoremap   <C-s>  :%s/\s\+$//gc<CR>|         " Delete trailing whitespace with confirmation
-
-" Syntax corrections
-au BufRead, BufNewFile *.pde setfiletype java " processing syntax highlighting
+nnoremap   <C-l>  :ls<CR>|                   " List the buffers
 
 autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0
 
@@ -50,5 +51,10 @@ autocmd Filetype gitcommit setlocal spell textwidth=72
 " show when I run over 120 columns
 set colorcolumn=121
 hi ColorColumn ctermbg=darkgray
-highlight OverLength ctermbg=red ctermfg=white guibg=#392929
-match OverLength /\%121v.\+/
+" highlight OverLength ctermbg=red ctermfg=white guibg=#392929
+" match OverLength /\%121v.\+/
+
+color elflord
+
+" :ls to get buffers
+" :b<N> to switch to the buffer
