@@ -47,6 +47,7 @@ new-alias pd pushd -Force -Option AllScope
 function grep($files, $pattern) { dir -recurse $files | select-string $pattern }
 function gohosts { & pushd c:\windows\system32\drivers\etc }
 
+$env:desktop = "c:\users\scmunro.REDMOND\Desktop"
 $env:DevPath = $env:HOMEDRIVE + $env:HOMEPATH + "\Dev";
 $env:SideProfilePath = $env:DevPath + "\dotfiles\config\ps_side.ps1"
 
