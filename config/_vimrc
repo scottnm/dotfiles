@@ -58,3 +58,6 @@ color elflord
 
 " :ls to get buffers
 " :b<N> to switch to the buffer
+
+" cpp file processors
+autocmd BufWritePre *.cpp,*.h %s/\s\+$//e

@@ -40,6 +40,8 @@ function gue { & git checkout -- $args }
 function gd { & git diff $args }
 function gdc { & git diff --cached $args }
 
+update-current-git-repo;
+
 ########
 # MISC #
 ########
