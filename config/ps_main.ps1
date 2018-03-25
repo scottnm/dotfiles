@@ -8,6 +8,9 @@ Function Edit-Vimrc
     vim $HOME\_vimrc
 }
 
+Import-Module PSReadLine
+Set-PSReadlineKeyHandler -Key Tab -Function Complete
+
 ###############
 # GIT ALIASES #
 ###############
@@ -46,7 +49,7 @@ update-current-git-repo;
 # MISC #
 ########
 new-alias pd pushd -Force -Option AllScope
-function grep($files, $pattern) { dir -recurse $files | select-string $pattern }
+function grep($files, $pattern) { dir -recurse $files | select-string $pattern | select line }
 function gohosts { & pushd c:\windows\system32\drivers\etc }
 
 $env:desktop = "c:\users\scmunro.REDMOND\Desktop"
