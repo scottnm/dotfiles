@@ -49,7 +49,7 @@ update-current-git-repo;
 # MISC #
 ########
 new-alias pd pushd -Force -Option AllScope
-function grep($files, $pattern) { dir -recurse $files | select-string $pattern | select line }
+function grep($files, $pattern) { dir -recurse $files | select-string $pattern }
 function gohosts { & pushd c:\windows\system32\drivers\etc }
 
 $env:desktop = "c:\users\scmunro.REDMOND\Desktop"

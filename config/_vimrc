@@ -7,6 +7,7 @@ set shell=powershell
 set shellcmdflag=-command
 if has('gui_running')
     set guifont=Consolas:h11:cANSI:qDRAFT
+    autocmd GUIEnter * simalt ~x
 endif
 
 set ruler                            " show row/column number
