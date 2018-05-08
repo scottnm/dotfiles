@@ -1,11 +1,16 @@
 Function Edit-Profile
 {
-    vim $profile
+    gvim $profile
 }
 
 Function Edit-Vimrc
 {
-    vim $HOME\_vimrc
+    gvim $HOME\_vimrc
+}
+
+Function Edit-SideProfile
+{
+    gvim $env:SideProfilePath
 }
 
 Import-Module PSReadLine
