@@ -1,11 +1,16 @@
 Function Edit-Profile
 {
-    vim $profile
+    gvim $profile
+}
+
+Function Edit-SideProfile
+{
+    gvim $env:SideProfilePath
 }
 
 Function Edit-Vimrc
 {
-    vim $HOME\_vimrc
+    gvim $HOME\_vimrc
 }
 
 Import-Module PSReadLine
@@ -42,6 +47,21 @@ function gco { & git checkout $args; & update-current-git-repo }
 function gue { & git checkout -- $args }
 function gd { & git diff $args }
 function gdc { & git diff --cached $args }
+function gcp
+{
+
+    if ($args.Length -lt 1)
+    {
+        echo "Must supply at least one argument for the patch name"
+    }
+    else
+    {
+        $diffArgs = $args[0..($args.Length - 2)]
+        $cmdString = "git diff $diffArgs > z:\patches\$($args[-1])"
+        cmd /c $cmdString
+        echo $cmdString
+    }
+}
 
 update-current-git-repo;
 
@@ -57,3 +77,5 @@ $env:DevPath = $env:HOMEDRIVE + $env:HOMEPATH + "\Dev";
 $env:SideProfilePath = $env:DevPath + "\dotfiles\config\ps_side.ps1"
 
 . $env:SideProfilePath
+
+# net stop beep
