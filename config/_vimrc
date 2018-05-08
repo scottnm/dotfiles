@@ -14,6 +14,18 @@ if has('gui_running')
     autocmd GUIEnter * simalt ~x
 endif
 
+" Specify a directory for plugins
+" - For Neovim: ~/.local/share/nvim/plugged
+" - Avoid using standard Vim directory names like 'plugin'
+" call plug#begin('~/.vim/plugged')
+
+" Plug 'junegunn/goyo.vim'
+" Plug 'junegunn/seoul256.vim'
+" Plug 'junegunn/limelight.vim'
+
+" Initialize plugin system
+" call plug#end()
+
 set ruler                            " show row/column number
 set backspace=2                      " backspace works in insert mode
 filetype plugin on
@@ -38,9 +50,9 @@ map <Down> <NOP>
 map <Left> <NOP>
 map <Right> <NOP>
 
-" comment formatting
-" setlocal textwidth=120
-au FileType c,cpp setlocal comments^=:///
+" Correct line movement to work properly with wrapping
+nnoremap j gj
+nnoremap k gk
 
 " shortcuts
 nnoremap   <C-p>  :bprev<CR>|                " prev buffer
