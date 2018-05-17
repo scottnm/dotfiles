@@ -63,6 +63,8 @@ function gcp
     }
 }
 
+function howto-edit-git-exclude { echo "$GITROOT/.git/info/exclude" }
+
 update-current-git-repo;
 
 ########
