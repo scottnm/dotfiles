@@ -14,18 +14,6 @@ if has('gui_running')
     autocmd GUIEnter * simalt ~x
 endif
 
-" Specify a directory for plugins
-" - For Neovim: ~/.local/share/nvim/plugged
-" - Avoid using standard Vim directory names like 'plugin'
-" call plug#begin('~/.vim/plugged')
-
-" Plug 'junegunn/goyo.vim'
-" Plug 'junegunn/seoul256.vim'
-" Plug 'junegunn/limelight.vim'
-
-" Initialize plugin system
-" call plug#end()
-
 set ruler                            " show row/column number
 set backspace=2                      " backspace works in insert mode
 filetype plugin on
@@ -35,7 +23,6 @@ set nobackup
 set softtabstop=4 shiftwidth=4 expandtab " tabs & indents size 4, tabkey = spaces
 set incsearch hlsearch showmatch     " search options
 set lazyredraw ttyfast               " faster rendering
-syntax on                            " syntax highlighting
 set smartindent                      " prevent the # mark from unindenting
 set cinkeys-=0#
 set indentkeys-=0#
@@ -78,3 +65,7 @@ color desert
 
 " cpp file processors
 autocmd BufWritePre *.cpp,*.h %s/\s\+$//e
+
+" syntax highlighting
+syntax on
+au BufReadPost *.note set syntax=note
