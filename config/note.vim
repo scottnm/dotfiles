@@ -5,7 +5,7 @@
 
 " Keywords
 syn match unansweredQuestion 'Q: \(\w\+\s\?\)\+\n'
-syn match answeredQuestion 'Q: \(\w\+\s\?\)\+\nA: \w\+'
+syn match answeredQuestion 'Q: \(\w\+\s\?\)\+\nA: \(\w\+\s\?\)\+'
 syn match todo 'TODO:'
 
 highlight unansweredQuestion ctermfg=Red guifg=Red
