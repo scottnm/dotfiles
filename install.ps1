@@ -11,4 +11,9 @@ $env:WindowsVimConfPath = $env:HOME + "\_vimrc";
 $env:VimConfPath = $env:DotFilesPath + "\config\_vimrc";
 cmd /c mklink $env:WindowsVimConfPath $env:VimConfPath
 
+$env:WindowsVimSyntaxPath = $env:HOME + "\vimfiles\after\syntax";
+$env:WindowsNoteSynPath = $env:WindowsVimSyntaxPath + "\note.vim";
+$env:NoteSynPath = $env:DotFilesPath + "\config\note.vim"
+cmd /c mklink $env:WindowsNoteSynPath $env:NoteSynPath
+
 git config --global core.editor "vim"
