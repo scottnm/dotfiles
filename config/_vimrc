@@ -30,6 +30,7 @@ set indentkeys-=0#
 " Update vim command 'tab' autocompletion to only complete the common bits
 " i.e. :e R<tab> with items Red.cpp and Read.cpp would tab complete to :e Re
 set wildmode=longest,list
+set completeopt=longest,menuone,preview
 
 " unmap arrow keys to encourage good vim practices
 map <Up> <NOP>
@@ -42,8 +43,8 @@ nnoremap j gj
 nnoremap k gk
 
 " shortcuts
-nnoremap   <C-p>  :bprev<CR>|                " prev buffer
-nnoremap   <C-n>  :bnext<CR>|                " next buffer
+" nnoremap   <C-p>  :bprev<CR>|                " prev buffer
+" nnoremap   <C-n>  :bnext<CR>|                " next buffer
 nnoremap   <C-h>  :noh<CR>|                  " clear search
 nnoremap   <C-f>  gq|                        " format
 vnoremap   <C-f>  gq|                        " visual format
@@ -51,6 +52,7 @@ nnoremap   <C-s>  :%s/\s\+$//gc<CR>|         " Delete trailing whitespace with c
 nnoremap   <C-l>  :ls<CR>|                   " List the buffers
 
 autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0
+autocmd BufRead *.csx set syntax=cs
 
 " show when I run over 120 columns
 set colorcolumn=121
