@@ -66,8 +66,8 @@ nnoremap j gj
 nnoremap k gk
 
 " shortcuts
-" nnoremap   <C-p>  :bprev<CR>|                " prev buffer
-" nnoremap   <C-n>  :bnext<CR>|                " next buffer
+nnoremap   <C-p>  :bprev<CR>|                " prev buffer
+nnoremap   <C-n>  :bnext<CR>|                " next buffer
 nnoremap   <C-h>  :noh<CR>|                  " clear search
 nnoremap   <C-f>  gq|                        " format
 vnoremap   <C-f>  gq|                        " visual format
