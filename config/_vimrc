@@ -5,6 +5,11 @@ call plug#begin('~/.vim/plugged')
 
 " Vim Git Wrapper
 Plug 'tpope/vim-fugitive'
+" Pair shortcuts (e.g. [q ]q for :cprev :cnext
+Plug 'tpope/vim-unimpaired'
+" Advanced substitution handling casings and plurality
+Plug 'tpope/vim-abolish'
+" Korean kolor
 Plug 'junegunn/seoul256.vim'
 
 " Initialize plugin system
