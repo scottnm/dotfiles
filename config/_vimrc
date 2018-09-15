@@ -13,6 +13,9 @@ Plug 'tpope/vim-abolish'
 Plug 'junegunn/seoul256.vim'
 " Toggle between header and source files
 Plug 'vim-scripts/a.vim'
+" Make yanked region flash
+Plug 'machakann/vim-highlightedyank'
+
 
 " Initialize plugin system
 call plug#end()
