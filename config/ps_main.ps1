@@ -32,27 +32,6 @@ function UpdateBranchTopic($currentBranch)
     $env:CurrentBranchTopic = $currentBranch.Split('/')[-1];
 }
 
-# on home machine
-# function UpdateGitBranchVars
-# {
-#     $status = & git status $args 
-# 
-#     if (!$status)
-#     {
-#         $env:CurrentGitBranch = $null;
-#     }
-#     else
-#     {
-#         $env:CurrentGitBranch = $status.Split()[2]
-#         $localend=$env:CurrentGitBranch.IndexOf('.')
-#         if ($localend -ne -1)
-#         {
-#             $env:CurrentGitBranch = $env:CurrentGitBranch.Substring(0,$localend)
-#         }
-#         UpdateBranchTopic($env:CurrentGitBranch);
-#     }
-# }
-
 function prompt
 {
     Write-Host("")
