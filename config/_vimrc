@@ -92,4 +92,3 @@ autocmd BufWritePre *.cpp,*.h %s/\s\+$//e
 " syntax highlighting
 syntax on
 au BufReadPost *.note set syntax=note
-
