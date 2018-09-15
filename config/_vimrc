@@ -1,3 +1,18 @@
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"                                  VIM PLUG                                      "
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+call plug#begin('~/.vim/plugged')
+
+" Vim Git Wrapper
+Plug 'tpope/vim-fugitive'
+Plug 'junegunn/seoul256.vim'
+
+" Initialize plugin system
+call plug#end()
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"                              BEGIN CONFIG                                      "
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set noerrorbells visualbell t_vb=
 autocmd GUIEnter * set visualbell t_vb=
 
@@ -7,8 +22,8 @@ set nowritebackup
 set noundofile
 set noswapfile
 
-set shell=powershell
-set shellcmdflag=-command
+set shell=cmd
+" set shellcmdflag=-command
 if has('gui_running')
     set guifont=Consolas:h11:cANSI:qDRAFT
     autocmd GUIEnter * simalt ~x
@@ -32,6 +47,9 @@ set indentkeys-=0#
 set wildmode=longest,list
 set completeopt=longest,menuone,preview
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"                                 REMAP KEYS                                     "
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " unmap arrow keys to encourage good vim practices
 map <Up> <NOP>
 map <Down> <NOP>
@@ -60,7 +78,10 @@ hi ColorColumn ctermbg=darkgray
 " highlight OverLength ctermbg=red ctermfg=white guibg=#392929
 " match OverLength /\%121v.\+/
 
-color desert
+" color desert
+let g:seoul256_background = 256
+colo seoul256-light
+
 
 " :ls to get buffers
 " :b<N> to switch to the buffer
@@ -71,3 +92,4 @@ autocmd BufWritePre *.cpp,*.h %s/\s\+$//e
 " syntax highlighting
 syntax on
 au BufReadPost *.note set syntax=note
+
