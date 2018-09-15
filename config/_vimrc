@@ -11,6 +11,8 @@ Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-abolish'
 " Korean kolor
 Plug 'junegunn/seoul256.vim'
+" Toggle between header and source files
+Plug 'vim-scripts/a.vim'
 
 " Initialize plugin system
 call plug#end()
@@ -68,9 +70,10 @@ nnoremap k gk
 " shortcuts
 nnoremap   <C-p>  :bprev<CR>|                " prev buffer
 nnoremap   <C-n>  :bnext<CR>|                " next buffer
+nnoremap   <C-f>  :A<CR>|                    " flip buffer using a.vim
 nnoremap   <C-h>  :noh<CR>|                  " clear search
-nnoremap   <C-f>  gq|                        " format
-vnoremap   <C-f>  gq|                        " visual format
+" nnoremap   <C-f>  gq|                        " format
+" vnoremap   <C-f>  gq|                        " visual format
 nnoremap   <C-s>  :%s/\s\+$//gc<CR>|         " Delete trailing whitespace with confirmation
 nnoremap   <C-l>  :ls<CR>|                   " List the buffers
 
@@ -92,7 +95,7 @@ colo seoul256-light
 " :b<N> to switch to the buffer
 
 " cpp file processors
-autocmd BufWritePre *.cpp,*.h %s/\s\+$//e
+autocmd BufWritePre *.cpp,*.h,*.bat,*.ps1,*.cmd %s/\s\+$//e
 
 " syntax highlighting
 syntax on
