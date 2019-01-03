@@ -15,7 +15,10 @@ Plug 'junegunn/seoul256.vim'
 Plug 'vim-scripts/a.vim'
 " Make yanked region flash
 Plug 'machakann/vim-highlightedyank'
-
+" Powershell goodness
+Plug 'PProvost/vim-ps1'
+" Focused writer
+Plug 'junegunn/goyo.vim'
 
 " Initialize plugin system
 call plug#end()
@@ -26,7 +29,9 @@ call plug#end()
 set noerrorbells visualbell t_vb=
 autocmd GUIEnter * set visualbell t_vb=
 
-set noeol
+" prevent window movement when vsplit
+set guioptions-=r guioptions-=L
+
 set nobackup
 set nowritebackup
 set noundofile
@@ -47,6 +52,7 @@ set ignorecase smartcase             " case preferences
 set nobackup
 set softtabstop=4 shiftwidth=4 expandtab " tabs & indents size 4, tabkey = spaces
 set incsearch hlsearch showmatch     " search options
+set scrolloff=10                     " make it so search has at least 5 lines of padding below/above it
 set lazyredraw ttyfast               " faster rendering
 set smartindent                      " prevent the # mark from unindenting
 set cinkeys-=0#
@@ -79,6 +85,9 @@ nnoremap   <C-h>  :noh<CR>|                  " clear search
 " vnoremap   <C-f>  gq|                        " visual format
 nnoremap   <C-s>  :%s/\s\+$//gc<CR>|         " Delete trailing whitespace with confirmation
 nnoremap   <C-l>  :ls<CR>|                   " List the buffers
+nnoremap   <C-G>  :%s/\<<C-R><C-W>\>/| ":bufdo %s/\<<C-R><C-W>\>//ge \| update | " grab as bounded word
+nnoremap <S-Enter> O<Esc>|
+nnoremap <CR> o<Esc>|
 
 autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0
 autocmd BufRead *.csx set syntax=cs
@@ -89,17 +98,16 @@ hi ColorColumn ctermbg=darkgray
 " highlight OverLength ctermbg=red ctermfg=white guibg=#392929
 " match OverLength /\%121v.\+/
 
-" color desert
-let g:seoul256_background = 256
-colo seoul256-light
-
+color desert
 
 " :ls to get buffers
 " :b<N> to switch to the buffer
 
 " cpp file processors
-autocmd BufWritePre *.cpp,*.h,*.bat,*.ps1,*.cmd %s/\s\+$//e
+autocmd BufWritePre *.cpp,*.h,*.bat,*.ps1,*.cmd,*.cs,*.csx %s/\s\+$//e
 
 " syntax highlighting
 syntax on
 au BufReadPost *.note set syntax=note
+
+set nofixendofline
