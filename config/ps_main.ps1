@@ -19,9 +19,9 @@ Set-PSReadlineKeyHandler -Key Tab -Function Complete
 function UpdateWindowTitle
 {
     $title = "";
-    if ($env:CurrentGitBranch)
+    if ($env:GitBranch)
     {
-        $title = $title + $env:CurrentBranchTopic + " :: ";
+        $title = $title + $env:GitTopic + " :: ";
     }
     $title = $title + "$(get-location)";
     [System.Console]::Title = $title;
@@ -29,7 +29,7 @@ function UpdateWindowTitle
 
 function UpdateBranchTopic($currentBranch)
 {
-    $env:CurrentBranchTopic = $currentBranch.Split('/')[-1];
+    $env:GitTopic = $currentBranch.Split('/')[-1];
 }
 
 function prompt
@@ -40,12 +40,12 @@ function prompt
 
     UpdateGitBranchVars;
 
-    if ($env:CurrentGitBranch)
+    if ($env:GitBranch)
     {
         $status_string += " :: "
-        $status_string += $env:CurrentBranchTopic
+        $status_string += $env:GitTopic
     }
-    $status_string += "
+    $status_string += " :: $(Get-Date)
  "
 
     UpdateWindowTitle;
@@ -100,6 +100,17 @@ function gtui
 }
 function gst { & git status $args }
 function gstr { gst --no-renames --no-breaks }
+<#
+function gsql
+{
+    [CmdletBinding( )]
+    Param(
+    [Parameter(Mandatory = $true)][int]$CommitCount
+    )
+
+    & "git rebase -i HEAD~${CommitCount}";
+}
+#>
 
 function howto-edit-git-exclude { echo "$GITROOT/.git/info/exclude" }
 
@@ -108,7 +119,7 @@ function howto-edit-git-exclude { echo "$GITROOT/.git/info/exclude" }
 ########
 new-alias pd pushd -Force -Option AllScope
 function grep($files, $pattern) { dir -recurse $files | select-string $pattern }
-function grepc($pattern) { dir -recurse *.cpp,*.h,*sources*,*dirs* | select-string $pattern }
+function grepc($pattern) { dir -recurse *.cpp,*.h,*sources*,*dirs*,*.sln,*.props,*.vcx* | select-string $pattern }
 function gohosts { & pushd c:\windows\system32\drivers\etc }
 
 # net stop beep
