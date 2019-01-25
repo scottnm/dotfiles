@@ -11,6 +11,10 @@ $env:WindowsVimConfPath = $env:HOME + "\_vimrc";
 $env:VimConfPath = $env:DotFilesPath + "\config\_vimrc";
 cmd /c mklink $env:WindowsVimConfPath $env:VimConfPath
 
+$env:WindowsGhciConfPath = $env:HOME + "\.ghci";
+$env:GhciConfPath = $env:DotFilesPath + "\config\.ghci";
+cmd /c mklink $env:WindowsGhciConfPath $env:GhciConfPath
+
 $env:WindowsVimSyntaxDir = $env:HOME + "\vimfiles\after\syntax";
 
 $syntaxes = "note","cpp";

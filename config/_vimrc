@@ -15,6 +15,11 @@ Plug 'junegunn/seoul256.vim'
 Plug 'vim-scripts/a.vim'
 " Make yanked region flash
 Plug 'machakann/vim-highlightedyank'
+" Show if-branch path
+Plug 'aserebryakov/vim-branch-stack'
+" Distraction free writing
+" usage :[!]Goyo
+Plug 'junegunn/goyo.vim'
 
 
 " Initialize plugin system
@@ -89,9 +94,9 @@ hi ColorColumn ctermbg=darkgray
 " highlight OverLength ctermbg=red ctermfg=white guibg=#392929
 " match OverLength /\%121v.\+/
 
-" color desert
-let g:seoul256_background = 256
-colo seoul256-light
+" let g:seoul256_background = 256
+" colo seoul256
+color desert
 
 
 " :ls to get buffers
@@ -103,3 +108,7 @@ autocmd BufWritePre *.cpp,*.h,*.bat,*.ps1,*.cmd %s/\s\+$//e
 " syntax highlighting
 syntax on
 au BufReadPost *.note set syntax=note
+
+" experimental
+nnoremap ; :
+vnoremap ; :
