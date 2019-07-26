@@ -22,6 +22,10 @@ Plug 'PProvost/vim-ps1'
 " Distraction free writing
 " usage :[!]Goyo
 Plug 'junegunn/goyo.vim'
+" light color theme
+Plug 'NLKNguyen/papercolor-theme'
+" tab line
+Plug 'Yggdroot/indentLine'
 
 " Initialize plugin system
 call plug#end()
@@ -84,6 +88,7 @@ nnoremap   <C-p>  :bprev<CR>|                " prev buffer
 nnoremap   <C-n>  :bnext<CR>|                " next buffer
 nnoremap   <C-f>  :A<CR>|                    " flip buffer using a.vim
 nnoremap   <C-h>  :noh<CR>|                  " clear search
+" nnoremap <CR> :noh<CR><CR>|                  " clear search
 " nnoremap   <C-f>  gq|                        " format
 " vnoremap   <C-f>  gq|                        " visual format
 nnoremap   <C-s>  :%s/\s\+$//gc<CR>|         " Delete trailing whitespace with confirmation
@@ -103,13 +108,15 @@ hi ColorColumn ctermbg=darkgray
 
 " let g:seoul256_background = 256
 " colo seoul256
-color desert
+" color desert
+set background=light
+color papercolor
 
 " :ls to get buffers
 " :b<N> to switch to the buffer
 
-" cpp file processors
-autocmd BufWritePre *.cpp,*.h,*.bat,*.ps1,*.cmd,*.cs,*.csx %s/\s\+$//e
+" source file processors
+autocmd BufWritePre *.rs,*.cpp,*.h,*.bat,*.ps1,*.cmd,*.cs,*.csx %s/\s\+$//e
 
 " syntax highlighting
 syntax on
@@ -121,3 +128,26 @@ vnoremap ; :
 
 " prevent unnecessary rewrites
 set nofixendofline
+
+" left margin
+" autocmd Colorscheme * highlight FoldColumn guifg=bg guibg=bg
+" set nornu
+" set nonu
+
+" status line always one
+set laststatus=2
+
+" netrw settings:
+"   to use tree view
+let g:netrw_liststyle = 3
+"   no banner
+let g:netrw_banner = 0
+"   set file open style
+let g:netrw_browse_split = 4
+"   15% drawer width
+let g:netrw_winsize = 15
+"   auto drawer
+augroup ProjectDrawer
+  autocmd!
+  autocmd VimEnter * :Vexplore
+augroup END
