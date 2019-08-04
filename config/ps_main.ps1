@@ -98,6 +98,7 @@ function gtui
 }
 function gst { & git status $args }
 function gstr { gst --no-renames --no-breaks }
+function gbm { git branch -r | sls "origin/scmunro" }
 <#
 function gsql
 {

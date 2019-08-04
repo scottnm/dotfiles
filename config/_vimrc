@@ -24,6 +24,10 @@ Plug 'PProvost/vim-ps1'
 Plug 'junegunn/goyo.vim'
 " allow quitting all vim buffers except active
 Plug 'vim-scripts/BufOnly.vim'
+" light color theme
+Plug 'NLKNguyen/papercolor-theme'
+" tab line
+Plug 'Yggdroot/indentLine'
 
 " Initialize plugin system
 call plug#end()
@@ -49,7 +53,9 @@ set shell=cmd
 " set shellcmdflag=-command
 if has('gui_running')
     set guifont=Consolas:h11:cANSI:qDRAFT
-    autocmd GUIEnter * simalt ~x
+    " autocmd GUIEnter * simalt ~x
+    set lines=40 columns=125
+    winpos 300 300
 endif
 
 set ruler                            " show row/column number
@@ -92,10 +98,10 @@ nnoremap   <C-p>  :bprev<CR>|                " prev buffer
 nnoremap   <C-n>  :bnext<CR>|                " next buffer
 nnoremap   <C-f>  :A<CR>|                    " flip buffer using a.vim
 nnoremap   <C-h>  :noh<CR>|                  " clear search
+" nnoremap <CR> :noh<CR><CR>|                  " clear search
 " nnoremap   <C-f>  gq|                        " format
 " vnoremap   <C-f>  gq|                        " visual format
 nnoremap   <C-s>  :%s/\s\+$//gc<CR>|         " Delete trailing whitespace with confirmation
-" nnoremap   <C-l>  :ls<CR>|                   " List the buffers
 nnoremap   <C-G>  :%s/\<<C-R><C-W>\>/| ":bufdo %s/\<<C-R><C-W>\>//ge \| update | " grab as bounded word
 nnoremap   <C-L> 0y$/\V<c-r>"<cr>
 nnoremap <S-Enter> O<Esc>|
@@ -120,13 +126,15 @@ hi ColorColumn ctermbg=darkgray
 color industry
 if has('gui_running')
     color desert
+    " set background=light
+    " color papercolor
 endif
 
 " :ls to get buffers
 " :b<N> to switch to the buffer
 
-" cpp file processors
-autocmd BufWritePre *.cpp,*.h,*.bat,*.ps1,*.cmd,*.cs,*.csx %s/\s\+$//e
+" source file processors
+autocmd BufWritePre *.rs,*.cpp,*.h,*.bat,*.ps1,*.cmd,*.cs,*.csx %s/\s\+$//e
 
 " syntax highlighting
 syntax on
@@ -138,3 +146,26 @@ vnoremap ; :
 
 " prevent unnecessary rewrites
 set nofixendofline
+
+" left margin
+" autocmd Colorscheme * highlight FoldColumn guifg=bg guibg=bg
+" set nornu
+" set nonu
+
+" status line always one
+set laststatus=2
+
+" netrw settings:
+"   to use tree view
+let g:netrw_liststyle = 0
+"   no banner
+let g:netrw_banner = 1
+"   set file open style
+let g:netrw_browse_split = 0
+"   15% drawer width
+" let g:netrw_winsize = 15
+"   auto drawer
+" augroup ProjectDrawer
+"   autocmd!
+"   autocmd VimEnter * :Vexplore
+" augroup END
