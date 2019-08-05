@@ -1,5 +1,5 @@
-$env:Desktop = "c:\users\scmunro.REDMOND\Desktop"
-$env:DevPath = $env:HOMEDRIVE + $env:HOMEPATH + "\Dev";
+$env:Desktop = "c:\users\scott\desktop"
+$env:DevPath = $env:HOMEDRIVE + $env:HOMEPATH + "\dev";
 $env:SideProfilePath = $env:DevPath + "\dotfiles\config\ps_side.ps1"
 . $env:SideProfilePath
 
@@ -118,8 +118,9 @@ function howto-edit-git-exclude { echo "$GITROOT/.git/info/exclude" }
 ########
 new-alias pd pushd -Force -Option AllScope
 function grep($files, $pattern) { dir -recurse $files | select-string $pattern }
-function grepc($pattern) { dir -recurse *.cpp,*.h,*sources*,*dirs*,*.sln,*.props,*.vcx* | select-string $pattern }
-function grepcc($pattern) { dir -recurse *.cpp,*.h,*sources*,*dirs*,*.sln,*.props,*.vcx* | select-string $pattern -casesensitive }
+function grepc($pattern) { dir -recurse *.rs,*.cpp,*.h,*sources*,*dirs*,*.sln,*.props,*.vcx* | select-string $pattern }
+function grepcc($pattern) { dir -recurse *.rs,*.cpp,*.h,*sources*,*dirs*,*.sln,*.props,*.vcx* | select-string $pattern -casesensitive }
+function gohosts { & pushd c:\windows\system32\drivers\etc }
 
 # net stop beep
 

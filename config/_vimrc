@@ -24,10 +24,11 @@ Plug 'PProvost/vim-ps1'
 Plug 'junegunn/goyo.vim'
 " allow quitting all vim buffers except active
 Plug 'vim-scripts/BufOnly.vim'
-" light color theme
-Plug 'NLKNguyen/papercolor-theme'
 " tab line
 Plug 'Yggdroot/indentLine'
+" color schemes
+Plug 'NLKNguyen/papercolor-theme'
+Plug 'jonathanfilip/vim-lucius'
 
 " Initialize plugin system
 call plug#end()
@@ -125,7 +126,9 @@ hi ColorColumn ctermbg=darkgray
 " colo seoul256
 color industry
 if has('gui_running')
-    color desert
+    " color slate
+    " color desert
+    color lucius
     " set background=light
     " color papercolor
 endif
