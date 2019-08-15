@@ -151,3 +151,6 @@ augroup ProjectDrawer
   autocmd!
   autocmd VimEnter * :Vexplore
 augroup END
+
+" set up italics
+highlight Comment gui=italic
