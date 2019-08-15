@@ -22,10 +22,13 @@ Plug 'PProvost/vim-ps1'
 " Distraction free writing
 " usage :[!]Goyo
 Plug 'junegunn/goyo.vim'
-" light color theme
-Plug 'NLKNguyen/papercolor-theme'
+" allow quitting all vim buffers except active
+Plug 'vim-scripts/BufOnly.vim'
 " tab line
 Plug 'Yggdroot/indentLine'
+" color schemes
+Plug 'NLKNguyen/papercolor-theme'
+Plug 'jonathanfilip/vim-lucius'
 
 " Initialize plugin system
 call plug#end()
@@ -33,8 +36,11 @@ call plug#end()
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "                              BEGIN CONFIG                                      "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set noerrorbells visualbell t_vb=
-autocmd GUIEnter * set visualbell t_vb=
+set noerrorbells
+if has('gui_running')
+    set visualbell t_vb=
+    autocmd GUIEnter * set visualbell t_vb=
+endif
 
 " prevent window movement when vsplit
 set guioptions-=r guioptions-=L
@@ -48,7 +54,9 @@ set shell=cmd
 " set shellcmdflag=-command
 if has('gui_running')
     set guifont=Consolas:h11:cANSI:qDRAFT
-    autocmd GUIEnter * simalt ~x
+    " autocmd GUIEnter * simalt ~x
+    set lines=40 columns=125
+    winpos 300 300
 endif
 
 set ruler                            " show row/column number
@@ -64,6 +72,9 @@ set lazyredraw ttyfast               " faster rendering
 set smartindent                      " prevent the # mark from unindenting
 set cinkeys-=0#
 set indentkeys-=0#
+set cursorline
+
+let g:netrw_list_hide= '.*\.wav$,.*\.etl$'
 
 " Update vim command 'tab' autocompletion to only complete the common bits
 " i.e. :e R<tab> with items Red.cpp and Read.cpp would tab complete to :e Re
@@ -92,10 +103,15 @@ nnoremap   <C-h>  :noh<CR>|                  " clear search
 " nnoremap   <C-f>  gq|                        " format
 " vnoremap   <C-f>  gq|                        " visual format
 nnoremap   <C-s>  :%s/\s\+$//gc<CR>|         " Delete trailing whitespace with confirmation
-nnoremap   <C-l>  :ls<CR>|                   " List the buffers
 nnoremap   <C-G>  :%s/\<<C-R><C-W>\>/| ":bufdo %s/\<<C-R><C-W>\>//ge \| update | " grab as bounded word
+nnoremap   <C-L> 0y$/\V<c-r>"<cr>
 nnoremap <S-Enter> O<Esc>|
 nnoremap <CR> o<Esc>|
+
+" better :e cmds
+nnoremap ,e :e <C-R>=expand("%:p:h") . "/" <CR>
+nnoremap ,t :tabe <C-R>=expand("%:p:h") . "/" <CR>
+nnoremap ,s :split <C-R>=expand("%:p:h") . "/" <CR>
 
 autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0
 autocmd BufRead *.csx set syntax=cs
@@ -108,9 +124,14 @@ hi ColorColumn ctermbg=darkgray
 
 " let g:seoul256_background = 256
 " colo seoul256
-" color desert
-set background=light
-color papercolor
+color industry
+if has('gui_running')
+    " color slate
+    " color desert
+    color lucius
+    " set background=light
+    " color papercolor
+endif
 
 " :ls to get buffers
 " :b<N> to switch to the buffer
@@ -139,18 +160,18 @@ set laststatus=2
 
 " netrw settings:
 "   to use tree view
-let g:netrw_liststyle = 3
+let g:netrw_liststyle = 0
 "   no banner
-let g:netrw_banner = 0
+let g:netrw_banner = 1
 "   set file open style
-let g:netrw_browse_split = 4
+let g:netrw_browse_split = 0
 "   15% drawer width
-let g:netrw_winsize = 15
+" let g:netrw_winsize = 15
 "   auto drawer
-augroup ProjectDrawer
-  autocmd!
-  autocmd VimEnter * :Vexplore
-augroup END
+" augroup ProjectDrawer
+"   autocmd!
+"   autocmd VimEnter * :Vexplore
+" augroup END
 
 " set up italics
 highlight Comment gui=italic
