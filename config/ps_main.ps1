@@ -118,9 +118,23 @@ function howto-edit-git-exclude { echo "$GITROOT/.git/info/exclude" }
 ########
 new-alias pd pushd -Force -Option AllScope
 function grep($files, $pattern) { dir -recurse $files | select-string $pattern }
-function grepc($pattern) { dir -recurse *.rs,*.cpp,*.h,*sources*,*dirs*,*.sln,*.props,*.vcx* | select-string $pattern }
+function grepvs($pattern) { dir -recurse *.sln,*.props,*.vcx* | select-string $pattern }
+function grepc($pattern)
+{
+    $grepResults = (dir -recurse *.cmd,*.ps1,*.rs,*.cpp,*.h,*sources*,*dirs*,*.sln,*.props,*.vcx* | select-string $pattern)
+    if ($grepResults)
+    {
+        CopyGreppedFilesToClipboard $grepResults
+        $grepResults
+    }
+    else
+    {
+        echo "No results";
+    }
+}
+
 function grepcc($pattern) { dir -recurse *.rs,*.cpp,*.h,*sources*,*dirs*,*.sln,*.props,*.vcx* | select-string $pattern -casesensitive }
-function gohosts { & pushd c:\windows\system32\drivers\etc }
+function edit-hosts { vim c:\windows\system32\drivers\etc\hosts }
 
 # net stop beep
 
@@ -132,7 +146,13 @@ function CopyClipboardWithGrepFiles
     [Parameter(Mandatory = $true)][string]$pattern
     )
 
-    $uniqueFileList = ((grep $files $pattern) | %{$_.Path.ToString()} | Get-Unique -asstring)
+    $grepResult = (grep $files $pattern)
+    CopyGreppedFilesToClipboard $grepResult
+}
+
+function CopyGreppedFilesToClipboard($grepResult)
+{
+    $uniqueFileList = ($grepResult | %{$_.Path.ToString()} | Get-Unique -asstring)
     echo $uniqueFileList
     set-clipboard ($uniqueFileList -join " ")
 }
