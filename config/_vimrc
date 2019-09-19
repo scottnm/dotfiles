@@ -53,7 +53,8 @@ set noswapfile
 set shell=cmd
 " set shellcmdflag=-command
 if has('gui_running')
-    set guifont=Consolas:h11:cANSI:qDRAFT
+    " old font - set guifont=Consolas:h11:cANSI:qDRAFT
+    set guifont=Cascadia\ Code:h11:cANSI:qDRAFT
     " autocmd GUIEnter * simalt ~x
     set lines=40 columns=125
     winpos 300 300
