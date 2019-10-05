@@ -6,9 +6,25 @@ $env:SideProfilePath = $env:DevPath + "\dotfiles\config\ps_side.ps1"
 # DevEnv edit paths
 function Edit-Profile { gvim $profile $env:SideProfilePath }
 function Edit-Vimrc { gvim $HOME\_vimrc }
+function Edit-GhciConf { gvim $env:APPDATA\ghc\ghci.conf }
 function Edit-Hosts { gvim c:\windows\system32\drivers\etc\hosts }
 
+function Get-Version { $PSVersionTable.PSVersion }
+
 Import-Module PSReadLine
+
+Set-PSReadLineOption -Colors @{
+    Command            = 'Gray'
+    Number             = 'Red'
+    Member             = 'Yellow'
+    Operator           = 'Magenta'
+    Type               = 'Cyan'
+    Variable           = 'Red'
+    Parameter          = 'Green'
+    ContinuationPrompt = 'White'
+    Default            = 'White'
+};
+
 Set-PSReadlineKeyHandler -Key Tab -Function Complete
 
 function UpdateWindowTitle
