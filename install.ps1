@@ -1,29 +1,27 @@
-$DotFilesPath = "$home\Dev\dotfiles";
+& $PSScriptRoot\paths.ps1
 
-$PSProfilePath = "$DotFilesPath\config\ps_main.ps1";
-$WindowsPSProfileDir = "$home\Documents\WindowsPowerShell";
-$WindowsPSProfilePath = "$WindowsPSProfileDir\Microsoft.PowerShell_profile.ps1";
-cmd /c mklink $WindowsPSProfilePath $PSProfilePath
+# Setup powershell profile
+cmd /c mklink $env:WindowsPSProfilePath $env:PSProfilePath
 
-$WindowsVimConfPath = "$home\_vimrc";
-$VimConfPath = "$DotFilesPath\config\_vimrc";
-cmd /c mklink $WindowsVimConfPath $VimConfPath
-
-$WindowsGhciConfPath1 = "$env:APPDATA\ghc\.ghci";
-$WindowsGhciConfPath2 = "$env:APPDATA\ghc\ghci.conf";
-$GhciConfPath = "$DotFilesPath\config\.ghci";
-cmd /c mklink $WindowsGhciConfPath1 $GhciConfPath
-cmd /c mklink $WindowsGhciConfPath2 $GhciConfPath
-
-$afterPath = "$home\vimfiles\after"
-mkdir $afterPath
-$WindowsVimSyntaxDir = "$afterPath\syntax";
-$syntaxes = "note","cpp";
-foreach ($syn in $syntaxes)
+# Setup Vim profile
+cmd /c mklink $env:WindowsVimConfPath $env:VimConfPath
+mkdir -Force $env:WindowsVimAfterPath
+mkdir -Force $env:WindowsVimSyntaxPath
+$syntaxes = @("note", "cpp");
+foreach ($syntax in $syntaxes)
 {
-    $WindowsVimSyntaxPath = "$WindowsVimSyntaxDir\$syn.vim";
-    $VimSyntaxPath = "$DotFilesPath\config\$syn.vim";
+    $WindowsVimSyntaxPath = "$env:WindowsVimSyntaxDir\$syntax.vim";
+    $VimSyntaxPath = "$env:DotFilesPath\config\$syntax.vim";
+    echo $WindowsVimSyntaxPath
+    echo $VimSyntaxPath
     cmd /c mklink $WindowsVimSyntaxPath $VimSyntaxPath
 }
 
-git config --global core.editor "vim"
+# Setup GHCI profile
+cmd /c mklink $env:WindowsGhciConfPath $env:GhciConfPath
+
+# Install fonts
+start $env:FontsPath\*.ttf
+
+# Setup git config
+git config --global core.editor "gvim"
