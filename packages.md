@@ -8,3 +8,4 @@
 * cpp compiler of choice
 * rustlang
 * golang
+* ghc+ghci
