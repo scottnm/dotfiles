@@ -31,6 +31,8 @@ Plug 'NLKNguyen/papercolor-theme'
 Plug 'jonathanfilip/vim-lucius'
 " line differ
 Plug 'AndrewRadev/linediff.vim'
+" haskell
+Plug 'neovimhaskell/haskell-vim' " syntax highlighting
 
 " Initialize plugin system
 call plug#end()
@@ -108,13 +110,13 @@ nnoremap   <C-h>  :noh<CR>|                  " clear search
 nnoremap   <C-s>  :%s/\s\+$//gc<CR>|         " Delete trailing whitespace with confirmation
 nnoremap   <C-G>  :%s/\<<C-R><C-W>\>/| ":bufdo %s/\<<C-R><C-W>\>//ge \| update | " grab as bounded word
 nnoremap   <C-L> 0y$/\V<c-r>"<cr>
-nnoremap <S-Enter> O<Esc>|
-nnoremap <CR> o<Esc>|
+nnoremap   <S-Enter> O<Esc>|
+nnoremap   <CR> o<Esc>|
 
 " better :e cmds
-nnoremap ,e :e <C-R>=expand("%:p:h") . "/" <CR>
-nnoremap ,t :tabe <C-R>=expand("%:p:h") . "/" <CR>
-nnoremap ,s :split <C-R>=expand("%:p:h") . "/" <CR>
+" nnoremap ,e :e <C-R>=expand("%:p:h") . "/" <CR>
+" nnoremap ,t :tabe <C-R>=expand("%:p:h") . "/" <CR>
+" nnoremap ,s :split <C-R>=expand("%:p:h") . "/" <CR>
 
 autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0
 autocmd BufRead *.csx set syntax=cs
@@ -175,3 +177,7 @@ let g:netrw_browse_split = 0
 "   autocmd!
 "   autocmd VimEnter * :Vexplore
 " augroup END
+
+" snippets
+nnoremap ,cppsnip :-1read $HOME\.vim\skeletons\main.cpp<CR>/return 0;<CR>O
+nnoremap ,csnip :-1read $HOME\.vim\skeletons\main.c<CR>/return 0;<CR>O

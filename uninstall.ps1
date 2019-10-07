@@ -1,7 +1,11 @@
-$env:HOME = $env:HOMEDRIVE + $env:HOMEPATH;
+& $PSScriptRoot\paths.ps1
 
-$env:WindowsPSProfilePath = $env:HOME + "\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1";
+# powershell profile paths
 rm $env:WindowsPSProfilePath
 
-$env:WindowsVimConfPath = $env:HOME + "\_vimrc";
+# Vim paths
 rm $env:WindowsVimConfPath
+rm -rec -force $env:WindowsVimAfterPath
+
+# GHCI
+rm $env:WindowsGhciConfPath
