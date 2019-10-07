@@ -29,6 +29,8 @@ Plug 'Yggdroot/indentLine'
 " color schemes
 Plug 'NLKNguyen/papercolor-theme'
 Plug 'jonathanfilip/vim-lucius'
+" line differ
+Plug 'AndrewRadev/linediff.vim'
 
 " Initialize plugin system
 call plug#end()
