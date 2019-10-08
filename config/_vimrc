@@ -179,3 +179,21 @@ let g:netrw_browse_split = 0
 " snippets
 nnoremap ,cppsnip :-1read $HOME\.vim\skeletons\main.cpp<CR>/return 0;<CR>O
 nnoremap ,csnip :-1read $HOME\.vim\skeletons\main.c<CR>/return 0;<CR>O
+
+" Self-written vim function to find the git root
+function! FindGitDirEx(dir)
+    if isdirectory(a:dir . "\\.git")
+        return a:dir
+    endif
+
+    let parent = fnamemodify(a:dir, ':h')
+    if parent != a:dir
+        return FindGitDirEx(parent)
+    endif
+
+    throw "No git dir!"
+endfunction
+
+function! FindGitDir()
+    echo FindGitDirEx(getcwd())
+endfunction
