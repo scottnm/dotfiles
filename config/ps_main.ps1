@@ -176,6 +176,17 @@ function CopyGreppedFilesToClipboard($grepResult)
 function setnetsh {netsh winhttp set proxy 127.0.0.1:8888 "<-loopback>"}
 function clearnetsh {netsh winhttp reset proxy }
 
+function RenameLowerCase($dir)
+{
+    $dir = $dir.TrimEnd("\");
+    $tmpGuid = new-guid
+    $tmpName = "$dir" + "_" + "$tmpGuid"
+    mv $dir $tmpName
+
+    $dir = $dir.ToLower();
+    mv $tmpName $dir
+}
+
 # Chocolatey profile
 $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 if (Test-Path($ChocolateyProfile)) {

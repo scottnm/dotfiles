@@ -29,6 +29,8 @@ Plug 'Yggdroot/indentLine'
 " color schemes
 Plug 'NLKNguyen/papercolor-theme'
 Plug 'jonathanfilip/vim-lucius'
+" line differ
+Plug 'AndrewRadev/linediff.vim'
 " haskell
 Plug 'neovimhaskell/haskell-vim' " syntax highlighting
 
@@ -175,6 +177,9 @@ let g:netrw_browse_split = 0
 "   autocmd!
 "   autocmd VimEnter * :Vexplore
 " augroup END
+
+" set up italics
+highlight Comment gui=italic
 
 " snippets
 nnoremap ,cppsnip :-1read $HOME\.vim\skeletons\main.cpp<CR>/return 0;<CR>O
