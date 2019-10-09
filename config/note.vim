@@ -8,15 +8,19 @@ syn match unansweredQuestion 'Q: .*\n'
 syn match answeredQuestion 'Q: .*\nA: .*'
 syn match todo 'TODO:'
 syn match failed '\[Failed.*$'
+syn match error '\[Error.*$'
 syn match passed '\[Passed.*$'
 syn match info '\[Info\s\+\]'
 syn match warning '\[Warning\s\+\]'
+syn match trace '\[Trace\s\+\]'
 
 highlight unansweredQuestion ctermfg=Red guifg=Red
 highlight answeredQuestion ctermfg=LightGreen guifg=LightGreen
 highlight todo gui=bold ctermfg=Blue guifg=Blue
 
-highlight failed ctermfg=Red guifg=Red
-highlight warning ctermfg=Red guifg=Red
+highlight failed ctermfg=DarkRed guifg=DarkRed
+highlight error ctermfg=Red guifg=Red
+highlight warning ctermfg=Yellow guifg=Yellow
 highlight passed ctermfg=LightGreen guifg=LightGreen
-highlight info ctermfg=Yellow guifg=Yellow
+" highlight info ctermfg=White guifg=White
+highlight trace ctermfg=DarkYellow guifg=DarkYellow
