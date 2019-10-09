@@ -24,7 +24,7 @@ cmd /c mklink $env:WindowsGhciConfPath $env:GhciConfPath
 start $env:FontsPath\*.ttf
 
 # Setup git config
-git config --global core.editor "gvim"
+git config --global core.editor "C:/Windows/gvim.bat"
 
 # Setup chocolatey and chocolatey installs
 if (!(Get-Command choco -ErrorAction SilentlyContinue))
