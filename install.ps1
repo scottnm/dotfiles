@@ -25,3 +25,10 @@ start $env:FontsPath\*.ttf
 
 # Setup git config
 git config --global core.editor "gvim"
+
+# Setup chocolatey and chocolatey installs
+if (!(Get-Command choco -ErrorAction SilentlyContinue))
+{
+    Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+    choco install powertoys
+}
