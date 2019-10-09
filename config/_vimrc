@@ -146,7 +146,7 @@ autocmd BufWritePre *.rs,*.cpp,*.h,*.bat,*.ps1,*.cmd,*.cs,*.csx %s/\s\+$//e
 
 " syntax highlighting
 syntax on
-au BufReadPost *.note set syntax=note
+au BufReadPost *.txt set syntax=note
 
 " experimental
 nnoremap ; :
