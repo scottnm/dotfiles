@@ -6,9 +6,25 @@ $env:SideProfilePath = $env:DevPath + "\dotfiles\config\ps_side.ps1"
 # DevEnv edit paths
 function Edit-Profile { gvim $profile $env:SideProfilePath }
 function Edit-Vimrc { gvim $HOME\_vimrc }
+function Edit-GhciConf { gvim $env:APPDATA\ghc\ghci.conf }
 function Edit-Hosts { gvim c:\windows\system32\drivers\etc\hosts }
 
+function Get-Version { $PSVersionTable.PSVersion }
+
 Import-Module PSReadLine
+
+Set-PSReadLineOption -Colors @{
+    Command            = 'Gray'
+    Number             = 'Red'
+    Member             = 'Yellow'
+    Operator           = 'Magenta'
+    Type               = 'Cyan'
+    Variable           = 'Red'
+    Parameter          = 'Green'
+    ContinuationPrompt = 'White'
+    Default            = 'White'
+};
+
 Set-PSReadlineKeyHandler -Key Tab -Function Complete
 
 function UpdateWindowTitle
@@ -118,9 +134,23 @@ function howto-edit-git-exclude { echo "$GITROOT/.git/info/exclude" }
 ########
 new-alias pd pushd -Force -Option AllScope
 function grep($files, $pattern) { dir -recurse $files | select-string $pattern }
-function grepc($pattern) { dir -recurse *.rs,*.cpp,*.h,*sources*,*dirs*,*.sln,*.props,*.vcx* | select-string $pattern }
+function grepvs($pattern) { dir -recurse *.sln,*.props,*.vcx* | select-string $pattern }
+function grepc($pattern)
+{
+    $grepResults = (dir -recurse *.cmd,*.ps1,*.rs,*.cpp,*.h,*sources*,*dirs*,*.sln,*.props,*.vcx* | select-string $pattern)
+    if ($grepResults)
+    {
+        CopyGreppedFilesToClipboard $grepResults
+        $grepResults
+    }
+    else
+    {
+        echo "No results";
+    }
+}
+
 function grepcc($pattern) { dir -recurse *.rs,*.cpp,*.h,*sources*,*dirs*,*.sln,*.props,*.vcx* | select-string $pattern -casesensitive }
-function gohosts { & pushd c:\windows\system32\drivers\etc }
+function edit-hosts { vim c:\windows\system32\drivers\etc\hosts }
 
 # net stop beep
 
@@ -132,7 +162,13 @@ function CopyClipboardWithGrepFiles
     [Parameter(Mandatory = $true)][string]$pattern
     )
 
-    $uniqueFileList = ((grep $files $pattern) | %{$_.Path.ToString()} | Get-Unique -asstring)
+    $grepResult = (grep $files $pattern)
+    CopyGreppedFilesToClipboard $grepResult
+}
+
+function CopyGreppedFilesToClipboard($grepResult)
+{
+    $uniqueFileList = ($grepResult | %{$_.Path.ToString()} | Get-Unique -asstring)
     echo $uniqueFileList
     set-clipboard ($uniqueFileList -join " ")
 }
@@ -149,4 +185,10 @@ function RenameLowerCase($dir)
 
     $dir = $dir.ToLower();
     mv $tmpName $dir
+}
+
+# Chocolatey profile
+$ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+if (Test-Path($ChocolateyProfile)) {
+  Import-Module "$ChocolateyProfile"
 }
