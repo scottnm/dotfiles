@@ -29,6 +29,7 @@ Plug 'Yggdroot/indentLine'
 " color schemes
 Plug 'NLKNguyen/papercolor-theme'
 Plug 'jonathanfilip/vim-lucius'
+Plug 'sainnhe/vim-color-desert-night'
 " line differ
 Plug 'AndrewRadev/linediff.vim'
 " haskell
@@ -131,11 +132,17 @@ hi ColorColumn ctermbg=darkgray
 " colo seoul256
 color industry
 if has('gui_running')
-    " color slate
-    " color desert
-    color lucius
-    " set background=light
-    " color papercolor
+    " Old colors:
+    "     color slate
+    "     color desert
+    "     set background=light
+    "     color papercolor
+
+    " Default cool colors
+    " color lucius
+
+    " Fall colors
+    color desert-night
 endif
 
 " :ls to get buffers
