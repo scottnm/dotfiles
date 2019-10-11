@@ -128,23 +128,6 @@ hi ColorColumn ctermbg=darkgray
 " highlight OverLength ctermbg=red ctermfg=white guibg=#392929
 " match OverLength /\%121v.\+/
 
-" let g:seoul256_background = 256
-" colo seoul256
-color industry
-if has('gui_running')
-    " Old colors:
-    "     color slate
-    "     color desert
-    "     set background=light
-    "     color papercolor
-
-    " Default cool colors
-    " color lucius
-
-    " Fall colors
-    color desert-night
-endif
-
 " :ls to get buffers
 " :b<N> to switch to the buffer
 
@@ -209,3 +192,30 @@ endfunction
 function! FindGitDir()
     echo FindGitDirEx(getcwd())
 endfunction
+
+"""""""""""""""""""""""""""""""""""""
+"|           COLORS                 |
+"""""""""""""""""""""""""""""""""""""
+
+" Old colors:
+"     let g:seoul256_background = 256
+"     color seoul256
+"     color industry
+"     color slate
+"     color desert
+"     set background=light
+"     color papercolor
+
+" Default cool colors
+" color lucius
+
+" Fall colors
+" TODO: find better vim term colorscheme
+color desert-night
+if has('gui_running')
+    " make the status lines more clear
+    " TODO: fork desert-night into my own Falloween colorscheme
+    hi statusline   guibg=darkorange guifg=black 
+    hi statuslinenc guibg=black guifg=darkorange
+endif
+
