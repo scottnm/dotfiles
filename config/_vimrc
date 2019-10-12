@@ -29,7 +29,7 @@ Plug 'Yggdroot/indentLine'
 " color schemes
 Plug 'NLKNguyen/papercolor-theme'
 Plug 'jonathanfilip/vim-lucius'
-Plug 'sainnhe/vim-color-desert-night'
+Plug 'scottnm/vim-color-desert-night' " fork of 'sainnhe/vim-color-desert-night'
 " line differ
 Plug 'AndrewRadev/linediff.vim'
 " haskell
@@ -210,12 +210,9 @@ endfunction
 " color lucius
 
 " Fall colors
-" TODO: find better vim term colorscheme
-color desert-night
 if has('gui_running')
-    " make the status lines more clear
-    " TODO: fork desert-night into my own Falloween colorscheme
-    hi statusline   guibg=darkorange guifg=black 
-    hi statuslinenc guibg=black guifg=darkorange
+    color desert-night
+else
+    color slate
 endif
 
