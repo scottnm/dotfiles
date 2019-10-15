@@ -31,5 +31,6 @@ git config --global core.editor "vim"
 if (!(Get-Command choco -ErrorAction SilentlyContinue))
 {
     Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-    choco install powertoys
 }
+choco install powertoys
+choco install fzf

@@ -9,8 +9,6 @@ Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-unimpaired'
 " Advanced substitution handling casings and plurality
 Plug 'tpope/vim-abolish'
-" Korean kolor
-Plug 'junegunn/seoul256.vim'
 " Toggle between header and source files
 Plug 'vim-scripts/a.vim'
 " Make yanked region flash
@@ -22,6 +20,11 @@ Plug 'PProvost/vim-ps1'
 " Distraction free writing
 " usage :[!]Goyo
 Plug 'junegunn/goyo.vim'
+" Korean kolor
+Plug 'junegunn/seoul256.vim'
+" fuzzy finder
+Plug 'junegunn/fzf'
+Plug 'junegunn/fzf.vim'
 " allow quitting all vim buffers except active
 Plug 'vim-scripts/BufOnly.vim'
 " tab line
