@@ -189,6 +189,34 @@ function RenameLowerCase($dir)
     mv $tmpName $dir
 }
 
+function PrintNum
+{
+    [CmdletBinding()]
+    Param(
+    [Parameter(Mandatory = $true)][int]$Value,
+    [Parameter(Mandatory = $false)][switch]$AsHex,
+    [Parameter(Mandatory = $false)][switch]$AsDec
+    )
+
+    if (!$AsHex -and !$AsDec)
+    {
+        $AsHex = $true
+        $AsDec = $true
+    }
+
+    if ($AsHex)
+    {
+        $hex = '0x{0:x}' -f $Value
+        Write-Host "Hex: $hex"
+    }
+
+    if ($AsDec)
+    {
+        $dec = '{0:d}' -f $Value
+        Write-Host "Dec: $dec"
+    }
+}
+
 # Chocolatey profile
 $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 if (Test-Path($ChocolateyProfile)) {

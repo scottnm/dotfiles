@@ -209,12 +209,13 @@ endfunction
 "     set background=light
 "     color papercolor
 
-" Default cool colors
-" color lucius
-
-" Fall colors
 if has('gui_running')
-    color desert-night
+"   Fall colors
+"   color desert-night
+
+"   Winter colors
+    color lucius
+    hi Search guibg=white
 else
     color slate
 endif
