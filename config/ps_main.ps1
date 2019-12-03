@@ -140,7 +140,8 @@ function grepc($pattern)
     $grepResults = (dir -recurse *.cmd,*.ps1,*.rs,*.cpp,*.h,*sources*,*dirs*,*.sln,*.props,*.vcx* | select-string $pattern)
     if ($grepResults)
     {
-        CopyGreppedFilesToClipboard $grepResults
+        $grepPaths = $grepResults | %{$_.Path.ToString()}
+        CopyPathListToClipboard $grepPaths
         $grepResults
     }
     else
@@ -162,13 +163,14 @@ function CopyClipboardWithGrepFiles
     [Parameter(Mandatory = $true)][string]$pattern
     )
 
-    $grepResult = (grep $files $pattern)
-    CopyGreppedFilesToClipboard $grepResult
+    $grepResults = (grep $files $pattern)
+    $grepPaths = $grepResults | select -property path
+    CopyPathListToClipboard $grepResults
 }
 
-function CopyGreppedFilesToClipboard($grepResult)
+function CopyPathListToClipboard($pathList)
 {
-    $uniqueFileList = ($grepResult | %{$_.Path.ToString()} | Get-Unique -asstring)
+    $uniqueFileList = ($pathList | Get-Unique -AsString)
     echo $uniqueFileList
     set-clipboard ($uniqueFileList -join " ")
 }
