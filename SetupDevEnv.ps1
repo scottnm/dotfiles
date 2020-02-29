@@ -1,5 +1,7 @@
 # New machine install
 
+pushd .
+
 # TODO
 # - remembear
 # - remembear extension for firefox
@@ -29,16 +31,6 @@ $uri = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
   )
 )
 
-# clone dotfiles
-mkdir ~\dev
-pushd ~\dev
-git clone https://github.com/scottnm/dotfiles
-pushd dotfiles
-.\install.ps1
-
-popd
-popd
-
 $checkUserName = (git config user.name)
 if (!$checkUserName)
 {
@@ -52,3 +44,40 @@ if (!$checkUserMail)
     $mail = Read-Host -Prompt "Git email? "
     git config --global user.email $mail
 }
+
+# Setup git config
+# git config --global core.editor "C:/Windows/gvim.bat"
+git config --global core.editor "vim"
+
+# clone dotfiles
+mkdir ~\dev
+cd ~\dev
+git clone https://github.com/scottnm/dotfiles
+cd dotfiles
+
+& .\paths.ps1
+
+# Setup powershell profile
+cmd /c mklink $env:WindowsPSProfilePath $env:PSProfilePath
+
+# Setup Vim profile
+cmd /c mklink $env:WindowsVimConfPath $env:VimConfPath
+mkdir -Force $env:WindowsVimAfterPath
+mkdir -Force $env:WindowsVimSyntaxDir
+$syntaxes = @("note", "cpp");
+foreach ($syntax in $syntaxes)
+{
+    $WindowsVimSyntaxPath = "$env:WindowsVimSyntaxDir\$syntax.vim";
+    $VimSyntaxPath = "$env:DotFilesPath\config\$syntax.vim";
+    echo $WindowsVimSyntaxPath
+    echo $VimSyntaxPath
+    cmd /c mklink $WindowsVimSyntaxPath $VimSyntaxPath
+}
+
+# Setup GHCI profile
+cmd /c mklink $env:WindowsGhciConfPath $env:GhciConfPath
+
+# Install fonts
+start $env:FontsPath\*.ttf
+
+popd
