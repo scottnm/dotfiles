@@ -31,30 +31,13 @@ $uri = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
   )
 )
 
-$checkUserName = (git config user.name)
-if (!$checkUserName)
-{
-    $username = Read-Host -Prompt "Git name? "
-    git config --global user.name $username
-}
-
-$checkUserMail = (git config user.email)
-if (!$checkUserMail)
-{
-    $mail = Read-Host -Prompt "Git email? "
-    git config --global user.email $mail
-}
-
-# Setup git config
-# git config --global core.editor "C:/Windows/gvim.bat"
-git config --global core.editor "vim"
-
 # clone dotfiles
 mkdir ~\dev
 cd ~\dev
 git clone https://github.com/scottnm/dotfiles
 cd dotfiles
 
+& .\gitsetup.ps1
 & .\paths.ps1
 
 # Setup powershell profile
