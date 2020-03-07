@@ -58,7 +58,10 @@ cd dotfiles
 & .\paths.ps1
 
 # Setup powershell profile
+mkdir -Force $env:WindowsPSPath
+mkdir -Force $env:WindowsPSCorePath
 cmd /c mklink $env:WindowsPSProfilePath $env:PSProfilePath
+cmd /c mklink $env:WindowsPSCoreProfilePath $env:PSProfilePath
 
 # Setup Vim profile
 cmd /c mklink $env:WindowsVimConfPath $env:VimConfPath
