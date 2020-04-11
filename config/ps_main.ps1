@@ -44,6 +44,7 @@ function UpdateBranchTopic($currentBranch)
 
 function prompt
 {
+    RefreshCwdSensitiveState;
     Write-Host("")
 
     $status_string = " $(get-location) "
@@ -132,45 +133,12 @@ function howto-edit-git-exclude { echo "$GITROOT/.git/info/exclude" }
 # MISC #
 ########
 new-alias pd pushd -Force -Option AllScope
-function grep($files, $pattern) { dir -recurse $files | select-string $pattern }
-function grepvs($pattern) { dir -recurse *.sln,*.props,*.vcx* | select-string $pattern }
-function grepc($pattern)
-{
-    $grepResults = (dir -recurse *.cmd,*.ps1,*.rs,*.cpp,*.h,*sources*,*dirs*,*.sln,*.props,*.vcx* | select-string $pattern)
-    if ($grepResults)
-    {
-        CopyGreppedFilesToClipboard $grepResults
-        $grepResults
-    }
-    else
-    {
-        echo "No results";
-    }
-}
+function grep($pattern) { git grep -r --ignore-case $pattern }
 
-function grepcc($pattern) { dir -recurse *.rs,*.cpp,*.h,*sources*,*dirs*,*.sln,*.props,*.vcx* | select-string $pattern -casesensitive }
-function edit-hosts { vim c:\windows\system32\drivers\etc\hosts }
+function edit-hosts { Start-Process -FilePath vim -ArgumentList c:\windows\system32\drivers\etc\hosts -Verb RunAs }
+function type-hosts { type c:\windows\system32\drivers\etc\hosts | sls "^\w" -NoEmphasis }
 
 # net stop beep
-
-function CopyClipboardWithGrepFiles
-{
-    [CmdletBinding( )]
-    Param(
-    [Parameter(Mandatory = $true)][string[]]$files,
-    [Parameter(Mandatory = $true)][string]$pattern
-    )
-
-    $grepResult = (grep $files $pattern)
-    CopyGreppedFilesToClipboard $grepResult
-}
-
-function CopyGreppedFilesToClipboard($grepResult)
-{
-    $uniqueFileList = ($grepResult | %{$_.Path.ToString()} | Get-Unique -asstring)
-    echo $uniqueFileList
-    set-clipboard ($uniqueFileList -join " ")
-}
 
 function setnetsh {netsh winhttp set proxy 127.0.0.1:8888 "<-loopback>"}
 function clearnetsh {netsh winhttp reset proxy }
