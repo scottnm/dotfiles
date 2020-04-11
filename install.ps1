@@ -22,18 +22,18 @@ choco install powertoys
 choco install fzf
 
 # - vimplug
-md ~\vimfiles\autoload
+md $HOME\vimfiles\autoload
 $uri = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 (New-Object Net.WebClient).DownloadFile(
   $uri,
   $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
-    "~\vimfiles\autoload\plug.vim"
+    "$HOME\vimfiles\autoload\plug.vim"
   )
 )
 
 # clone dotfiles
-mkdir ~\dev
-cd ~\dev
+mkdir $HOME\dev
+cd $HOME\dev
 git clone https://github.com/scottnm/dotfiles
 cd dotfiles
 

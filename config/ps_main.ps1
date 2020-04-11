@@ -115,7 +115,6 @@ function gtui
 function gst { & git status $args }
 function gstr { gst --no-renames --no-breaks }
 
-<#
 function gsql
 {
     [CmdletBinding( )]
@@ -125,7 +124,6 @@ function gsql
 
     & "git rebase -i HEAD~${CommitCount}";
 }
-#>
 
 function howto-edit-git-exclude { echo "$GITROOT/.git/info/exclude" }
 
