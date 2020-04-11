@@ -2,7 +2,7 @@
 
 pushd .
 
-# TODO
+# TODO: currently have to setup manually
 # - remembear
 # - remembear extension for firefox
 
