@@ -1,6 +1,5 @@
-$env:Desktop = "c:\users\scott\desktop"
-$env:DevPath = $env:HOMEDRIVE + $env:HOMEPATH + "\dev";
-$env:SideProfilePath = $env:DevPath + "\dotfiles\config\ps_side.ps1"
+$env:SideProfilePath = "$HOME\dev\dotfiles\config\ps_side.ps1"
+
 . $env:SideProfilePath
 
 # DevEnv edit paths
@@ -89,7 +88,7 @@ function gcp
     else
     {
         $diffArgs = $args[0..($args.Length - 2)]
-        $cmdString = "git diff $diffArgs > z:\patches\$($args[-1])"
+        $cmdString = "git diff $diffArgs > $HOME\work\git_patches\$($args[-1])"
         cmd /c $cmdString
         echo $cmdString
     }
@@ -114,7 +113,7 @@ function gtui
 }
 function gst { & git status $args }
 function gstr { gst --no-renames --no-breaks }
-function gbm { git branch -r | sls "origin/scmunro" }
+
 <#
 function gsql
 {
