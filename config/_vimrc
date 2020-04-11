@@ -33,6 +33,9 @@ Plug 'Yggdroot/indentLine'
 Plug 'NLKNguyen/papercolor-theme'
 Plug 'jonathanfilip/vim-lucius'
 Plug 'scottnm/vim-color-desert-night' " fork of 'sainnhe/vim-color-desert-night'
+Plug 'gregsexton/Gravity'
+Plug 'MichaelMalick/vim-colors-bluedrake'
+Plug 'atelierbram/vim-colors_atelier-schemes'
 " line differ
 Plug 'AndrewRadev/linediff.vim'
 " haskell
@@ -135,7 +138,7 @@ hi ColorColumn ctermbg=darkgray
 " :b<N> to switch to the buffer
 
 " source file processors
-autocmd BufWritePre *.rs,*.cpp,*.h,*.bat,*.ps1,*.cmd,*.cs,*.csx %s/\s\+$//e
+autocmd BufWritePre *.rs,*.c,*.cpp,*.h,*.bat,*.ps1,*.cmd,*.cs,*.csx %s/\s\+$//e
 
 " syntax highlighting
 syntax on
@@ -201,22 +204,27 @@ endfunction
 """""""""""""""""""""""""""""""""""""
 
 " Old colors:
-"     let g:seoul256_background = 256
-"     color seoul256
 "     color industry
 "     color slate
 "     color desert
 "     set background=light
-"     color papercolor
 
 if has('gui_running')
+"   Spring colors
+        set background=light
+"       color gravity
+"       color bluedrake
+"       color Atelier_SeasideLight
+"       let g:seoul256_background = 256
+"       color seoul256
+        color papercolor
+
 "   Fall colors
-"   color desert-night
+"       color desert-night
 
 "   Winter colors
-    color lucius
-    hi Search guibg=white
+"       color lucius
+"       hi Search guibg=white
 else
     color slate
 endif
-
