@@ -217,6 +217,16 @@ function PrintNum
     }
 }
 
+function CompareFiles()
+{
+    Param(
+    [Parameter(Mandatory = $true)][string]$fileA,
+    [Parameter(Mandatory = $true)][string]$fileB
+    )
+
+    if((Get-FileHash $fileA).hash  -ne (Get-FileHash $fileB).hash) {"files are different"} Else {"Files are the same"}
+}
+
 # Chocolatey profile
 $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 if (Test-Path($ChocolateyProfile)) {
