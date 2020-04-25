@@ -119,11 +119,17 @@ nnoremap   <C-G>  :%s/\<<C-R><C-W>\>/| ":bufdo %s/\<<C-R><C-W>\>//ge \| update |
 nnoremap   <C-L> 0y$/\V<c-r>"<cr>
 nnoremap   <S-Enter> O<Esc>|
 nnoremap   <CR> o<Esc>|
+vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR> " enable searching for visually selected text
+vnoremap <C-r> "hy:%s/<C-r>h//gc<left><left><left> " enable replacing visually selected text
 
 " better :e cmds
 " nnoremap ,e :e <C-R>=expand("%:p:h") . "/" <CR>
 " nnoremap ,t :tabe <C-R>=expand("%:p:h") . "/" <CR>
 " nnoremap ,s :split <C-R>=expand("%:p:h") . "/" <CR>
+
+" Better splits with vim
+set splitbelow
+set splitright
 
 autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0
 autocmd BufRead *.csx set syntax=cs

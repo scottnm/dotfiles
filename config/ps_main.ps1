@@ -68,6 +68,14 @@ function prompt
 ###############
 # GIT ALIASES #
 ###############
+function gsu
+{
+    UpdateGitBranchVars
+    if ($env:GitBranch)
+    {
+        git branch --set-upstream-to=origin/$env:GitBranch $env:GitBranch
+    }
+}
 function gc { & git commit -ev $args }
 function ga { & git add --all $args }
 function gp { & git push $args }
@@ -123,6 +131,41 @@ function gsql
     )
 
     & "git rebase -i HEAD~${CommitCount}";
+}
+
+function PruneSquashedBranches
+{
+    [CmdletBinding( )]
+    Param(
+    [string]$Branch = "develop",
+    [switch]$Apply
+    )
+
+    git checkout -q $Branch
+    git for-each-ref refs/heads/ "--format=%(refname:short)" | % {
+        $mergeBase = (git merge-base $Branch $_)
+
+        $gitTree = (git rev-parse "$_^{tree}")
+        $gitCherry = (git cherry $branch "$(git commit-tree $gitTree -p $mergeBase -m _)")
+        $squashMerged = $gitCherry[0] -eq '-'
+        $topicHead = (git rev-parse --short $_)
+
+        if ($squashMerged)
+        {
+            if ($Apply)
+            {
+                (git branch -D $_) | Out-Null
+            }
+
+            $deleteMsg = if ($Apply) { "    DELETED" } else { "WILL DELETE"}
+            Write-Host -ForegroundColor Red $deleteMsg -NoNewLine
+        }
+        else
+        {
+            Write-Host " not merged" -NoNewLine
+        }
+        Write-Host " ... ($topicHead) $_"
+    }
 }
 
 function howto-edit-git-exclude { echo "$GITROOT/.git/info/exclude" }
