@@ -2,7 +2,10 @@ $env:DotFilesPath = "$home\Dev\dotfiles";
 
 # powershell profile paths
 $env:PSProfilePath = "$env:DotFilesPath\config\ps_main.ps1";
+$env:WindowsPSPath = "$home\Documents\WindowsPowerShell\";
+$env:WindowsPSCorePath = "$home\Documents\PowerShell\";
 $env:WindowsPSProfilePath = "$home\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1";
+$env:WindowsPSCoreProfilePath = "$home\Documents\PowerShell\Microsoft.PowerShell_profile.ps1";
 
 # Vim paths
 $env:WindowsVimConfPath = "$home\_vimrc";
