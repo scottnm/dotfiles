@@ -37,6 +37,8 @@ Plug 'scottnm/vim-color-desert-night' " fork of 'sainnhe/vim-color-desert-night'
 Plug 'AndrewRadev/linediff.vim'
 " haskell
 Plug 'neovimhaskell/haskell-vim' " syntax highlighting
+" rust
+Plug 'rust-lang/rust.vim' " highlighting + fmt support
 
 " Initialize plugin system
 call plug#end()

@@ -220,3 +220,6 @@ $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 if (Test-Path($ChocolateyProfile)) {
   Import-Module "$ChocolateyProfile"
 }
+
+# MISC aliases
+new-alias ppm OpenSeeIt.exe -Force -Option AllScope
