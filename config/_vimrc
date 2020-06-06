@@ -36,6 +36,7 @@ Plug 'scottnm/vim-color-desert-night' " fork of 'sainnhe/vim-color-desert-night'
 Plug 'gregsexton/Gravity'
 Plug 'MichaelMalick/vim-colors-bluedrake'
 Plug 'atelierbram/vim-colors_atelier-schemes'
+Plug 'lifepillar/vim-solarized8'
 " line differ
 Plug 'AndrewRadev/linediff.vim'
 " haskell
@@ -234,5 +235,6 @@ if has('gui_running')
 "       color lucius
 "       hi Search guibg=white
 else
-    color slate
+    set nocursorline
+    color seoul256
 endif
