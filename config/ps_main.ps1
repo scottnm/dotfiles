@@ -2,6 +2,10 @@ $env:SideProfilePath = "$HOME\dev\dotfiles\config\ps_side.ps1"
 
 . $env:SideProfilePath
 
+# vim aliases
+new-alias cvim c:\windows\vim.bat -Force -Option AllScope
+new-alias vim c:\windows\gvim.bat -Force -Option AllScope
+
 # DevEnv edit paths
 function Edit-Profile { gvim $profile $env:SideProfilePath }
 function Edit-Vimrc { gvim $HOME\_vimrc }
@@ -47,7 +51,7 @@ function prompt
     RefreshCwdSensitiveState;
     Write-Host("")
 
-    $status_string = " $(get-location) "
+    $status_string = " $(get-location)"
 
     UpdateGitBranchVars;
 
@@ -62,7 +66,7 @@ function prompt
     UpdateWindowTitle;
 
     Write-Host ($status_string) -nonewline -foregroundcolor cyan
-    return "> "
+    return "λ "
 }
 
 ###############
@@ -70,10 +74,19 @@ function prompt
 ###############
 function gsu
 {
+    Param(
+        [string]$Remote
+        )
+
     UpdateGitBranchVars
+    if (!$Remote)
+    {
+        $Remote = $env:GitBranch
+    }
+
     if ($env:GitBranch)
     {
-        git branch --set-upstream-to=origin/$env:GitBranch $env:GitBranch
+        git branch --set-upstream-to=origin/$Remote $env:GitBranch
     }
 }
 function gc { & git commit -ev $args }
