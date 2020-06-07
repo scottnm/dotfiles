@@ -65,12 +65,14 @@ set noswapfile
 set shell=cmd
 " set shellcmdflag=-command
 if has('gui_running')
-    " old font - set guifont=Consolas:h11:cANSI:qDRAFT
-    set guifont=Cascadia\ Code:h11:cANSI:qDRAFT
+    set guifont=Cascadia\ Mono:h11
+    "set guifont=Consolas:h11:cANSI:qDRAFT
     " autocmd GUIEnter * simalt ~x
     set lines=40 columns=125
     winpos 300 300
 endif
+
+set encoding=utf-8
 
 set ruler                            " show row/column number
 set backspace=2                      " backspace works in insert mode
@@ -217,14 +219,18 @@ endfunction
 "     set background=light
 
 if has('gui_running')
+"   Summer colors
+        set background=dark
+        color papercolor
+
 "   Spring colors
-        set background=light
+"       set background=light
 "       color gravity
 "       color bluedrake
 "       color Atelier_SeasideLight
 "       let g:seoul256_background = 256
 "       color seoul256
-        color papercolor
+"       color papercolor
 
 "   Fall colors
 "       color desert-night
