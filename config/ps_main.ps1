@@ -46,27 +46,73 @@ function UpdateBranchTopic($currentBranch)
     $env:GitTopic = $currentBranch.Split('/')[-1];
 }
 
+function Colored
+{
+    Param(
+        [Parameter(Mandatory)]
+        [string]$Text,
+
+        [Parameter(Mandatory)]
+        [ValidateSet("Gray", "Red", "Green", "Yellow", "Blue", "Pink", "Cyan")]
+        [string]$Color
+        )
+
+    $code = 0
+    if ($Color -eq "Gray")
+    {
+        $code = 30
+    }
+    elseif ($Color -eq "Red")
+    {
+        $code = 31
+    }
+    elseif ($Color -eq "Green")
+    {
+        $code = 32
+    }
+    elseif ($Color -eq "Yellow")
+    {
+        $code = 33
+    }
+    elseif ($Color -eq "Blue")
+    {
+        $code = 34
+    }
+    elseif ($Color -eq "Pink")
+    {
+        $code = 35
+    }
+    elseif ($Color -eq "Cyan")
+    {
+        $code = 36
+    }
+
+    return "`e[$($code)m$($Text)`e[0m"
+}
+
 function prompt
 {
     RefreshCwdSensitiveState;
     Write-Host("")
 
-    $status_string = " $(get-location)"
+    $locationPrompt = Colored -Text (Get-Location).Path -Color Cyan
+    $statusLine = " $locationPrompt"
 
     UpdateGitBranchVars;
 
     if ($env:GitBranch)
     {
-        $status_string += " :: "
-        $status_string += $env:GitBranch
+        $branchPrompt = Colored -Text $env:GitBranch -Color Green
+        $statusLine += " :: $branchPrompt"
     }
-    $status_string += " :: $(Get-Date)
+    $statusLine += " :: $(Get-Date)
  "
 
     UpdateWindowTitle;
 
-    Write-Host ($status_string) -nonewline -foregroundcolor cyan
-    return "λ "
+    Write-Host $statusLine -nonewline
+    $prompt = "λ"
+    return "$(Colored -Text $prompt -Color Yellow) "
 }
 
 ###############
