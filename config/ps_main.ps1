@@ -76,6 +76,35 @@ function gsu
         git branch --set-upstream-to=origin/$env:GitBranch $env:GitBranch
     }
 }
+
+function GitRenameTag
+{
+    [CmdletBinding( )]
+    Param(
+        [string]$Remote = "origin",
+
+        [Parameter(Mandatory = $true)]
+        [string]$Old,
+
+        [Parameter(Mandatory = $true)]
+        [string]$New,
+
+        [switch]$Apply
+        )
+
+    $cmd = "git push -f $Remote $($Old):refs/tags/$New :$Old"
+
+    if ($Apply)
+    {
+        Write-Host -ForegroundColor Yellow "Renaming tag '$Old' to '$New'"
+        Invoke-Expression $cmd
+    }
+    else
+    {
+        Write-Host "Would rename tag '$Old' to '$New' with '$cmd'"
+    }
+}
+
 function gc { & git commit -ev $args }
 function ga { & git add --all $args }
 function gp { & git push $args }
@@ -221,6 +250,35 @@ function PrintNum
         $dec = '{0:d}' -f $Value
         Write-Host "Dec: $dec"
     }
+}
+
+function CompareFiles()
+{
+    Param(
+    [Parameter(Mandatory = $true)][string]$fileA,
+    [Parameter(Mandatory = $true)][string]$fileB
+    )
+
+    <#
+    if((Get-FileHash $fileA).hash  -ne (Get-FileHash $fileB).hash)
+    {
+        $fileCmpString = "different"
+        $writeColor = Red
+    }
+    Else
+    {
+        $fileCmpString = "the same"
+        $writeColor = Green
+    }
+    #>
+
+    $properties = @{
+        "Left"=$fileA;
+        "Right"=$fileB;
+        "Same"=(Get-FileHash $fileA).hash  -eq (Get-FileHash $fileB).hash;
+    };
+
+    New-Object -TypeName PSObject -Property $properties
 }
 
 # Chocolatey profile

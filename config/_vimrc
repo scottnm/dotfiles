@@ -116,7 +116,7 @@ nnoremap   <C-h>  :noh<CR>|                  " clear search
 " vnoremap   <C-f>  gq|                        " visual format
 nnoremap   <C-s>  :%s/\s\+$//gc<CR>|         " Delete trailing whitespace with confirmation
 nnoremap   <C-G>  :%s/\<<C-R><C-W>\>/| ":bufdo %s/\<<C-R><C-W>\>//ge \| update | " grab as bounded word
-nnoremap   <C-L> 0y$/\V<c-r>"<cr>
+" nnoremap   <C-L> 0y$/\V<c-r>"<cr>
 nnoremap   <S-Enter> O<Esc>|
 nnoremap   <CR> o<Esc>|
 vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR> " enable searching for visually selected text
