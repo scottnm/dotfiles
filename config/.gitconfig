@@ -1,0 +1,10 @@
+[credential]
+	helper = /mnt/c/Program\\ Files/Git/mingw64/libexec/git-core/git-credential-manager.exe
+[user]
+	email = scottnmunro@gmail.com
+	name = Scott Munro
+[alias]
+	st = !git status
+	co = !git checkout
+	aa = !git add -A
+	cm = !git commit -m
