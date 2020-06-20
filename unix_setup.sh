@@ -11,3 +11,7 @@ ln -s ~/dev/dotfiles/config/unix_profile $UNIX_PROFILE
 FISH_CONFIG=~/.config/fish/config.fish
 rm $FISH_CONFIG
 ln -s ~/dev/dotfiles/config/config.fish $FISH_CONFIG
+
+VIM_CONFIG=~/.vimrc
+rm $VIM_CONFIG
+ln -s ~/dev/dotfiles/config/_vimrc $VIM_CONFIG

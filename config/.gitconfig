@@ -8,3 +8,4 @@
 	co = !git checkout
 	aa = !git add -A
 	cm = !git commit -m
+	d  = !git diff
