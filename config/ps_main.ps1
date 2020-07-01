@@ -345,3 +345,15 @@ $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 if (Test-Path($ChocolateyProfile)) {
   Import-Module "$ChocolateyProfile"
 }
+
+function GitGrepReplace
+{
+    param(
+        [string]$PathSpec,
+        [string]$Original,
+        [string]$Replace
+        )
+
+    $files = git grep --name-only $Original -- $PathSpec
+    $files | % { ((Get-Content -Path $_ -Raw) -Replace $Original,$Replace) | Set-Content -NoNewLine -Path $_ }
+}
