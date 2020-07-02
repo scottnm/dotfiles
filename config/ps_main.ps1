@@ -135,6 +135,35 @@ function gsu
         git branch --set-upstream-to=origin/$Remote $env:GitBranch
     }
 }
+
+function GitRenameTag
+{
+    [CmdletBinding( )]
+    Param(
+        [string]$Remote = "origin",
+
+        [Parameter(Mandatory = $true)]
+        [string]$Old,
+
+        [Parameter(Mandatory = $true)]
+        [string]$New,
+
+        [switch]$Apply
+        )
+
+    $cmd = "git push -f $Remote $($Old):refs/tags/$New :$Old"
+
+    if ($Apply)
+    {
+        Write-Host -ForegroundColor Yellow "Renaming tag '$Old' to '$New'"
+        Invoke-Expression $cmd
+    }
+    else
+    {
+        Write-Host "Would rename tag '$Old' to '$New' with '$cmd'"
+    }
+}
+
 function gc { & git commit -ev $args }
 function ga { & git add --all $args }
 function gp { & git push $args }
@@ -289,11 +318,29 @@ function CompareFiles()
     [Parameter(Mandatory = $true)][string]$fileB
     )
 
-    if((Get-FileHash $fileA).hash  -ne (Get-FileHash $fileB).hash) {"files are different"} Else {"Files are the same"}
+    $properties = @{
+        "Left"=$fileA;
+        "Right"=$fileB;
+        "Same"=(Get-FileHash $fileA).hash  -eq (Get-FileHash $fileB).hash;
+    };
+
+    New-Object -TypeName PSObject -Property $properties
 }
 
 # Chocolatey profile
 $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 if (Test-Path($ChocolateyProfile)) {
   Import-Module "$ChocolateyProfile"
+}
+
+function GitGrepReplace
+{
+    param(
+        [string]$PathSpec,
+        [string]$Original,
+        [string]$Replace
+        )
+
+    $files = git grep --name-only $Original -- $PathSpec
+    $files | % { ((Get-Content -Path $_ -Raw) -Replace $Original,$Replace) | Set-Content -NoNewLine -Path $_ }
 }
