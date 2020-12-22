@@ -1,0 +1,137 @@
+# Lifted from https://github.com/SysAdminDoc/Windows10/blob/master/Win10-AIO
+
+:: For Windows 10 Upgrade.
+
+:: Create Restore Point
+PowerShell -Command checkpoint-computer -description "Checkpoint"
+
+:: Import clean Start Menu for new users
+Powershell Invoke-WebRequest https://www.dropbox.com/s/krzmgm4my54oi8t/clean_layout.xml?dl=1 -OutFile C:\Windows\Temp\defaultlayout.xml
+Powershell Import-StartLayout -LayoutPath C:\Windows\Temp\defaultlayout.xml -MountPath $env:SystemDrive\
+
+::Install Chocolatey
+Powershell Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+
+::Install applications
+choco install googlechrome vlc 7zip adobereader -y -force
+
+:: Disable Recently Added Apps from start menu
+REG ADD HKCU\Software\Microsoft\Windows\CurrentVersion\CloudStore\Store\Cache\DefaultAccount\$$windows.data.unifiedtile.startglobalproperties\Current /v Data /t REG_BINARY /d 02000000ee86c3d9de57d3010000000043420100c21401c21e00c528f404cb320a0205bcc9a8a401248cac034489850166a081bacbbdd7a8a4820100058691cc930524aaa30144c38401669ff79db187cbd1acd40100c23c0100 /F
+
+:: Enables F8 Advanced Boot Options screen in Windows 10 for Safe Mode access like Windows 7 and sets timeout to 3 seconds
+bcdedit /set {bootmgr} displaybootmenu yes
+bcdedit /timeout 3
+
+:: Set Windows to never sleep
+c:\windows\system32\powercfg.exe -change -disk-timeout-ac 0
+c:\windows\system32\powercfg.exe -change -disk-timeout-dc 0
+c:\windows\system32\powercfg.exe -change -standby-timeout-ac 0
+c:\windows\system32\powercfg.exe -change -standby-timeout-dc 0
+c:\windows\system32\powercfg.exe -change -hibernate-timeout-ac 0
+c:\windows\system32\powercfg.exe -change -hibernate-timeout-dc 0
+
+:: Set the Monitor timeout to 20 minutes
+Powercfg -Change -monitor-timeout-ac 20
+powercfg.exe -x -monitor-timeout-ac 20
+powercfg.exe -x -monitor-timeout-dc 20
+
+:: Remove Store and Edge from taskbar
+Powershell Invoke-WebRequest https://www.dropbox.com/s/6bhwl85dht1cab8/Unpin_Store_and_Edge.ps1?dl=1 - 
+   OutFile C:\Windows\Temp\unpin.ps1
+powershell -ExecutionPolicy ByPass powershell.exe C:\Windows\Temp\unpin.ps1
+Powershell Remove-Item C:\Windows\Temp\unpin.ps1 -recurse
+
+:: Remove Microsoft Bloat
+Powershell Invoke-WebRequest https://www.dropbox.com/s/8ar40kvlqwlf8xj/App_Uninstaller2.ps1?dl=1 -OutFile C:\Windows\Temp\App_Uninstaller2.ps1 
+powershell -ExecutionPolicy ByPass powershell.exe C:\Windows\Temp\App_Uninstaller2.ps1
+Powershell Remove-Item C:\Windows\Temp\App_Uninstaller2.ps1 -recurse
+
+:: Script to download Corp logos from dropbox
+Powershell Invoke-WebRequest https://www.dropbox.com/sh/URL?dl=1 -OutFile C:\Windows\Temp\accountpics.zip 
+Powershell Expand-Archive C:\Windows\Temp\accountpics.zip -DestinationPath C:\Windows\Temp\accountpics
+:: Replaces User Account Pictures with Corporate Logos
+Powershell Copy-Item -Path 'C:\Windows\Temp\accountpics\*' -recurse -destination 'C:\ProgramData\Microsoft\User Account Pictures\' -force
+Powershell Remove-Item C:\Windows\Temp\accountpics -recurse
+Powershell Remove-Item C:\Windows\Temp\accountpics.zip -recurse
+:: Make Logo default for all accounts
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v UseDefaultTile /t REG_DWORD /d 1 /f
+
+:: Set owner and organization of machine
+REG ADD "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v RegisteredOwner /t REG_SZ /d "OWNER" /f
+REG ADD "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v RegisteredOrganization /t REG_SZ /d "ORGANIZATION_NAME" /f
+
+:: Disable Lockscreen
+REG ADD "HKLM\SOFTWARE\Policies\Microsoft\Windows\Personalization" /V NoLockScreen /T REG_dWORD /F /D 1
+:: Disable Lockscreen Background
+REG ADD "HKLM\SOFTWARE\Policies\Microsoft\Windows\System" /V DisableLogonBackgroundImage /T REG_dWORD /F /D 1
+
+:: Turn On Storage Sense to Automatically Free Up Space in Windows 10
+REG ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\StorageSense\Parameters\StoragePolicy" /V 01 /T REG_dWORD /D 1 /F
+REG ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\StorageSense\Parameters\StoragePolicy" /V 04 /T REG_dWORD /D 1 /F
+REG ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\StorageSense\Parameters\StoragePolicy" /V 08 /T REG_dWORD /D 1 /F
+REG ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\StorageSense\Parameters\StoragePolicy" /V 32 /T REG_dWORD /D 1 /F
+
+:: Hide People Bar
+reg add "HKCU\Software\Policies\Microsoft\Windows\Explorer" /v "HidePeopleBar" /t REG_DWORD /d 1 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Explorer" /v "HidePeopleBar" /t REG_DWORD /d 1 /f
+:: Disable Ink Workspace
+Reg Add "HKLM\SOFTWARE\Policies\Microsoft\WindowsInkWorkspace" /v AllowWindowsInkWorkspace /t REG_DWORD /d 0 /f
+:: Disable People Button
+REG ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People" /V PeopleBand /T REG_DWORD /D 0 /F
+
+:: Hide Edge Button in IE
+REG ADD "HKCU\Software\Microsoft\Internet Explorer\Main" /V HideNewEdgeButton /T REG_dWORD /F /D 1
+:: Change homepage to domain of choice
+reg add "HKCU\SOFTWARE\Microsoft\Internet Explorer\Main" /v "Start Page" /t REG_SZ /d "http://www.domain.org" /f
+
+:: Disable Edge First Run and set homepage
+reg add "HKLM\SOFTWARE\Policies\Microsoft\MicrosoftEdge\Main" /V PreventFirstRunPage /T REG_dWORD /F /D 1
+reg add "HKCU\Software\Policies\Microsoft\Internet Explorer\Main" /v "RunOnceComplete" /t REG_DWORD /d 1 /f 
+reg add "HKLM\Software\Policies\Microsoft\MicrosoftEdge\Internet Settings" /v ProvisionedHomePages /t REG_SZ /d "http://www.domain.org/home" /f
+
+:: Disable Microsoft Ads
+REG ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /V SilentInstalledAppsEnabled /T REG_dWORD /D 0 /F
+REG ADD "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /V SystemPaneSuggestionsEnabled /T REG_dWORD /D 0 /F
+REG ADD "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /V SoftLandingEnabled /T REG_dWORD /D 0 /F
+REG ADD "HKCU\Software\Microsoft\GameBar" /V ShowStartupPanel /T REG_dWORD /D 0 /F
+REG ADD "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /V ShowSyncProviderNotifications /T REG_dWORD /D 0 /F
+REG ADD "HKLM\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /V DisableWindowsConsumerFeatures /T REG_dWORD /D 1 /F
+REG ADD "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /V SubscribedContent-338388Enabled /T REG_dWORD /D 0 /F
+REG ADD "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /V Enabled /T REG_dWORD /D 0 /F
+
+:: Disable Advertising ID 
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo" /v "Enabled" /t REG_DWORD /d 0 /f
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo" /v "Enabled" /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AdvertisingInfo" /v "DisabledByGroupPolicy" /t REG_DWORD /d 1 /f
+
+:: Disable Cortana & Telemetry
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" /v "BingSearchEnabled" /t REG_DWORD /d 0 /f
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" /v "CortanaEnabled" /t REG_DWORD /d 0 /f
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" /v "CanCortanaBeEnabled" /t REG_DWORD /d 0 /f
+reg add "HKCU\SOFTWARE\Microsoft\Personalization\Settings" /v "AcceptedPrivacyPolicy" /t REG_DWORD /d 0 /f
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" /v "DeviceHistoryEnabled" /t REG_DWORD /d 0 /f
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" /v "HistoryViewEnabled" /t REG_DWORD /d 0 /f
+
+:: Disable Edge First Run
+REG ADD "HKLM\Software\Microsoft\Windows\CurrentVersion\Explorer" /V DisableEdgeDesktopShortcutCreation /T REG_dWORD /F /D 1
+
+:: Downloads DefaultApps
+Powershell Invoke-WebRequest https://www.dropbox.com/s/94bdaebj6c2wl8f/DefaultApps.xml?dl=1 -OutFile C:\Windows\System32\DefaultApps.xml 
+Powershell Invoke-WebRequest https://www.dropbox.com/s/po98ceavrqom3yp/DefaultAssociations.reg?dl=1 -OutFile C:\Windows\System32\DefaultAssociations.reg 
+Reg import "C:\Windows\System32\DefaultAssociations.reg"
+del "C:\Windows\System32\DefaultAssociations.reg"
+
+:: Install uBlock Origin adblocker for Chrome
+reg ADD "HKLM\SOFTWARE\Policies\Google\Chrome\ExtensionInstallForcelist" /v "1" /d "cjpalhdlnbpafiamejdnhcphjbkeiagm;https://clients2.google.com/service/update2/crx" /f
+reg ADD "HKLM\SOFTWARE\Policies\Google\Chrome\ExtensionInstallBlacklist" /v "1" /d "efaidnbmnnnibpcajpcglclefindmkaj" /f
+reg ADD "HKLM\SOFTWARE\Policies\Google\Chrome\ExtensionInstallBlacklist" /v "1" /d "bjicifbhnpakmaekfnphojjehhnifkmc" /f
+:: Block Google Chrome Software Reporter Tool
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "DisallowRun" /t REG_DWORD /d 1 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer\DisallowRun" /v 1 /t REG_SZ /d software_reporter_tool.exe /f
+
+:: Disable and Adjust Features
+Dism /Online /Disable-Feature /FeatureName:FaxServicesClientPackage /Quiet /NoRestart
+Dism /Online /Disable-Feature /FeatureName:Printing-XPSServices-Features /Quiet /NoRestart
+Dism /Online /Disable-Feature /FeatureName:WorkFolders-Client /Quiet /NoRestart
+Dism /Online /Disable-Feature /FeatureName:Xps-Foundation-Xps-Viewer /Quiet /NoRestart
+DISM /Online /Set-OSUninstallWindow /Value:60
