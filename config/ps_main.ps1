@@ -327,6 +327,49 @@ function CompareFiles()
     New-Object -TypeName PSObject -Property $properties
 }
 
+function CompareMeasureObject()
+{
+    Param(
+    [Parameter(Mandatory = $true)]$ObjectA,
+    [Parameter(Mandatory = $true)]$ObjectB
+    )
+
+    <#
+    Count             : 1358
+    Average           : 125270.397643594
+    Sum               : 170117200
+    Maximum           : 1017200
+    Minimum           : 27100
+    StandardDeviation : 58282.3393138254
+    Property          : Inc. Duration
+    #>
+
+    function PercentDiff
+    {
+        Param(
+        [Parameter(Mandatory = $true)]$ValueName,
+        [Parameter(Mandatory = $true)]$ValueA,
+        [Parameter(Mandatory = $true)]$ValueB
+        )
+
+        $diff = $ValueB - $ValueA;
+        $percentDiff = $diff / $valueA;
+        $properties = @{
+            "Name"=$ValueName;
+            "Diff"=$diff;
+            "PercentDiff"=$percentDiff;
+            "A"=$ValueA;
+            "B"=$ValueB;
+        };
+        return New-Object -TypeName PSObject -Property $properties
+    }
+
+    PercentDiff -ValueName "Average" -ValueA $ObjectA.Average -ValueB $ObjectB.Average
+    PercentDiff -ValueName "Maximum" -ValueA $ObjectA.Maximum -ValueB $ObjectB.Maximum
+    PercentDiff -ValueName "Minimum" -ValueA $ObjectA.Minimum -ValueB $ObjectB.Minimum
+    PercentDiff -ValueName "StandardDeviation" -ValueA $ObjectA.StandardDeviation -ValueB $ObjectB.StandardDeviation
+}
+
 # Chocolatey profile
 $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 if (Test-Path($ChocolateyProfile)) {
@@ -343,4 +386,28 @@ function GitGrepReplace
 
     $files = git grep --name-only $Original -- $PathSpec
     $files | % { ((Get-Content -Path $_ -Raw) -Replace $Original,$Replace) | Set-Content -NoNewLine -Path $_ }
+}
+
+function PixClipboardToCsv
+{
+    return Get-Clipboard | %{$_.Replace("`t", ",")} | ConvertFrom-Csv
+}
+
+function AnalyzePixClipboard
+{
+    PixClipboardToCsv | Measure-Object -Property "Inc. Duration" -Average -Sum -Maximum -Minimum -StandardDeviation
+}
+
+function MeasureCsv
+{
+    [CmdletBinding()]
+    param(
+        [Parameter(ValueFromPipeline)]
+        $Input,
+
+        [Parameter(Mandatory)]
+        [string]$Property
+        )
+
+    $Input | Measure-Object -Property $Property -Average -Sum -Maximum -Minimum -StandardDeviation
 }
