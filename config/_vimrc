@@ -1,6 +1,14 @@
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "                                  VIM PLUG                                      "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if has('unix')
+    if empty(glob('~/.vim/autoload/plug.vim'))
+        silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+            \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+        autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+    endif
+endif
+
 call plug#begin('~/.vim/plugged')
 
 " Vim Git Wrapper
@@ -20,6 +28,8 @@ Plug 'PProvost/vim-ps1'
 " Distraction free writing
 " usage :[!]Goyo
 Plug 'junegunn/goyo.vim'
+" Centered code buffer
+Plug 'JMcKiern/vim-venter'
 " Korean kolor
 Plug 'junegunn/seoul256.vim'
 " fuzzy finder
@@ -68,6 +78,7 @@ set shell=cmd
 " set shellcmdflag=-command
 if has('gui_running')
     set guifont=Cascadia\ Mono:h11
+    set renderoptions=type:directx
     "set guifont=Consolas:h11:cANSI:qDRAFT
     " autocmd GUIEnter * simalt ~x
     set lines=40 columns=125
@@ -121,7 +132,7 @@ nnoremap   <C-h>  :noh<CR>|                  " clear search
 " vnoremap   <C-f>  gq|                        " visual format
 nnoremap   <C-s>  :%s/\s\+$//gc<CR>|         " Delete trailing whitespace with confirmation
 nnoremap   <C-G>  :%s/\<<C-R><C-W>\>/| ":bufdo %s/\<<C-R><C-W>\>//ge \| update | " grab as bounded word
-nnoremap   <C-L> 0y$/\V<c-r>"<cr>
+" nnoremap   <C-L> 0y$/\V<c-r>"<cr>
 nnoremap   <S-Enter> O<Esc>|
 nnoremap   <CR> o<Esc>|
 vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR> " enable searching for visually selected text
@@ -137,6 +148,7 @@ set splitbelow
 set splitright
 
 autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0
+autocmd FileType gitconfig set noexpandtab shiftwidth=8 softtabstop=0
 autocmd BufRead *.csx set syntax=cs
 
 " show when I run over 120 columns
@@ -223,7 +235,7 @@ endfunction
 if has('gui_running')
 "   Summer colors
         set background=dark
-        color papercolor
+        color PaperColor
 
 "   Spring colors
 "       set background=light
@@ -241,6 +253,8 @@ if has('gui_running')
 "       color lucius
 "       hi Search guibg=white
 else
-    set nocursorline
-    color seoul256
+    set background=dark
+    color PaperColor
 endif
+
+set ffs=unix,dos
