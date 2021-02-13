@@ -15,6 +15,7 @@ function Edit-Hosts { gvim c:\windows\system32\drivers\etc\hosts }
 function Get-Version { $PSVersionTable.PSVersion }
 
 Import-Module PSReadLine
+Import-Module Posh-Git
 
 Set-PSReadLineOption -Colors @{
     Command            = 'Gray'
@@ -90,6 +91,7 @@ function Colored
     return "`e[$($code)m$($Text)`e[0m"
 }
 
+<#
 function prompt
 {
     RefreshCwdSensitiveState;
@@ -114,6 +116,7 @@ function prompt
     $prompt = "λ"
     return "$(Colored -Text $prompt -Color Yellow) "
 }
+#>
 
 ###############
 # GIT ALIASES #
@@ -196,9 +199,14 @@ function PruneSquashedBranches
 {
     [CmdletBinding( )]
     Param(
-    [string]$Branch = "develop",
+    [string]$Branch,
     [switch]$Apply
     )
+
+    if (!$Branch) {
+        $Branch = $env:GitBranch
+        Write-Host "Defaulting to compare against branch [$Branch]"
+    }
 
     git checkout -q $Branch
     git for-each-ref refs/heads/ "--format=%(refname:short)" | % {
