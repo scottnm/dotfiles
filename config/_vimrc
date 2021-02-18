@@ -30,6 +30,8 @@ Plug 'PProvost/vim-ps1'
 " Distraction free writing
 " usage :[!]Goyo
 Plug 'junegunn/goyo.vim'
+" Centered code buffer
+Plug 'JMcKiern/vim-venter'
 " Korean kolor
 Plug 'junegunn/seoul256.vim'
 " fuzzy finder
@@ -51,6 +53,8 @@ Plug 'lifepillar/vim-solarized8'
 Plug 'AndrewRadev/linediff.vim'
 " haskell
 Plug 'neovimhaskell/haskell-vim' " syntax highlighting
+" rust
+Plug 'rust-lang/rust.vim' " highlighting + fmt support
 
 " Initialize plugin system
 call plug#end()
@@ -257,3 +261,5 @@ else
     set background=dark
     color PaperColor
 endif
+
+set ffs=unix,dos
