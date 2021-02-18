@@ -3,8 +3,9 @@ $env:SideProfilePath = "$HOME\dev\dotfiles\config\ps_side.ps1"
 . $env:SideProfilePath
 
 # vim aliases
-new-alias cvim c:\windows\vim.bat -Force -Option AllScope
-new-alias vim c:\windows\gvim.bat -Force -Option AllScope
+# new-alias cvim c:\windows\vim.bat -Force -Option AllScope
+# new-alias vim c:\windows\gvim.bat -Force -Option AllScope
+new-alias vim gvim -Force -Option AllScope
 
 # DevEnv edit paths
 function Edit-Profile { gvim $profile $env:SideProfilePath }
@@ -15,6 +16,7 @@ function Edit-Hosts { gvim c:\windows\system32\drivers\etc\hosts }
 function Get-Version { $PSVersionTable.PSVersion }
 
 Import-Module PSReadLine
+Import-Module Posh-Git
 
 Set-PSReadLineOption -Colors @{
     Command            = 'Gray'
@@ -343,4 +345,14 @@ function GitGrepReplace
 
     $files = git grep --name-only $Original -- $PathSpec
     $files | % { ((Get-Content -Path $_ -Raw) -Replace $Original,$Replace) | Set-Content -NoNewLine -Path $_ }
+}
+
+function GitGrepToVim
+{
+    param(
+        [Parameter(Mandatory)]
+        [string]$Pattern
+        )
+
+    gvim (git grep --name-only -i $Pattern)
 }
