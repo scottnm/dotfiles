@@ -434,3 +434,27 @@ function MeasureCsv
 
     $Input | Measure-Object -Property $Property -Average -Sum -Maximum -Minimum -StandardDeviation
 }
+
+###########
+# Journal #
+###########
+function Journal
+{
+    if (!$env:JournalPath)
+    {
+        throw "Journal path not set in ps_side.ps1";
+    }
+
+    if (!(Test-Path "$env:JournalPath"))
+    {
+        throw "$env:JournalPath does not exist";
+    }
+
+    $requiredExtension = ".jf"
+    if ((Get-Item $env:JournalPath).Extension -ne $requiredExtension)
+    {
+        throw "Journal file needs '$requiredExtension' extension. Found $env:JournalPath";
+    }
+
+    gvim $env:JournalPath
+}

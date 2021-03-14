@@ -37,6 +37,8 @@ Plug 'junegunn/seoul256.vim'
 " fuzzy finder
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
+" journal
+Plug 'junegunn/vim-journal'
 " allow quitting all vim buffers except active
 Plug 'vim-scripts/BufOnly.vim'
 " tab line
@@ -265,3 +267,13 @@ endif
 set fileformat=unix
 set fileformats=unix,dos
 "set nobinary
+
+" Journal
+autocmd VimEnter *.jf call EnterJournal()
+function EnterJournal()
+    set syn=journal
+    $pu=''
+    $pu=strftime('[ %a %d %b %y - %X ]')
+    normal o
+    startinsert!
+endfunction
