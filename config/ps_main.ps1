@@ -168,6 +168,7 @@ function GitRenameTag
     }
 }
 
+function grc { gvim (git diff --name-only --diff-filter=U) }
 function gc { & git commit -ev $args }
 function ga { & git add --all $args }
 function gp { & git push $args }

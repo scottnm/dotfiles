@@ -262,4 +262,6 @@ else
     color PaperColor
 endif
 
-set ffs=unix,dos
+set fileformat=unix
+set fileformats=unix,dos
+"set nobinary
