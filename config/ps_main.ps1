@@ -92,7 +92,6 @@ function Colored
     return "`e[$($code)m$($Text)`e[0m"
 }
 
-<#
 function prompt
 {
     RefreshCwdSensitiveState;
@@ -117,7 +116,6 @@ function prompt
     $prompt = "λ"
     return "$(Colored -Text $prompt -Color Yellow) "
 }
-#>
 
 ###############
 # GIT ALIASES #
