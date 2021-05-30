@@ -9,6 +9,10 @@ $env:WindowsPSProfilePath = "$home\Documents\WindowsPowerShell\Microsoft.PowerSh
 $env:WindowsPSCoreProfilePath = "$home\Documents\PowerShell\Microsoft.PowerShell_profile.ps1";
 $env:WindowsPSSideProfilePath = "$env:DotFilesPath\config\ps_side.ps1"
 
+# Windows Terminal paths
+$env:WinTermPath = "$env:DotFilesPath\config\winterm_profiles.json"
+$env:LocalWinTermPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
+
 # Vim paths
 $env:WindowsVimConfPath = "$home\_vimrc";
 $env:VimConfPath = "$env:DotFilesPath\config\_vimrc";

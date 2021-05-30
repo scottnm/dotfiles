@@ -54,6 +54,10 @@ cmd /c mklink $env:WindowsPSProfilePath $env:PSProfilePath
 cmd /c mklink $env:WindowsPSCoreProfilePath $env:PSProfilePath
 cmd /c mklink $env:WindowsPSSideProfilePath $env:PSSideProfilePath
 
+# Setup Windows Terminal profile
+rm $env:LocalWinTermPath
+cmd /c mklink $env:LocalWinTermPath $env:WinTermPath
+
 # Setup Vim profile
 cmd /c mklink $env:WindowsVimConfPath $env:VimConfPath
 mkdir -Force $env:WindowsVimAfterPath
