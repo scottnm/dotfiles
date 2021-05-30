@@ -14,14 +14,14 @@ if (!(Get-Command choco -ErrorAction SilentlyContinue))
     iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 }
 
-choco install powershell-core
-choco install microsoft-windows-terminal
-choco install git
-choco install vim
-choco install powertoys
-choco install fzf
-# choco install firefox
-# choco install sharpkeys
+choco install powershell-core -y
+choco install microsoft-windows-terminal -y
+choco install git -y
+choco install vim -y
+choco install powertoys -y
+choco install fzf -y
+# choco install firefox -y
+# choco install sharpkeys -y
 
 # - vimplug
 md $HOME\vimfiles\autoload
