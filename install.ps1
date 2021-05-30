@@ -1,4 +1,14 @@
+#
 # New machine install
+#
+
+# First warn if not running as admin
+$isAdmin = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).groups -match "S-1-5-32-544")
+if (!$isAdmin)
+{
+    Write-Warning "It is recommended to run as admin!"
+    Read-Host "Ctrl-c to quit. Enter to continue"
+}
 
 pushd .
 
