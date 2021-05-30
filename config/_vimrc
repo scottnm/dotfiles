@@ -241,17 +241,17 @@ endfunction
 
 if has('gui_running')
 "   Summer colors
-        set background=dark
-        color PaperColor
+"       set background=dark
+"       color PaperColor
 
 "   Spring colors
-"       set background=light
+        set background=light
+"       color papercolor
 "       color gravity
 "       color bluedrake
 "       color Atelier_SeasideLight
-"       let g:seoul256_background = 256
-"       color seoul256
-"       color papercolor
+        let g:seoul256_background = 256
+        color seoul256
 
 "   Fall colors
 "       color desert-night

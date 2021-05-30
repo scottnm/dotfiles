@@ -1,5 +1,21 @@
 $env:SideProfilePath = "$HOME\dev\dotfiles\config\ps_side.ps1"
 
+function Ensure-Module
+{
+    Param(
+        [string]$Name
+        )
+
+    try {
+        Import-Module $Name -ErrorAction stop
+    }
+    catch {
+        Write-Warning "Couldn't import module $Name. Attempting install..."
+        Install-Module -Name $Name
+        Import-Module $Name
+    }
+}
+
 . $env:SideProfilePath
 
 # vim aliases
@@ -12,11 +28,18 @@ function Edit-Profile { gvim $profile $env:SideProfilePath }
 function Edit-Vimrc { gvim $HOME\_vimrc }
 function Edit-GhciConf { gvim $env:APPDATA\ghc\ghci.conf }
 function Edit-Hosts { gvim c:\windows\system32\drivers\etc\hosts }
-
+function Edit-GitConfig {
+    Param([switch]$Global) $globalFlag = if ($Global) { "--global" } else { "" }
+    git config $globalFlag -e
+}
+function Edit-TopicNotes {
+    $path = Join-Path -path $env:TopicNotesDir -ChildPath "${env:GitTopic}_notes.md"
+    gvim $path
+}
 function Get-Version { $PSVersionTable.PSVersion }
 
 Import-Module PSReadLine
-Import-Module Posh-Git
+Ensure-Module -Name Posh-Git
 
 Set-PSReadLineOption -Colors @{
     Command            = 'Gray'
@@ -438,6 +461,10 @@ function MeasureCsv
 ###########
 function Journal
 {
+    Param(
+        [string]$Entry
+        )
+
     if (!$env:JournalPath)
     {
         throw "Journal path not set in ps_side.ps1";
@@ -454,5 +481,14 @@ function Journal
         throw "Journal file needs '$requiredExtension' extension. Found $env:JournalPath";
     }
 
-    gvim $env:JournalPath
+    if ($Entry)
+    {
+        $dateline = (Get-Date -Format "`n[ ddd d MMM yy - h:mm:ss tt ]`n")
+        Out-File -InputObject $dateline -Append -FilePath $env:JournalPath  -NoNewline
+        Out-File -InputObject "$Entry`n" -Append -FilePath $env:JournalPath -NoNewline
+    }
+    else
+    {
+        gvim $env:JournalPath
+    }
 }

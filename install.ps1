@@ -16,8 +16,8 @@ if (!(Get-Command choco -ErrorAction SilentlyContinue))
 
 choco install git
 choco install vim
-choco install firefox
-choco install sharpkeys
+# choco install firefox
+# choco install sharpkeys
 choco install powertoys
 choco install fzf
 
