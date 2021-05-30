@@ -23,6 +23,11 @@ choco install fzf -y
 # choco install firefox -y
 # choco install sharpkeys -y
 
+# refresh after installing everything
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") +
+	";" +
+	[System.Environment]::GetEnvironmentVariable("Path","User")
+
 # - vimplug
 md $HOME\vimfiles\autoload
 $uri = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
@@ -47,6 +52,7 @@ mkdir -Force $env:WindowsPSPath
 mkdir -Force $env:WindowsPSCorePath
 cmd /c mklink $env:WindowsPSProfilePath $env:PSProfilePath
 cmd /c mklink $env:WindowsPSCoreProfilePath $env:PSProfilePath
+cmd /c mklink $env:WindowsPSSideProfilePath $env:PSSideProfilePath
 
 # Setup Vim profile
 cmd /c mklink $env:WindowsVimConfPath $env:VimConfPath
