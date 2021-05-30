@@ -21,8 +21,8 @@ if (!(Get-Command choco -ErrorAction SilentlyContinue))
 }
 
 # - remembear
-https://s3.amazonaws.com/remembear/app/release/downloads/windows/RememBear_x64.exe
-iwr -uri "https://s3.amazonaws.com/remembear/app/release/downloads/windows/RememBear_x64.exe" -OutFile "~\Downloads\rx64.exe"
+$remembearUrl = "https://s3.amazonaws.com/remembear/app/release/downloads/windows/RememBear_x64.exe"
+iwr -uri $remembearUrl -OutFile "~\Downloads\rx64.exe"
 . ~\Downloads\rx64.exe
 
 choco install powershell-core -y
