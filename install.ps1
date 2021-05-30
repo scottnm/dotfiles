@@ -2,10 +2,6 @@
 
 pushd .
 
-# TODO: currently have to setup manually
-# - remembear
-# - remembear extension for firefox
-
 # - chocolatey
 if (!(Get-Command choco -ErrorAction SilentlyContinue))
 {
@@ -13,6 +9,11 @@ if (!(Get-Command choco -ErrorAction SilentlyContinue))
     [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072;
     iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 }
+
+# - remembear
+https://s3.amazonaws.com/remembear/app/release/downloads/windows/RememBear_x64.exe
+iwr -uri "https://s3.amazonaws.com/remembear/app/release/downloads/windows/RememBear_x64.exe" -OutFile "~\Downloads\rx64.exe"
+. ~\Downloads\rx64.exe
 
 choco install powershell-core -y
 choco install microsoft-windows-terminal -y
