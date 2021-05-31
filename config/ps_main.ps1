@@ -462,33 +462,48 @@ function MeasureCsv
 function Journal
 {
     Param(
+        [switch]$Alt,
         [string]$Entry
         )
 
-    if (!$env:JournalPath)
+    if ($Alt)
     {
-        throw "Journal path not set in ps_side.ps1";
+        if (!$env:AltJournalPath)
+        {
+            throw "Alt journal path not set in ps_side.ps1";
+        }
+        $journalPath = $env:AltJournalPath
+        $journalDescTag = "[alt]"
+    }
+    else
+    {
+        if (!$env:JournalPath)
+        {
+            throw "Journal path not set in ps_side.ps1";
+        }
+        $journalPath = $env:JournalPath
+        $journalDescTag = ""
     }
 
-    if (!(Test-Path "$env:JournalPath"))
+    if (!(Test-Path $journalPath))
     {
-        throw "$env:JournalPath does not exist";
+        throw "$journalPath does not exist";
     }
 
     $requiredExtension = ".jf"
-    if ((Get-Item $env:JournalPath).Extension -ne $requiredExtension)
+    if ((Get-Item $journalPath).Extension -ne $requiredExtension)
     {
-        throw "Journal file needs '$requiredExtension' extension. Found $env:JournalPath";
+        throw "Journal$journalDescTag file needs '$requiredExtension' extension. Found $journalPath";
     }
 
     if ($Entry)
     {
         $dateline = (Get-Date -Format "`n[ ddd d MMM yy - h:mm:ss tt ]`n")
-        Out-File -InputObject $dateline -Append -FilePath $env:JournalPath  -NoNewline
-        Out-File -InputObject "$Entry`n" -Append -FilePath $env:JournalPath -NoNewline
+        Out-File -InputObject $dateline -Append -FilePath $journalPath  -NoNewline
+        Out-File -InputObject "$Entry`n" -Append -FilePath $journalPath -NoNewline
     }
     else
     {
-        gvim $env:JournalPath
+        gvim $journalPath
     }
 }
