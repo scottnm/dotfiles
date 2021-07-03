@@ -151,10 +151,6 @@ vnoremap <C-r> "hy:%s/<C-r>h//gc<left><left><left> " enable replacing visually s
 set splitbelow
 set splitright
 
-autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0
-autocmd FileType gitconfig set noexpandtab shiftwidth=8 softtabstop=0
-autocmd BufRead *.csx set syntax=cs
-
 " show when I run over 120 columns
 set colorcolumn=121
 hi ColorColumn ctermbg=darkgray
@@ -163,13 +159,6 @@ hi ColorColumn ctermbg=darkgray
 
 " :ls to get buffers
 " :b<N> to switch to the buffer
-
-" source file processors
-autocmd BufWritePre *.rs,*.c,*.cpp,*.h,*.bat,*.ps1,*.cmd,*.cs,*.csx %s/\s\+$//e
-
-" syntax highlighting
-syntax on
-au BufReadPost *.txt set syntax=note
 
 " experimental
 nnoremap ; :
@@ -189,6 +178,33 @@ set laststatus=2
 " created
 set showtabline=2
 
+" set up italics
+highlight Comment gui=italic
+
+set conceallevel=0
+
+"""""""""""""""""""""""""""""""""""""
+"|     PROGRAMMING LANG CONFIGS     |
+"""""""""""""""""""""""""""""""""""""
+
+" source file processors
+autocmd BufWritePre *.rs,*.c,*.cpp,*.h,*.bat,*.ps1,*.cmd,*.cs,*.csx %s/\s\+$//e
+
+" syntax highlighting
+syntax on
+au BufReadPost *.txt set syntax=note
+
+autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0
+autocmd FileType gitconfig set noexpandtab shiftwidth=8 softtabstop=0
+autocmd BufRead *.csx set syntax=cs
+
+" rust auto fmting
+let g:rustfmt_autosave = 1
+
+"""""""""""""""""""""""""""""""""""""
+"|          NETRW SETTINGS          |
+"""""""""""""""""""""""""""""""""""""
+
 " netrw settings:
 "   to use tree view
 let g:netrw_liststyle = 0
@@ -203,9 +219,6 @@ let g:netrw_browse_split = 0
 "   autocmd!
 "   autocmd VimEnter * :Vexplore
 " augroup END
-
-" set up italics
-highlight Comment gui=italic
 
 " snippets
 nnoremap ,cppsnip :-1read $HOME\.vim\skeletons\main.cpp<CR>/return 0;<CR>O
@@ -239,19 +252,23 @@ endfunction
 "     color desert
 "     set background=light
 
-if has('gui_running')
+if has('nvim')
+        set background=light
+        let g:seoul256_background = 256
+        color seoul256
+elseif has('gui_running')
 "   Summer colors
-"       set background=dark
-"       color PaperColor
+        set background=dark
+        color PaperColor
 
 "   Spring colors
-        set background=light
+"       set background=light
 "       color papercolor
 "       color gravity
 "       color bluedrake
 "       color Atelier_SeasideLight
-        let g:seoul256_background = 256
-        color seoul256
+"       let g:seoul256_background = 256
+"       color seoul256
 
 "   Fall colors
 "       color desert-night
