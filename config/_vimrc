@@ -57,6 +57,8 @@ Plug 'AndrewRadev/linediff.vim'
 Plug 'neovimhaskell/haskell-vim' " syntax highlighting
 " rust
 Plug 'rust-lang/rust.vim' " highlighting + fmt support
+" vim markdown
+Plug 'plasticboy/vim-markdown' " vim's default markdown highlighting is pretty funky. maybe this is better
 
 " Initialize plugin system
 call plug#end()
@@ -71,7 +73,8 @@ if has('gui_running')
 endif
 
 " prevent window movement when vsplit
-set guioptions-=r guioptions-=L
+set guioptions-=r
+set guioptions-=L
 
 set nobackup
 set nowritebackup
@@ -141,6 +144,14 @@ nnoremap   <S-Enter> O<Esc>|
 nnoremap   <CR> o<Esc>|
 vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR> " enable searching for visually selected text
 vnoremap <C-r> "hy:%s/<C-r>h//gc<left><left><left> " enable replacing visually selected text
+
+" leader key shortcuts
+let mapleader="-"
+
+" clipboard copy-paste support
+:nnoremap <Leader>p "+gP
+:nnoremap <Leader>P O<ESC>"+gP
+:vnoremap <Leader>y "+y
 
 " better :e cmds
 " nnoremap ,e :e <C-R>=expand("%:p:h") . "/" <CR>
@@ -240,18 +251,19 @@ endfunction
 "     set background=light
 
 if has('gui_running')
+    color desert
 "   Summer colors
 "       set background=dark
 "       color PaperColor
 
 "   Spring colors
-        set background=light
+"       set background=light
 "       color papercolor
 "       color gravity
 "       color bluedrake
 "       color Atelier_SeasideLight
-        let g:seoul256_background = 256
-        color seoul256
+"       let g:seoul256_background = 256
+"       color seoul256
 
 "   Fall colors
 "       color desert-night
@@ -264,9 +276,18 @@ else
     color PaperColor
 endif
 
+"""""""""""""""""""""""""""""""""""""
+"|          FILE FORMATTING         |
+"""""""""""""""""""""""""""""""""""""
+" disable vim-markdown autofolding
+let g:vim_markdown_folding_disabled = 1 
+" don't conceal in markdown mode
+let g:vim_markdown_conceal = 0
+
+
+" use LF line endings by default
 set fileformat=unix
 set fileformats=unix,dos
-"set nobinary
 
 " Journal
 autocmd VimEnter *.jf call EnterJournal()
