@@ -507,7 +507,8 @@ function Journal
 {
     Param(
         [switch]$Alt,
-        [string]$Entry
+        [string]$Entry,
+        [string[]]$EntryTags
         )
 
     if ($Alt)
@@ -543,11 +544,22 @@ function Journal
     if ($Entry)
     {
         $dateline = (Get-Date -Format "`n[ ddd d MMM yy - h:mm:ss tt ]`n")
+
         Out-File -InputObject $dateline -Append -FilePath $journalPath  -NoNewline
         Out-File -InputObject "$Entry`n" -Append -FilePath $journalPath -NoNewline
+
+        if ($EntryTags)
+        {
+            $tagsline = "#" + ($EntryTags -Join "  #") + "`n"
+            Out-File -InputObject $tagsline -Append -FilePath $journalPath -NoNewLine
+        }
     }
     else
     {
+        if ($EntryTags)
+        {
+            throw "Can't supply `$EntryTags without `$Entry!";
+        }
         gvim $journalPath
     }
 }
