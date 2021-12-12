@@ -84,6 +84,7 @@ foreach ($syntax in $syntaxes)
 }
 
 # Setup GHCI profile
+mkdir Split-Path $env:WindowsGhciConfPath -Parent
 cmd /c mklink $env:WindowsGhciConfPath $env:GhciConfPath
 
 # Install fonts
