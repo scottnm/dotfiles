@@ -192,6 +192,7 @@ set showtabline=2
 " set up italics
 highlight Comment gui=italic
 
+let g:indentLine_setConceal = 0
 set conceallevel=0
 
 """""""""""""""""""""""""""""""""""""
