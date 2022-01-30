@@ -254,6 +254,11 @@ function! FindGitDir()
     echo FindGitDirEx(getcwd())
 endfunction
 
+function! GenerateGuid()
+    let guid = system('pwsh -noprofile -command (new-guid).Guid')
+    execute "normal! i" . trim(guid) . "\<Esc>"
+endfunction
+
 """""""""""""""""""""""""""""""""""""
 "|           COLORS                 |
 """""""""""""""""""""""""""""""""""""
