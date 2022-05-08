@@ -3,11 +3,21 @@
 ######################################
 function VerifyEnvironmentVariables
 {
+    if ($env:_NT_SYMBOL_PATH)
+    {
+        Write-Warning "Danger! I made a hack fix that might impact work the next time I pull my dotfiles"
+        <#
+        $requiredEnvironmentVariables = @(
+            "symstore_path" # needed for the xbox debugging tools at work
+            "_NT_SYMBOL_PATH" # needed for the xbox debugging tools at work
+            "SideProfilePath"
+            "GitPatchDirectory"
+            )
+        #>
+    }
+
     $requiredEnvironmentVariables = @(
-        "symstore_path" # needed for the xbox debugging tools at work
-        "_NT_SYMBOL_PATH" # needed for the xbox debugging tools at work
         "SideProfilePath"
-        "GitPatchDirectory"
         )
 
     $requiredEnvironmentVariables | %{
