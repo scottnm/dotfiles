@@ -1,5 +1,27 @@
-$env:SideProfilePath = "$HOME\dev\dotfiles\config\ps_side.ps1"
+######################################
+#### WARNINGS FOR NEEDED ENV VARS ####
+######################################
+function VerifyEnvironmentVariables
+{
+    $requiredEnvironmentVariables = @(
+        "symstore_path" # needed for the xbox debugging tools at work
+        "_NT_SYMBOL_PATH" # needed for the xbox debugging tools at work
+        "SideProfilePath"
+        "GitPatchDirectory"
+        )
 
+    $requiredEnvironmentVariables | %{
+        if (! (Get-Item -path "Env:$_" -ErrorAction SilentlyContinue) )
+        {
+            Write-Error "`$env:$_ not set! Set in system path variables"
+        }
+    }
+}
+VerifyEnvironmentVariables # call and verify
+
+######################################
+####          PROFILE START       ####
+######################################
 function Ensure-Module
 {
     Param(
@@ -39,7 +61,7 @@ function Edit-TopicNotes {
 function Get-Version { $PSVersionTable.PSVersion }
 
 Import-Module PSReadLine
-Ensure-Module -Name Posh-Git
+# Ensure-Module -Name Posh-Git
 
 Set-PSReadLineOption -Colors @{
     Command            = 'Gray'
@@ -68,7 +90,10 @@ function UpdateWindowTitle
 
 function UpdateBranchTopic($currentBranch)
 {
-    $env:GitTopic = $currentBranch.Split('/')[-1];
+    if ($currentBranch)
+    {
+        $env:GitTopic = $currentBranch.Split('/')[-1];
+    }
 }
 
 function Colored
@@ -189,7 +214,11 @@ function GitRenameTag
     }
 }
 
-function grc { gvim (git diff --name-only --diff-filter=U) }
+function grc {
+    pushd $env:GitRoot
+    gvim (git diff --name-only --diff-filter=U)
+    popd
+}
 function gc { & git commit -ev $args }
 function ga { & git add --all $args }
 function gp { & git push $args }
@@ -204,17 +233,23 @@ function gd { & git diff $args }
 function gdc { & git diff --cached $args }
 function gcp
 {
-    if ($args.Length -lt 1)
+    if ($args.Length -lt 2)
     {
-        echo "Must supply at least one argument for the patch name"
+        Write-Warning "Usage: gcp [diff args] [patch name]"
+        return
     }
-    else
+
+    $patchDirectory = $env:GitPatchDirectory
+    if (!(Test-Path $patchDirectory))
     {
-        $diffArgs = $args[0..($args.Length - 2)]
-        $cmdString = "git diff $diffArgs > $HOME\work\git_patches\$($args[-1])"
-        cmd /c $cmdString
-        echo $cmdString
+        Write-Warning "Patch directory `"$patchDirectory`" does not exist!"
+        return
     }
+
+    $diffArgs = $args[0..($args.Length - 2)]
+    $cmdString = "git diff $diffArgs > $patchDirectory\$($args[-1])"
+    cmd /c $cmdString
+    echo $cmdString
 }
 function gti
 {
@@ -318,7 +353,7 @@ function PrintNum
 {
     [CmdletBinding()]
     Param(
-    [Parameter(Mandatory = $true)][int]$Value,
+    [Parameter(Mandatory = $true)][int64]$Value,
     [Parameter(Mandatory = $false)][switch]$AsHex,
     [Parameter(Mandatory = $false)][switch]$AsDec
     )
@@ -399,6 +434,15 @@ function CompareMeasureObject()
     PercentDiff -ValueName "Maximum" -ValueA $ObjectA.Maximum -ValueB $ObjectB.Maximum
     PercentDiff -ValueName "Minimum" -ValueA $ObjectA.Minimum -ValueB $ObjectB.Minimum
     PercentDiff -ValueName "StandardDeviation" -ValueA $ObjectA.StandardDeviation -ValueB $ObjectB.StandardDeviation
+}
+
+function DecodeBase64
+{
+    Param(
+    [Parameter(Mandatory = $true)]$Base64String
+    )
+
+    return [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($Base64String))
 }
 
 # Chocolatey profile

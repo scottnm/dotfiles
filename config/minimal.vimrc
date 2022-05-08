@@ -11,20 +11,12 @@ endif
 
 call plug#begin('~/.vim/plugged')
 
-" Kql
-Plug 'christianrondeau/vim-azure-log-analytics'
 " Vim Git Wrapper
 Plug 'tpope/vim-fugitive'
-" Pair shortcuts (e.g. [q ]q for :cprev :cnext
-Plug 'tpope/vim-unimpaired'
-" Advanced substitution handling casings and plurality
-Plug 'tpope/vim-abolish'
 " Toggle between header and source files
 Plug 'vim-scripts/a.vim'
 " Make yanked region flash
 Plug 'machakann/vim-highlightedyank'
-" Show if-branch path
-Plug 'aserebryakov/vim-branch-stack'
 " Powershell goodness
 Plug 'PProvost/vim-ps1'
 " Distraction free writing
@@ -32,8 +24,6 @@ Plug 'PProvost/vim-ps1'
 Plug 'junegunn/goyo.vim'
 " Centered code buffer
 Plug 'JMcKiern/vim-venter'
-" Korean kolor
-Plug 'junegunn/seoul256.vim'
 " fuzzy finder
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
@@ -43,24 +33,39 @@ Plug 'junegunn/vim-journal'
 Plug 'vim-scripts/BufOnly.vim'
 " tab line
 Plug 'Yggdroot/indentLine'
-" color schemes
-Plug 'NLKNguyen/papercolor-theme'
-Plug 'jonathanfilip/vim-lucius'
+" My fork of desert-night
 Plug 'scottnm/vim-color-desert-night' " fork of 'sainnhe/vim-color-desert-night'
-Plug 'gregsexton/Gravity'
-Plug 'MichaelMalick/vim-colors-bluedrake'
-Plug 'atelierbram/vim-colors_atelier-schemes'
-Plug 'lifepillar/vim-solarized8'
 " line differ
 Plug 'AndrewRadev/linediff.vim'
-" haskell
-Plug 'neovimhaskell/haskell-vim' " syntax highlighting
-" rust
-Plug 'rust-lang/rust.vim' " highlighting + fmt support
-" zig
-Plug 'ziglang/zig.vim' " highlighting + fmt support
 " vim markdown
 Plug 'plasticboy/vim-markdown' " vim's default markdown highlighting is pretty funky. maybe this is better
+
+"
+"
+" OTHER OPTIONAL PACKAGES
+"
+"
+" " Kql
+" Plug 'christianrondeau/vim-azure-log-analytics'
+" " Pair shortcuts (e.g. [q ]q for :cprev :cnext
+" Plug 'tpope/vim-unimpaired'
+" " Advanced substitution handling casings and plurality
+" Plug 'tpope/vim-abolish'
+" " Show if-branch path
+" Plug 'aserebryakov/vim-branch-stack'
+" " Korean kolor
+" Plug 'junegunn/seoul256.vim'
+" " color schemes
+" Plug 'NLKNguyen/papercolor-theme'
+" Plug 'jonathanfilip/vim-lucius'
+" Plug 'gregsexton/Gravity'
+" Plug 'MichaelMalick/vim-colors-bluedrake'
+" Plug 'atelierbram/vim-colors_atelier-schemes'
+" Plug 'lifepillar/vim-solarized8'
+" " haskell
+" Plug 'neovimhaskell/haskell-vim' " syntax highlighting
+" " rust
+" Plug 'rust-lang/rust.vim' " highlighting + fmt support
 
 " Initialize plugin system
 call plug#end()
@@ -86,9 +91,9 @@ set noswapfile
 set shell=cmd
 " set shellcmdflag=-command
 if has('gui_running')
-    set guifont=Cascadia\ Mono:h11
+    " set guifont=Cascadia\ Mono:h11
     " set renderoptions=type:directx
-    "set guifont=Consolas:h11:cANSI:qDRAFT
+    set guifont=Consolas:h11:cANSI:qDRAFT
     " autocmd GUIEnter * simalt ~x
     set lines=40 columns=125
     winpos 300 300
@@ -136,12 +141,8 @@ nnoremap   <C-p>  :bprev<CR>|                " prev buffer
 nnoremap   <C-n>  :bnext<CR>|                " next buffer
 nnoremap   <C-f>  :A<CR>|                    " flip buffer using a.vim
 nnoremap   <C-h>  :noh<CR>|                  " clear search
-" nnoremap <CR> :noh<CR><CR>|                  " clear search
-" nnoremap   <C-f>  gq|                        " format
-" vnoremap   <C-f>  gq|                        " visual format
 nnoremap   <C-s>  :%s/\s\+$//gc<CR>|         " Delete trailing whitespace with confirmation
 nnoremap   <C-G>  :%s/\<<C-R><C-W>\>/| ":bufdo %s/\<<C-R><C-W>\>//ge \| update | " grab as bounded word
-" nnoremap   <C-L> 0y$/\V<c-r>"<cr>
 nnoremap   <S-Enter> O<Esc>|
 nnoremap   <CR> o<Esc>|
 vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR> " enable searching for visually selected text
@@ -155,11 +156,6 @@ let mapleader="-"
 :nnoremap <Leader>P O<ESC>"+gP
 :vnoremap <Leader>y "+y
 
-" better :e cmds
-" nnoremap ,e :e <C-R>=expand("%:p:h") . "/" <CR>
-" nnoremap ,t :tabe <C-R>=expand("%:p:h") . "/" <CR>
-" nnoremap ,s :split <C-R>=expand("%:p:h") . "/" <CR>
-
 " Better splits with vim
 set splitbelow
 set splitright
@@ -167,8 +163,6 @@ set splitright
 " show when I run over 120 columns
 set colorcolumn=121
 hi ColorColumn ctermbg=darkgray
-" highlight OverLength ctermbg=red ctermfg=white guibg=#392929
-" match OverLength /\%121v.\+/
 
 " :ls to get buffers
 " :b<N> to switch to the buffer
@@ -180,11 +174,6 @@ vnoremap ; :
 " prevent unnecessary rewrites
 set nofixendofline
 
-" left margin
-" autocmd Colorscheme * highlight FoldColumn guifg=bg guibg=bg
-" set nornu
-" set nonu
-
 " status line always one
 set laststatus=2
 " always display the tab bar to prevent window resizing when new tabs are created
@@ -193,15 +182,12 @@ set showtabline=2
 " set up italics
 highlight Comment gui=italic
 
-let g:indentLine_setConceal = 0
-set conceallevel=0
-
 """""""""""""""""""""""""""""""""""""
 "|     PROGRAMMING LANG CONFIGS     |
 """""""""""""""""""""""""""""""""""""
 
 " source file processors
-autocmd BufWritePre *.lua,*.rs,*.c,*.cpp,*.h,*.bat,*.ps1,*.cmd,*.cs,*.csx %s/\s\+$//e
+autocmd BufWritePre *.rs,*.c,*.cpp,*.h,*.bat,*.ps1,*.cmd,*.cs,*.csx %s/\s\+$//e
 
 " syntax highlighting
 syntax on
@@ -210,9 +196,6 @@ au BufReadPost *.txt set syntax=note
 autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0
 autocmd FileType gitconfig set noexpandtab shiftwidth=8 softtabstop=0
 autocmd BufRead *.csx set syntax=cs
-
-" rust auto fmting
-let g:rustfmt_autosave = 1
 
 """""""""""""""""""""""""""""""""""""
 "|          NETRW SETTINGS          |
@@ -225,17 +208,6 @@ let g:netrw_liststyle = 0
 let g:netrw_banner = 1
 "   set file open style
 let g:netrw_browse_split = 0
-"   15% drawer width
-" let g:netrw_winsize = 15
-"   auto drawer
-" augroup ProjectDrawer
-"   autocmd!
-"   autocmd VimEnter * :Vexplore
-" augroup END
-
-" snippets
-nnoremap ,cppsnip :-1read $HOME\.vim\skeletons\main.cpp<CR>/return 0;<CR>O
-nnoremap ,csnip :-1read $HOME\.vim\skeletons\main.c<CR>/return 0;<CR>O
 
 " Self-written vim function to find the git root
 function! FindGitDirEx(dir)
@@ -255,11 +227,6 @@ function! FindGitDir()
     echo FindGitDirEx(getcwd())
 endfunction
 
-function! GenerateGuid()
-    let guid = system('pwsh -noprofile -command (new-guid).Guid')
-    execute "normal! i" . trim(guid) . "\<Esc>"
-endfunction
-
 """""""""""""""""""""""""""""""""""""
 "|           COLORS                 |
 """""""""""""""""""""""""""""""""""""
@@ -269,7 +236,7 @@ elseif has('gui_running')
     color desert
 else
     set background=dark
-    color PaperColor
+    color desert
 endif
 
 """""""""""""""""""""""""""""""""""""
@@ -288,9 +255,12 @@ set fileformats=unix,dos
 " Journal
 autocmd VimEnter *.jf call EnterJournal()
 function EnterJournal()
-    set syn=journal " vim-journal
+    set syn=journal
     $pu=''
     $pu=strftime('[ %a %d %b %y - %X ]')
     normal o
     startinsert!
 endfunction
+
+" FOR THE LOVE OF GOD TRY TO GET JSON FILES TO RENDER WITHOUT CONCEALING
+set conceallevel=0

@@ -14,7 +14,7 @@ $env:WinTermPath = "$env:DotFilesPath\config\winterm_profiles.json"
 $env:LocalWinTermPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
 
 # Vim paths
-$env:WindowsVimConfPath = "$home\.vimrc";
+$env:WindowsVimConfPath = "$home\_vimrc";
 $env:VimConfPath = "$env:DotFilesPath\config\_vimrc";
 $env:WindowsVimAfterPath = "$home\vimfiles\after"
 $env:WindowsVimSyntaxDir = "$env:WindowsVimAfterPath\syntax";
