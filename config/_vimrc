@@ -209,7 +209,7 @@ let g:fzf_preview_window = []
 """""""""""""""""""""""""""""""""""""
 
 " source file processors
-autocmd BufWritePre *.rs,*.c,*.cpp,*.h,*.bat,*.ps1,*.cmd,*.cs,*.csx %s/\s\+$//e
+autocmd BufWritePre *.py,*.rs,*.c,*.cpp,*.h,*.bat,*.ps1,*.cmd,*.cs,*.csx %s/\s\+$//e
 
 " syntax highlighting
 syntax on
