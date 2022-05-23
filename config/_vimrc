@@ -152,6 +152,11 @@ let mapleader="-"
 :nnoremap <Leader>p "+gP
 :nnoremap <Leader>P O<ESC>"+gP
 :vnoremap <Leader>y "+y
+" a.vim remaps these for some reason. Unmap them to avoid weird behavior when
+" typing things like "-ism" and "-ish" in comments
+" :iunmap <Leader>ihn
+" :iunmap <Leader>is
+" :iunmap <Leader>ih
 
 " better :e cmds
 " nnoremap ,e :e <C-R>=expand("%:p:h") . "/" <CR>
