@@ -38,7 +38,7 @@ Plug 'junegunn/seoul256.vim'
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 " journal
-Plug 'junegunn/vim-journal'
+" Plug 'junegunn/vim-journal'
 " allow quitting all vim buffers except active
 Plug 'vim-scripts/BufOnly.vim'
 " tab line
@@ -287,7 +287,13 @@ set fileformats=unix,dos
 " Journal
 autocmd VimEnter *.jf call EnterJournal()
 function EnterJournal()
-    set syn=journal
+    set syn=markdown
+    syntax sync fromstart
+    normal G
+endfunction
+
+function PrepNewJournalEntry()
+    call EnterJournal()
     $pu=''
     $pu=strftime('[ %a %d %b %y - %X ]')
     normal o

@@ -500,14 +500,30 @@ function MeasureCsv
     $Input | Measure-Object -Property $Property -Average -Sum -Maximum -Minimum -StandardDeviation
 }
 
+Function LaunchVs
+{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [ValidateSet("2019", "2022")]
+        [string]$Ver,
+        [string]$Sln
+        )
+
+    $ProgFilesPath = if ($Ver -ge "2022") { $env:ProgramFiles } else { ${env:ProgramFiles(x86)} }
+    & "$ProgFilesPath\Microsoft Visual Studio\$Ver\Enterprise\Common7\IDE\devenv.exe" $Sln
+
+}
+
 ###########
 # Journal #
 ###########
 function Journal
 {
     Param(
+        [switch]$AddEntry,
         [switch]$Alt,
-        [string]$Entry,
+        [string]$EntryText,
         [string[]]$EntryTags
         )
 
@@ -541,12 +557,12 @@ function Journal
         throw "Journal$journalDescTag file needs '$requiredExtension' extension. Found $journalPath";
     }
 
-    if ($Entry)
+    if ($EntryText)
     {
         $dateline = (Get-Date -Format "`n[ ddd d MMM yy - h:mm:ss tt ]`n")
 
         Out-File -InputObject $dateline -Append -FilePath $journalPath  -NoNewline
-        Out-File -InputObject "$Entry`n" -Append -FilePath $journalPath -NoNewline
+        Out-File -InputObject "$EntryText`n" -Append -FilePath $journalPath -NoNewline
 
         if ($EntryTags)
         {
@@ -558,8 +574,16 @@ function Journal
     {
         if ($EntryTags)
         {
-            throw "Can't supply `$EntryTags without `$Entry!";
+            throw "Can't supply `$EntryTags without `$EntryText!";
         }
-        gvim $journalPath
+
+        if ($AddEntry)
+        {
+            gvim $journalPath -c "call PrepNewJournalEntry()"
+        }
+        else
+        {
+            gvim $journalPath
+        }
     }
 }
