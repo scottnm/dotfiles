@@ -200,6 +200,10 @@ highlight Comment gui=italic
 let g:indentLine_setConceal = 0
 set conceallevel=0
 
+
+" Empty value to disable preview window altogether
+let g:fzf_preview_window = []
+
 """""""""""""""""""""""""""""""""""""
 "|     PROGRAMMING LANG CONFIGS     |
 """""""""""""""""""""""""""""""""""""
