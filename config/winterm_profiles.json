@@ -24,9 +24,9 @@
             },
             {
                 "guid": "{24e9d302-1544-4ddd-a1d2-a7f5b383c37e}",
-                "commandline": "cmd /K \"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Auxiliary\\Build\\vcvars64.bat\"",
+                "commandline": "cmd /K \"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Auxiliary\\Build\\vcvars64.bat\"",
                 "fontSize": 10,
-                "name": "vs2019 (x64)",
+                "name": "vs2022",
                 "startingDirectory": "%USERPROFILE%\\dev"
             },
             {

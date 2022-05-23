@@ -59,11 +59,7 @@ cd dotfiles
 & .\paths.ps1
 
 # Setup powershell profile
-mkdir -Force $env:WindowsPSPath
-mkdir -Force $env:WindowsPSCorePath
-cmd /c mklink $env:WindowsPSProfilePath $env:PSProfilePath
-cmd /c mklink $env:WindowsPSCoreProfilePath $env:PSProfilePath
-cmd /c mklink $env:WindowsPSSideProfilePath $env:PSSideProfilePath
+& .\SetupPwshProfiles.ps1
 
 # Setup Windows Terminal profile
 rm $env:LocalWinTermPath

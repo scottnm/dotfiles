@@ -57,6 +57,8 @@ Plug 'AndrewRadev/linediff.vim'
 Plug 'neovimhaskell/haskell-vim' " syntax highlighting
 " rust
 Plug 'rust-lang/rust.vim' " highlighting + fmt support
+" zig
+Plug 'ziglang/zig.vim' " highlighting + fmt support
 " vim markdown
 Plug 'plasticboy/vim-markdown' " vim's default markdown highlighting is pretty funky. maybe this is better
 
@@ -190,8 +192,7 @@ set nofixendofline
 
 " status line always one
 set laststatus=2
-" always display the tab bar to prevent window resizing when new tabs are
-" created
+" always display the tab bar to prevent window resizing when new tabs are created
 set showtabline=2
 
 " set up italics
@@ -209,7 +210,7 @@ let g:fzf_preview_window = []
 """""""""""""""""""""""""""""""""""""
 
 " source file processors
-autocmd BufWritePre *.py,*.rs,*.c,*.cpp,*.h,*.bat,*.ps1,*.cmd,*.cs,*.csx %s/\s\+$//e
+autocmd BufWritePre *.lua,*.py,*.rs,*.c,*.cpp,*.h,*.bat,*.ps1,*.cmd,*.cs,*.csx %s/\s\+$//e
 
 " syntax highlighting
 syntax on
