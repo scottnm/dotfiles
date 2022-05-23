@@ -288,29 +288,37 @@ function PruneSquashedBranches
 {
     [CmdletBinding( )]
     Param(
-    [string]$Branch,
+    [string]$BaseBranch,
+    [string]$PruneBranch,
     [switch]$Apply
     )
 
-    if (!$Branch) {
-        $Branch = $env:GitBranch
-        Write-Host "Defaulting to compare against branch [$Branch]"
+    if (!$BaseBranch) {
+        $BaseBranch = $env:GitBranch
+        Write-Host "Defaulting to compare against branch [$BaseBranch]"
     }
 
-    git checkout -q $Branch
-    git for-each-ref refs/heads/ "--format=%(refname:short)" | % {
-        $mergeBase = (git merge-base $Branch $_)
+    git checkout -q $BaseBranch
 
-        $gitTree = (git rev-parse "$_^{tree}")
-        $gitCherry = (git cherry $branch "$(git commit-tree $gitTree -p $mergeBase -m _)")
+    function PruneInternal
+    {
+        Param(
+            [string]$BaseBranch,
+            [string]$PruneBranch
+        )
+        $mergeBase = (git merge-base $BaseBranch $PruneBranch)
+
+        Write-Host -foregroundcolor cyan "Testing $BaseBranch <- $PruneBranch"
+        $gitTree = (git rev-parse "$PruneBranch^{tree}")
+        $gitCherry = (git cherry $BaseBranch "$(git commit-tree $gitTree -p $mergeBase -m _)")
         $squashMerged = $gitCherry[0] -eq '-'
-        $topicHead = (git rev-parse --short $_)
+        $topicHead = (git rev-parse --short $PruneBranch)
 
         if ($squashMerged)
         {
             if ($Apply)
             {
-                (git branch -D $_) | Out-Null
+                (git branch -D $PruneBranch) | Out-Null
             }
 
             $deleteMsg = if ($Apply) { "    DELETED" } else { "WILL DELETE"}
@@ -320,7 +328,22 @@ function PruneSquashedBranches
         {
             Write-Host " not merged" -NoNewLine
         }
-        Write-Host " ... ($topicHead) $_"
+        Write-Host " ... ($topicHead) $PruneBranch"
+    }
+
+    if ($PruneBranch)
+    {
+        PruneInternal -BaseBranch $BaseBranch -PruneBranch $PruneBranch
+    }
+    else
+    {
+        git for-each-ref refs/heads/ "--format=%(refname:short)" | % {
+            $pruneBranch = $_
+            if ($BaseBranch -ne $pruneBranch)
+            {
+                PruneInternal -BaseBranch $BaseBranch -PruneBranch $pruneBranch
+            }
+        }
     }
 }
 
