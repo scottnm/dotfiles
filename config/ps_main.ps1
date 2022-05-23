@@ -231,6 +231,8 @@ function gdllf { & git branch -D "@{-1}" $args; }
 function gue { & git checkout -- $args }
 function gd { & git diff $args }
 function gdc { & git diff --cached $args }
+function gdcw { & git diff --color-words $args }
+function gdccw { & git diff --cached --color-words $args }
 function gcp
 {
     if ($args.Length -lt 2)
