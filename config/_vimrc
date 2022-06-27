@@ -202,7 +202,7 @@ set conceallevel=0
 """""""""""""""""""""""""""""""""""""
 
 " source file processors
-autocmd BufWritePre *.rs,*.c,*.cpp,*.h,*.bat,*.ps1,*.cmd,*.cs,*.csx %s/\s\+$//e
+autocmd BufWritePre *.rs,*.c,*.cpp,*.h,*.bat,*.ps1,*.cmd,*.cs,*.csx,*.lua %s/\s\+$//e
 
 " syntax highlighting
 syntax on
