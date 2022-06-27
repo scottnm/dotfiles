@@ -38,7 +38,7 @@ Plug 'junegunn/seoul256.vim'
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 " journal
-Plug 'junegunn/vim-journal'
+" Plug 'junegunn/vim-journal'
 " allow quitting all vim buffers except active
 Plug 'vim-scripts/BufOnly.vim'
 " tab line
@@ -154,6 +154,11 @@ let mapleader="-"
 :nnoremap <Leader>p "+gP
 :nnoremap <Leader>P O<ESC>"+gP
 :vnoremap <Leader>y "+y
+" a.vim remaps these for some reason. Unmap them to avoid weird behavior when
+" typing things like "-ism" and "-ish" in comments
+" :iunmap <Leader>ihn
+" :iunmap <Leader>is
+" :iunmap <Leader>ih
 
 " better :e cmds
 " nnoremap ,e :e <C-R>=expand("%:p:h") . "/" <CR>
@@ -187,8 +192,7 @@ set nofixendofline
 
 " status line always one
 set laststatus=2
-" always display the tab bar to prevent window resizing when new tabs are
-" created
+" always display the tab bar to prevent window resizing when new tabs are created
 set showtabline=2
 
 " set up italics
@@ -197,12 +201,16 @@ highlight Comment gui=italic
 let g:indentLine_setConceal = 0
 set conceallevel=0
 
+
+" Empty value to disable preview window altogether
+let g:fzf_preview_window = []
+
 """""""""""""""""""""""""""""""""""""
 "|     PROGRAMMING LANG CONFIGS     |
 """""""""""""""""""""""""""""""""""""
 
 " source file processors
-autocmd BufWritePre *.rs,*.c,*.cpp,*.h,*.bat,*.ps1,*.cmd,*.cs,*.csx,*.lua %s/\s\+$//e
+autocmd BufWritePre *.lua,*.py,*.rs,*.c,*.cpp,*.h,*.bat,*.ps1,*.cmd,*.cs,*.csx %s/\s\+$//e
 
 " syntax highlighting
 syntax on
@@ -289,7 +297,13 @@ set fileformats=unix,dos
 " Journal
 autocmd VimEnter *.jf call EnterJournal()
 function EnterJournal()
-    set syn=journal
+    set syn=markdown
+    syntax sync fromstart
+    normal G
+endfunction
+
+function PrepNewJournalEntry()
+    call EnterJournal()
     $pu=''
     $pu=strftime('[ %a %d %b %y - %X ]')
     normal o

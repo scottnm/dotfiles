@@ -5,8 +5,8 @@ $env:PSProfilePath = "$env:DotFilesPath\config\ps_main.ps1";
 $env:PSSideProfilePath = "$env:OneDrive\projects\dev\private_dotfiles\ps_side.ps1";
 $env:WindowsPSPath = "$home\Documents\WindowsPowerShell\";
 $env:WindowsPSCorePath = "$home\Documents\PowerShell\";
-$env:WindowsPSProfilePath = "$home\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1";
-$env:WindowsPSCoreProfilePath = "$home\Documents\PowerShell\Microsoft.PowerShell_profile.ps1";
+$env:WindowsPSProfilePath = "$env:WindowsPSPath\Microsoft.PowerShell_profile.ps1";
+$env:WindowsPSCoreProfilePath = "$env:WindowsPSCorePath\Microsoft.PowerShell_profile.ps1";
 $env:WindowsPSSideProfilePath = "$env:DotFilesPath\config\ps_side.ps1"
 
 # Windows Terminal paths
