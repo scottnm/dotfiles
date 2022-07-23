@@ -605,7 +605,7 @@ function Journal
 
         if ($AddEntry)
         {
-            gvim $journalPath -c "call PrepNewJournalEntry()"
+            gvim $journalPath -c "call NewJournalEntry()"
         }
         else
         {

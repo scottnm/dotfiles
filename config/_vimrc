@@ -302,7 +302,7 @@ function EnterJournal()
     normal G
 endfunction
 
-function PrepNewJournalEntry()
+function NewJournalEntry()
     call EnterJournal()
     $pu=''
     $pu=strftime('[ %a %d %b %y - %X ]')
