@@ -51,9 +51,8 @@ function Ensure-Module
 . $env:SideProfilePath
 
 # vim aliases
-# new-alias cvim c:\windows\vim.bat -Force -Option AllScope
-# new-alias vim c:\windows\gvim.bat -Force -Option AllScope
-new-alias vim gvim -Force -Option AllScope
+new-alias vim nvim-qt -Force -Option AllScope
+new-alias nvim nvim-qt -Force -Option AllScope
 
 # DevEnv edit paths
 function Edit-Profile { gvim $profile $env:SideProfilePath }
