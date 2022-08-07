@@ -1,33 +1,19 @@
 ######################################
 #### WARNINGS FOR NEEDED ENV VARS ####
 ######################################
-function VerifyEnvironmentVariables
+function VerifyEnvironmentVariable
 {
-    if ($env:_NT_SYMBOL_PATH)
-    {
-        Write-Warning "Danger! I made a hack fix that might impact work the next time I pull my dotfiles"
-        <#
-        $requiredEnvironmentVariables = @(
-            "symstore_path" # needed for the xbox debugging tools at work
-            "_NT_SYMBOL_PATH" # needed for the xbox debugging tools at work
-            "SideProfilePath"
-            "GitPatchDirectory"
-            )
-        #>
-    }
-
-    $requiredEnvironmentVariables = @(
-        "SideProfilePath"
+    Param(
+        [string]$Name
         )
 
-    $requiredEnvironmentVariables | %{
-        if (! (Get-Item -path "Env:$_" -ErrorAction SilentlyContinue) )
-        {
-            Write-Error "`$env:$_ not set! Set in system path variables"
-        }
+    if (! (Get-Item -path "Env:$Name" -ErrorAction SilentlyContinue) )
+    {
+        Write-Error "`$env:$Name not set! Set in system path variables"
     }
 }
-VerifyEnvironmentVariables # call and verify
+
+VerifyEnvironmentVariable "SideProfilePath"
 
 ######################################
 ####          PROFILE START       ####
@@ -159,6 +145,11 @@ function prompt
     $statusLine = " $locationPrompt"
 
     UpdateGitBranchVars;
+
+    if ($env:CustomPromptPathTrail)
+    {
+        $statusLine += " :: $(Colored -Color Yellow -Text $env:CustomPromptPathTrail)"
+    }
 
     if ($env:GitBranch)
     {
@@ -614,7 +605,7 @@ function Journal
 
         if ($AddEntry)
         {
-            gvim $journalPath -c "call PrepNewJournalEntry()"
+            gvim $journalPath -c "call NewJournalEntry()"
         }
         else
         {
