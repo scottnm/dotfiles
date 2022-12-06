@@ -312,3 +312,5 @@ function NewJournalEntry()
     normal o
     startinsert!
 endfunction
+
+let g:rustfmt_autosave = 1
