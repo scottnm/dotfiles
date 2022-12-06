@@ -291,8 +291,8 @@ let g:vim_markdown_conceal = 0
 
 
 " use LF line endings by default
-set fileformat=unix
-set fileformats=unix,dos
+" set fileformat=unix
+" set fileformats=unix,dos
 
 " Journal
 autocmd VimEnter *.jf call EnterJournal()
