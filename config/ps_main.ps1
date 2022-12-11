@@ -181,18 +181,19 @@ function prompt
 function gsu
 {
     Param(
-        [string]$Remote
+        [string]$Remote = "origin",
+        [string]$Branch
         )
 
     UpdateGitBranchVars
-    if (!$Remote)
+    if (!$Branch)
     {
-        $Remote = $env:GitBranch
+        $Branch = $env:GitBranch
     }
 
     if ($env:GitBranch)
     {
-        git branch --set-upstream-to=origin/$Remote $env:GitBranch
+        git branch --set-upstream-to=$Remote/$Branch $env:GitBranch
     }
 }
 
