@@ -284,13 +284,22 @@ function gsql
     & "git rebase -i HEAD~${CommitCount}";
 }
 
+function gbrowse
+{
+    $url = (git config --get remote.origin.url)
+    if ($?)
+    {
+        start $url
+    }
+}
+
 function PruneSquashedBranches
 {
     [CmdletBinding( )]
     Param(
     [string]$BaseBranch,
-    [string]$PruneBranch,
-    [switch]$Apply
+    [string[]]$TargetBranches,
+    [switch]$WhatIf
     )
 
     if (!$BaseBranch) {
@@ -304,44 +313,47 @@ function PruneSquashedBranches
     {
         Param(
             [string]$BaseBranch,
-            [string]$PruneBranch
+            [string]$TargetBranch
         )
-        $mergeBase = (git merge-base $BaseBranch $PruneBranch)
+        $mergeBase = (git merge-base $BaseBranch $TargetBranch)
 
-        Write-Host -foregroundcolor cyan "Testing $BaseBranch <- $PruneBranch"
-        $gitTree = (git rev-parse "$PruneBranch^{tree}")
+        Write-Host -foregroundcolor cyan "Testing $BaseBranch <- $TargetBranch"
+        $gitTree = (git rev-parse "$TargetBranch^{tree}")
         $gitCherry = (git cherry $BaseBranch "$(git commit-tree $gitTree -p $mergeBase -m _)")
         $squashMerged = $gitCherry[0] -eq '-'
-        $topicHead = (git rev-parse --short $PruneBranch)
+        $topicHead = (git rev-parse --short $TargetBranch)
 
         if ($squashMerged)
         {
-            if ($Apply)
+            if (!$WhatIf)
             {
-                (git branch -D $PruneBranch) | Out-Null
+                (git branch -D $TargetBranch) | Out-Null
             }
 
-            $deleteMsg = if ($Apply) { "    DELETED" } else { "WILL DELETE"}
+            $deleteMsg = if (!$WhatIf) { "    DELETED" } else { "WILL DELETE"}
             Write-Host -ForegroundColor Red $deleteMsg -NoNewLine
         }
         else
         {
             Write-Host " not merged" -NoNewLine
         }
-        Write-Host " ... ($topicHead) $PruneBranch"
+        Write-Host " ... ($topicHead) $TargetBranch"
     }
 
-    if ($PruneBranch)
+    if ($TargetBranches.Count -gt 0)
     {
-        PruneInternal -BaseBranch $BaseBranch -PruneBranch $PruneBranch
+        foreach ($TargetBranch in $TargetBranches)
+        {
+            PruneInternal -BaseBranch $BaseBranch -TargetBranch $TargetBranch
+        }
     }
     else
     {
         git for-each-ref refs/heads/ "--format=%(refname:short)" | % {
-            $pruneBranch = $_
-            if ($BaseBranch -ne $pruneBranch)
+            $targetBranch = $_
+            if ($BaseBranch -ne $targetBranch)
             {
-                PruneInternal -BaseBranch $BaseBranch -PruneBranch $pruneBranch
+                PruneInternal -BaseBranch $BaseBranch -TargetBranch $targetBranch
             }
         }
     }
@@ -372,6 +384,31 @@ function RenameLowerCase($dir)
 
     $dir = $dir.ToLower();
     mv $tmpName $dir
+}
+
+function FindAndReplace
+{
+    param(
+        [string[]]$Paths,
+        [string]$From,
+        [string]$To,
+        [switch]$Recurse
+        )
+
+    function ReplaceTextInFile {
+        param(
+            [string]$Path,
+            [string]$From,
+            [string]$To
+            )
+
+        $x = (Get-Content $Path | %{ $_ -Replace $From, $To })
+        Set-Content $x -Path:$Path
+    }
+
+    Get-ChildItem $Paths -Recurse:$Recurse |
+        ? { (sls $From $_).Matches.Count -gt 0 } |
+        % { ReplaceTextInFile -Path:$_ -From:$From -To:$To }
 }
 
 function PrintNum
