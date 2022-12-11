@@ -7,95 +7,114 @@ if has('unix')
             \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
         autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
     endif
+else " windows
+    if empty(glob('$HOME/vimfiles/autoload/plug.vim'))
+        iwr -useb https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim |`
+            ni $HOME/vimfiles/autoload/plug.vim -Force
+    endif
 endif
 
 call plug#begin('~/.vim/plugged')
 
-" Kql
-Plug 'christianrondeau/vim-azure-log-analytics'
+" language plugins
+if has('nvim')
+    " Plug 'williamboman/mason.nvim'
+    Plug 'neovim/nvim-lspconfig'
+    Plug 'glepnir/lspsaga.nvim'
+    Plug 'nvim-treesitter/nvim-treesitter'
+    " Plug 'hrsh7th/cmp-nvim-lsp'
+    " Plug 'hrsh7th/cmp-buffer'
+    " Plug 'hrsh7th/cmp-path'
+    " Plug 'hrsh7th/cmp-cmdline'
+    " Plug 'hrsh7th/nvim-cmp'
+    " " For vsnip users.
+    " Plug 'hrsh7th/cmp-vsnip'
+    " Plug 'hrsh7th/vim-vsnip'
+endif
+Plug 'PProvost/vim-ps1'          " powershell
+Plug 'neovimhaskell/haskell-vim' " haskell (better syntax highlighting)
+Plug 'rust-lang/rust.vim'        " rust (better highlighting + fmt support)
+Plug 'ziglang/zig.vim'           " zig (highlighting + fmt support)
+Plug 'plasticboy/vim-markdown'   " markdown (better highlighting than default)
+
+" Formatters
+Plug 'junegunn/goyo.vim' " Distraction free writing; usage :[!]Goyo
+Plug 'JMcKiern/vim-venter' " Vertically-centered code buffer
+
 " Vim Git Wrapper
 Plug 'tpope/vim-fugitive'
-" Pair shortcuts (e.g. [q ]q for :cprev :cnext
-Plug 'tpope/vim-unimpaired'
-" Advanced substitution handling casings and plurality
-Plug 'tpope/vim-abolish'
 " Toggle between header and source files
 Plug 'vim-scripts/a.vim'
 " Make yanked region flash
 Plug 'machakann/vim-highlightedyank'
 " Show if-branch path
 Plug 'aserebryakov/vim-branch-stack'
-" Powershell goodness
-Plug 'PProvost/vim-ps1'
-" Distraction free writing
-" usage :[!]Goyo
-Plug 'junegunn/goyo.vim'
-" Centered code buffer
-Plug 'JMcKiern/vim-venter'
-" Korean kolor
-Plug 'junegunn/seoul256.vim'
 " fuzzy finder
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
-" journal
-" Plug 'junegunn/vim-journal'
 " allow quitting all vim buffers except active
 Plug 'vim-scripts/BufOnly.vim'
 " tab line
 Plug 'Yggdroot/indentLine'
 " color schemes
-Plug 'NLKNguyen/papercolor-theme'
-Plug 'jonathanfilip/vim-lucius'
 Plug 'scottnm/vim-color-desert-night' " fork of 'sainnhe/vim-color-desert-night'
-Plug 'gregsexton/Gravity'
-Plug 'MichaelMalick/vim-colors-bluedrake'
-Plug 'atelierbram/vim-colors_atelier-schemes'
-Plug 'lifepillar/vim-solarized8'
+Plug 'jonathanfilip/vim-lucius'
 " line differ
 Plug 'AndrewRadev/linediff.vim'
-" haskell
-Plug 'neovimhaskell/haskell-vim' " syntax highlighting
-" rust
-Plug 'rust-lang/rust.vim' " highlighting + fmt support
-" zig
-Plug 'ziglang/zig.vim' " highlighting + fmt support
-" vim markdown
-Plug 'plasticboy/vim-markdown' " vim's default markdown highlighting is pretty funky. maybe this is better
+
+" Unused Plugins
+" Kql
+" Plug 'christianrondeau/vim-azure-log-analytics'
+" " Pair shortcuts (e.g. [q ]q for :cprev :cnext
+" Plug 'tpope/vim-unimpaired'
+" " Advanced substitution handling casings and plurality
+" Plug 'tpope/vim-abolish'
+" " vim-journal
+" Plug 'junegunn/vim-journal'
+" " color schemes
+" Plug 'gregsexton/Gravity'
+" Plug 'MichaelMalick/vim-colors-bluedrake'
+" Plug 'atelierbram/vim-colors_atelier-schemes'
+" Plug 'lifepillar/vim-solarized8'
+" Plug 'NLKNguyen/papercolor-theme'
+" Plug 'junegunn/seoul256.vim'
 
 " Initialize plugin system
 call plug#end()
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"                              BEGIN CONFIG                                      "
+"                                 CONFIG                                         "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set noerrorbells
-if has('gui_running')
-    set visualbell t_vb=
-    autocmd GUIEnter * set visualbell t_vb=
-endif
 
-" prevent window movement when vsplit
-set guioptions-=r
-set guioptions-=L
+" Neovim decided not to support the old 'gui_running' flag so use my own flag
+" to determine the presence of a gui window
+let g:in_gui_window = has('gui_running') || exists('g:neovide') || exists('g:GuiLoaded')
+
+set noerrorbells
+
+"        GUI CONFIG        "
+set guifont=Cascadia\ Mono:h11
+set lines=40 columns=125
+if has('gui_running')
+    winpos 300 300
+endif
+set visualbell t_vb=
+autocmd GUIEnter * set visualbell t_vb=
+set guioptions-=r " prevent window movement when vsplit
+set guioptions-=L " prevent window movement when vsplit
 
 set nobackup
 set nowritebackup
 set noundofile
 set noswapfile
 
-set shell=cmd
-" set shellcmdflag=-command
-if has('gui_running')
-    set guifont=Cascadia\ Mono:h11
-    " set renderoptions=type:directx
-    "set guifont=Consolas:h11:cANSI:qDRAFT
-    " autocmd GUIEnter * simalt ~x
-    set lines=40 columns=125
-    winpos 300 300
+if !has('unix')
+    " On windows, set my shell to cmd so that my powershell config doesn't
+    " load everytime vim needs to run a shell command
+    set shell=cmd
 endif
 
 set encoding=utf-8
-
 set ruler                            " show row/column number
 set backspace=2                      " backspace works in insert mode
 filetype plugin on
@@ -136,16 +155,17 @@ nnoremap   <C-p>  :bprev<CR>|                " prev buffer
 nnoremap   <C-n>  :bnext<CR>|                " next buffer
 nnoremap   <C-f>  :A<CR>|                    " flip buffer using a.vim
 nnoremap   <C-h>  :noh<CR>|                  " clear search
-" nnoremap <CR> :noh<CR><CR>|                  " clear search
-" nnoremap   <C-f>  gq|                        " format
-" vnoremap   <C-f>  gq|                        " visual format
 nnoremap   <C-s>  :%s/\s\+$//gc<CR>|         " Delete trailing whitespace with confirmation
-nnoremap   <C-G>  :%s/\<<C-R><C-W>\>/| ":bufdo %s/\<<C-R><C-W>\>//ge \| update | " grab as bounded word
-" nnoremap   <C-L> 0y$/\V<c-r>"<cr>
+nnoremap   <C-G>  :%s/\<<C-R><C-W>\>/|       " grab as bounded word
 nnoremap   <S-Enter> O<Esc>|
 nnoremap   <CR> o<Esc>|
 vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR> " enable searching for visually selected text
 vnoremap <C-r> "hy:%s/<C-r>h//gc<left><left><left> " enable replacing visually selected text
+if has('nvim')
+    " apparently neovim '''fixed''' Y's behavior to match C/D (only goes to end of line).
+    " Fix back to regular vim behavior because I'm too far gone to relearn.
+    nnoremap Y yy
+endif
 
 " leader key shortcuts
 let mapleader="-"
@@ -160,11 +180,6 @@ let mapleader="-"
 " :iunmap <Leader>is
 " :iunmap <Leader>ih
 
-" better :e cmds
-" nnoremap ,e :e <C-R>=expand("%:p:h") . "/" <CR>
-" nnoremap ,t :tabe <C-R>=expand("%:p:h") . "/" <CR>
-" nnoremap ,s :split <C-R>=expand("%:p:h") . "/" <CR>
-
 " Better splits with vim
 set splitbelow
 set splitright
@@ -175,22 +190,10 @@ hi ColorColumn ctermbg=darkgray
 " highlight OverLength ctermbg=red ctermfg=white guibg=#392929
 " match OverLength /\%121v.\+/
 
-" :ls to get buffers
-" :b<N> to switch to the buffer
-
-" experimental
-nnoremap ; :
-vnoremap ; :
-
-" prevent unnecessary rewrites
+" prevent unnecessary rewrites to clean up extra endoflines
 set nofixendofline
 
-" left margin
-" autocmd Colorscheme * highlight FoldColumn guifg=bg guibg=bg
-" set nornu
-" set nonu
-
-" status line always one
+" status line always on
 set laststatus=2
 " always display the tab bar to prevent window resizing when new tabs are created
 set showtabline=2
@@ -198,9 +201,13 @@ set showtabline=2
 " set up italics
 highlight Comment gui=italic
 
-let g:indentLine_setConceal = 0
-set conceallevel=0
-
+" Prevent indent line from overwriting default conceal options. In my
+" experience this tended to cause JSON strings to render without surrounding
+" quotes
+let g:indentLine_char_list = ['|', '¦', '┆', '┊']
+autocmd BufRead,BufNewFile *.json IndentLinesDisable
+" let g:indentLine_setConceal = 0
+" set conceallevel=0
 
 " Empty value to disable preview window altogether
 let g:fzf_preview_window = []
@@ -213,7 +220,9 @@ let g:fzf_preview_window = []
 autocmd BufWritePre *.lua,*.py,*.rs,*.c,*.cpp,*.h,*.bat,*.ps1,*.cmd,*.cs,*.csx %s/\s\+$//e
 
 " syntax highlighting
-syntax on
+if !has('nvim')
+    syntax on
+endif
 au BufReadPost *.txt set syntax=note
 
 " XML and XML-based syntaxes get indent size of 2
@@ -277,27 +286,21 @@ endfunction
 """""""""""""""""""""""""""""""""""""
 "|           COLORS                 |
 """""""""""""""""""""""""""""""""""""
-if has('nvim')
-    color desert
-elseif has('gui_running')
-    color desert
-else
-    set background=dark
-    color PaperColor
-endif
+color lucius 
+set background=dark
 
 """""""""""""""""""""""""""""""""""""
 "|          FILE FORMATTING         |
 """""""""""""""""""""""""""""""""""""
 " disable vim-markdown autofolding
-let g:vim_markdown_folding_disabled = 1 
+let g:vim_markdown_folding_disabled = 1
 " don't conceal in markdown mode
 let g:vim_markdown_conceal = 0
 
 
 " use LF line endings by default
-set fileformat=unix
-set fileformats=unix,dos
+" set fileformat=unix
+" set fileformats=unix,dos
 
 " Journal
 autocmd VimEnter *.jf call EnterJournal()
@@ -307,7 +310,7 @@ function EnterJournal()
     normal G
 endfunction
 
-function PrepNewJournalEntry()
+function NewJournalEntry()
     call EnterJournal()
     $pu=''
     $pu=strftime('[ %a %d %b %y - %X ]')

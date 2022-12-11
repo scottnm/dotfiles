@@ -1,33 +1,19 @@
 ######################################
 #### WARNINGS FOR NEEDED ENV VARS ####
 ######################################
-function VerifyEnvironmentVariables
+function VerifyEnvironmentVariable
 {
-    if ($env:_NT_SYMBOL_PATH)
-    {
-        Write-Warning "Danger! I made a hack fix that might impact work the next time I pull my dotfiles"
-        <#
-        $requiredEnvironmentVariables = @(
-            "symstore_path" # needed for the xbox debugging tools at work
-            "_NT_SYMBOL_PATH" # needed for the xbox debugging tools at work
-            "SideProfilePath"
-            "GitPatchDirectory"
-            )
-        #>
-    }
-
-    $requiredEnvironmentVariables = @(
-        "SideProfilePath"
+    Param(
+        [string]$Name
         )
 
-    $requiredEnvironmentVariables | %{
-        if (! (Get-Item -path "Env:$_" -ErrorAction SilentlyContinue) )
-        {
-            Write-Error "`$env:$_ not set! Set in system path variables"
-        }
+    if (! (Get-Item -path "Env:$Name" -ErrorAction SilentlyContinue) )
+    {
+        Write-Error "`$env:$Name not set! Set in system path variables"
     }
 }
-VerifyEnvironmentVariables # call and verify
+
+VerifyEnvironmentVariable "SideProfilePath"
 
 ######################################
 ####          PROFILE START       ####
@@ -159,6 +145,11 @@ function prompt
     $statusLine = " $locationPrompt"
 
     UpdateGitBranchVars;
+
+    if ($env:CustomPromptPathTrail)
+    {
+        $statusLine += " :: $(Colored -Color Yellow -Text $env:CustomPromptPathTrail)"
+    }
 
     if ($env:GitBranch)
     {
@@ -295,13 +286,22 @@ function gsql
     & "git rebase -i HEAD~${CommitCount}";
 }
 
+function gbrowse
+{
+    $url = (git config --get remote.origin.url)
+    if ($?)
+    {
+        start $url
+    }
+}
+
 function PruneSquashedBranches
 {
     [CmdletBinding( )]
     Param(
     [string]$BaseBranch,
-    [string]$PruneBranch,
-    [switch]$Apply
+    [string[]]$TargetBranches,
+    [switch]$WhatIf
     )
 
     if (!$BaseBranch) {
@@ -315,44 +315,47 @@ function PruneSquashedBranches
     {
         Param(
             [string]$BaseBranch,
-            [string]$PruneBranch
+            [string]$TargetBranch
         )
-        $mergeBase = (git merge-base $BaseBranch $PruneBranch)
+        $mergeBase = (git merge-base $BaseBranch $TargetBranch)
 
-        Write-Host -foregroundcolor cyan "Testing $BaseBranch <- $PruneBranch"
-        $gitTree = (git rev-parse "$PruneBranch^{tree}")
+        Write-Host -foregroundcolor cyan "Testing $BaseBranch <- $TargetBranch"
+        $gitTree = (git rev-parse "$TargetBranch^{tree}")
         $gitCherry = (git cherry $BaseBranch "$(git commit-tree $gitTree -p $mergeBase -m _)")
         $squashMerged = $gitCherry[0] -eq '-'
-        $topicHead = (git rev-parse --short $PruneBranch)
+        $topicHead = (git rev-parse --short $TargetBranch)
 
         if ($squashMerged)
         {
-            if ($Apply)
+            if (!$WhatIf)
             {
-                (git branch -D $PruneBranch) | Out-Null
+                (git branch -D $TargetBranch) | Out-Null
             }
 
-            $deleteMsg = if ($Apply) { "    DELETED" } else { "WILL DELETE"}
+            $deleteMsg = if (!$WhatIf) { "    DELETED" } else { "WILL DELETE"}
             Write-Host -ForegroundColor Red $deleteMsg -NoNewLine
         }
         else
         {
             Write-Host " not merged" -NoNewLine
         }
-        Write-Host " ... ($topicHead) $PruneBranch"
+        Write-Host " ... ($topicHead) $TargetBranch"
     }
 
-    if ($PruneBranch)
+    if ($TargetBranches.Count -gt 0)
     {
-        PruneInternal -BaseBranch $BaseBranch -PruneBranch $PruneBranch
+        foreach ($TargetBranch in $TargetBranches)
+        {
+            PruneInternal -BaseBranch $BaseBranch -TargetBranch $TargetBranch
+        }
     }
     else
     {
         git for-each-ref refs/heads/ "--format=%(refname:short)" | % {
-            $pruneBranch = $_
-            if ($BaseBranch -ne $pruneBranch)
+            $targetBranch = $_
+            if ($BaseBranch -ne $targetBranch)
             {
-                PruneInternal -BaseBranch $BaseBranch -PruneBranch $pruneBranch
+                PruneInternal -BaseBranch $BaseBranch -TargetBranch $targetBranch
             }
         }
     }
@@ -383,6 +386,31 @@ function RenameLowerCase($dir)
 
     $dir = $dir.ToLower();
     mv $tmpName $dir
+}
+
+function FindAndReplace
+{
+    param(
+        [string[]]$Paths,
+        [string]$From,
+        [string]$To,
+        [switch]$Recurse
+        )
+
+    function ReplaceTextInFile {
+        param(
+            [string]$Path,
+            [string]$From,
+            [string]$To
+            )
+
+        $x = (Get-Content $Path | %{ $_ -Replace $From, $To })
+        Set-Content $x -Path:$Path
+    }
+
+    Get-ChildItem $Paths -Recurse:$Recurse |
+        ? { (sls $From $_).Matches.Count -gt 0 } |
+        % { ReplaceTextInFile -Path:$_ -From:$From -To:$To }
 }
 
 function PrintNum
@@ -615,11 +643,57 @@ function Journal
 
         if ($AddEntry)
         {
-            gvim $journalPath -c "call PrepNewJournalEntry()"
+            gvim $journalPath -c "call NewJournalEntry()"
         }
         else
         {
             gvim $journalPath
         }
+    }
+}
+
+function Test-Image {
+    [CmdletBinding()]
+    [OutputType([System.Boolean])]
+    param(
+        [Parameter(Mandatory=$true, Position=0, ValueFromPipeline=$true)]
+        [ValidateNotNullOrEmpty()]
+        [Alias('PSPath')]
+        [string] $Path
+        )
+
+    PROCESS {
+        $knownHeaders = @{
+            jpg = @( "FF", "D8" );
+            bmp = @( "42", "4D" );
+            gif = @( "47", "49", "46" );
+            tif = @( "49", "49", "2A" );
+            png = @( "89", "50", "4E", "47", "0D", "0A", "1A", "0A" );
+            # pdf = @( "25", "50", "44", "46" );
+        }
+
+        # coerce relative paths from the pipeline into full paths
+        if($_ -ne $null) {
+            $Path = $_.FullName
+        }
+
+        # read in the first 8 bits
+        $bytes = Get-Content -LiteralPath $Path -AsByteStream -ReadCount 1 -TotalCount 8 -ErrorAction Ignore
+        $retval = $false
+        foreach($key in $knownHeaders.Keys) {
+            # make the file header data the same length and format as the known header
+            $fileHeader = $bytes |
+            Select-Object -First $knownHeaders[$key].Length |
+            ForEach-Object { $_.ToString("X2") }
+            if($fileHeader.Length -eq 0) {
+                continue
+            }
+            # compare the two headers
+            $diff = Compare-Object -ReferenceObject $knownHeaders[$key] -DifferenceObject $fileHeader
+            if(($diff | Measure-Object).Count -eq 0) {
+                $retval = $true
+            }
+        }
+        return $retval
     }
 }
