@@ -29,4 +29,4 @@ fi
 alias ls='ls -l'
 
 # enable to use fish-shell
-fish
+# fish
