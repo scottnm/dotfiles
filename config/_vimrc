@@ -95,8 +95,8 @@ set noerrorbells
 
 "        GUI CONFIG        "
 set guifont=Cascadia\ Mono:h11
-set lines=40 columns=125
 if has('gui_running')
+    set lines=40 columns=125
     winpos 300 300
 endif
 set visualbell t_vb=
