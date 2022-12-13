@@ -19,9 +19,10 @@ sudo apt update
 echo "...updated package repos!"
 
 # 3a. make sure that vim is installed
-echo "installing vim..."
-sudo apt install vim
-echo "...vim installed"
+echo "installing neovim..."
+sudo apt remove vim
+sudo apt install neovim
+echo "...neovim installed"
 
 # 3b. make sure that curl is installed
 echo "installing curl..."
@@ -39,6 +40,14 @@ VIM_CONFIG="$HOME/.vimrc"
 rm -f $VIM_CONFIG
 ln -s "/mnt/c/Users/$WINDOWS_USER/dev/dotfiles/config/_vimrc" $VIM_CONFIG
 echo "...vimrc linked"
+
+echo "linking nvim init.vim..."
+NVIM_CONFIG_DIR="$HOME/.config/nvim"
+NVIM_CONFIG="$NVIM_CONFIG_DIR/init.vim"
+mkdir -p $NVIM_CONFIG_DIR
+rm -f $NVIM_CONFIG
+ln -s "/mnt/c/Users/$WINDOWS_USER/dev/dotfiles/config/nvim_init.vim" $NVIM_CONFIG
+echo "...nvim init.vim linked"
 
 # 5. symlink inputrc to our home directory
 echo "linking inputrc..."

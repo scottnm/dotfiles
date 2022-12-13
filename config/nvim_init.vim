@@ -1,21 +1,25 @@
 set runtimepath^=~/.vim runtimepath+=~/.vim/after
 let &packpath = &runtimepath
-source ~/.vimrc
+if has('unix')
+    source ~/.vimrc
+else " windows
+    source ~/_vimrc
+endif
 " enable rust-analyzer lsp and auto-completion via nvim-completion
 lua << EOF
-    -- Setup lspconfig.
-    -- local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
-
-    require'lspconfig'.rust_analyzer.setup({
-        --- capabilities = capabilities
-    }) -- connect to RLS server
+--    -- Setup lspconfig.
+--    -- local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+--
+--    require'lspconfig'.rust_analyzer.setup({
+--        --- capabilities = capabilities
+--    }) -- connect to RLS server
 EOF
 
 " enable lspsaga for diagnostics, definition-search, reference-search, etc UI
 lua << EOF
-    require'lspsaga'.init_lsp_saga{
-        border_style = "round",
-    }
+--    require'lspsaga'.init_lsp_saga{
+--        border_style = "round",
+--    }
 EOF
 nnoremap <silent> <C-j> <Cmd>Lspsaga diagnostic_jump_next<CR>
 nnoremap <silent>K <Cmd>Lspsaga hover_doc<CR>
@@ -24,19 +28,19 @@ nnoremap <silent> gh <Cmd>Lspsaga lsp_finder<CR>
 
 " enable tree-sitter
 lua << EOF
-    require'nvim-treesitter.configs'.setup {
-        highlight = {
-            enable = true,
-            disable = {}
-        },
-        indent = {
-            enable = false,
-            disable = {},
-        },
-        ensure_installed = {
-            "rust",
-        }
-    }
+--    require'nvim-treesitter.configs'.setup {
+--        highlight = {
+--            enable = true,
+--            disable = {}
+--        },
+--        indent = {
+--            enable = false,
+--            disable = {},
+--        },
+--        ensure_installed = {
+--            "rust",
+--        }
+--    }
 EOF
 nnoremap <silent> <C-j> <Cmd>Lspsaga diagnostic_jump_next<CR>
 nnoremap <silent>K <Cmd>Lspsaga hover_doc<CR>

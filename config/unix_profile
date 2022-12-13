@@ -26,7 +26,7 @@ if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
 
-alias ls='ls -l'
+alias lsc='ls --color -la'
 
 # enable to use fish-shell
 # fish
