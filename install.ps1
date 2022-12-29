@@ -54,6 +54,7 @@ if ($All -or $InstallDeps)
     ChocoInstallWithPrompt microsoft-windows-terminal
     ChocoInstallWithPrompt git
     ChocoInstallWithPrompt vim
+    ChocoInstallWithPrompt neovim
     ChocoInstallWithPrompt powertoys
     ChocoInstallWithPrompt fzf
     ChocoInstallWithPrompt firefox
@@ -98,6 +99,7 @@ if ($All -or $InstallPaths) {
 
     # Setup Vim profile
     cmd /c mklink $env:WindowsVimConfPath $env:VimConfPath
+    cmd /c mklink $env:WindowsNVimConfPath $env:NVimConfPath
     mkdir -Force $env:WindowsVimAfterPath
     mkdir -Force $env:WindowsVimSyntaxDir
     $syntaxes = @("note", "cpp");

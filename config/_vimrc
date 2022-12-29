@@ -122,7 +122,12 @@ let g:netrw_list_hide= '.*\.wav$,.*\.etl$'
 " Update vim command 'tab' autocompletion to only complete the common bits
 " i.e. :e R<tab> with items Red.cpp and Read.cpp would tab complete to :e Re
 set wildmode=longest,list
-set completeopt=longest,menuone,preview
+if has('nvim')
+    set completeopt=longest,menuone,preview "menuone,noinsert,noselect
+    let g:compleion_enable_auto_popup = 1
+else
+    set completeopt=longest,menuone,preview
+endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "                                 REMAP KEYS                                     "
@@ -273,8 +278,13 @@ endfunction
 """""""""""""""""""""""""""""""""""""
 "|           COLORS                 |
 """""""""""""""""""""""""""""""""""""
-color lucius 
-set background=dark
+if g:in_gui_window
+    color lucius 
+    set background=dark
+else
+    color desert
+    set background=dark
+endif
 
 """""""""""""""""""""""""""""""""""""
 "|          FILE FORMATTING         |
@@ -304,3 +314,5 @@ function NewJournalEntry()
     normal o
     startinsert!
 endfunction
+
+let g:rustfmt_autosave = 1

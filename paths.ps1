@@ -18,6 +18,8 @@ $env:WindowsVimConfPath = "$home\_vimrc";
 $env:VimConfPath = "$env:DotFilesPath\config\_vimrc";
 $env:WindowsVimAfterPath = "$home\vimfiles\after"
 $env:WindowsVimSyntaxDir = "$env:WindowsVimAfterPath\syntax";
+$env:WindowsNVimConfPath = "$home\AppData\Local\nvim\init.vim";
+$env:NVimConfPath = "$env:DotFilesPath\config\nvim_init.vim";
 
 # Setup GHCI profile
 $env:WindowsGhciConfPath = "$env:APPDATA\ghc\ghci.conf";
