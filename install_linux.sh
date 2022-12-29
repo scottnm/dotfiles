@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# to download this remotely use...
+# wget https://raw.githubusercontent.com/scottnm/dotfiles/master/install_linux.sh ~/Downloads/install_linux.sh
+
 set -e
 
 # GIT_CONFIG=~/.gitconfig
