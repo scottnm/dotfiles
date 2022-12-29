@@ -1,26 +1,9 @@
 #!/bin/sh
 
 # to download this remotely use...
-# wget https://raw.githubusercontent.com/scottnm/dotfiles/master/install_linux.sh ~/Downloads/install_linux.sh
+# wget https://raw.githubusercontent.com/scottnm/dotfiles/master/install_linux.sh -O ~/Downloads/install_linux.sh && chmod +x ~/Downloads/install_linux
 
 set -e
-
-# GIT_CONFIG=~/.gitconfig
-# rm -f $GIT_CONFIG
-# ln -s ~/dev/dotfiles/config/.gitconfig $GIT_CONFIG
-# 
-# UNIX_PROFILE=~/.profile
-# rm -f $UNIX_PROFILE
-# ln -s ~/dev/dotfiles/config/unix_profile $UNIX_PROFILE
-# 
-# VIM_CONFIG=~/.vimrc
-# rm -f $VIM_CONFIG
-# ln -s ~/dev/dotfiles/config/_vimrc $VIM_CONFIG
-# 
-#### ^^^ BEFORE
-#### vvv AFTER
-
-# This script will...
 
 # make sure that package repos are updated
 echo "updating package repos..."
