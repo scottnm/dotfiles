@@ -80,7 +80,11 @@ let g:in_gui_window = has('gui_running') || exists('g:neovide') || exists('g:Gui
 set noerrorbells
 
 "        GUI CONFIG        "
-set guifont=Cascadia\ Mono:h11
+if has('nvim')
+    set guifont=Cascadia\ Mono:h8
+else " windows
+    set guifont=Cascadia\ Mono:h11
+endif
 if has('gui_running')
     set lines=40 columns=125
     winpos 300 300
@@ -314,5 +318,3 @@ function NewJournalEntry()
     normal o
     startinsert!
 endfunction
-
-let g:rustfmt_autosave = 1
