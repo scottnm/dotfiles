@@ -202,8 +202,9 @@ highlight Comment gui=italic
 " quotes
 let g:indentLine_char_list = ['|', '¦', '┆', '┊']
 autocmd BufRead,BufNewFile *.json IndentLinesDisable
-" let g:indentLine_setConceal = 0
-" set conceallevel=0
+autocmd BufRead,BufNewFile *.md IndentLinesDisable
+let g:indentLine_setConceal = 0
+set conceallevel=0
 
 " Empty value to disable preview window altogether
 let g:fzf_preview_window = []
