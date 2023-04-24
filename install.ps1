@@ -60,6 +60,9 @@ if ($All -or $InstallDeps)
     ChocoInstallWithPrompt firefox
     ChocoInstallWithPrompt sharpkeys
 
+    # setup git after initial installation
+    & .\gitsetup.ps1
+
     # refresh after installing everything
     $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") +
             ";" +
@@ -76,6 +79,11 @@ if ($All -or $InstallDeps)
     )
 }
 
+if ($All -or $CloneDotFiles -or $InstallPaths) {
+    # ensure setup git prior to cloning our dotfiles or doing anything which involves git
+    & .\gitsetup.ps1
+}
+
 if ($All -or $CloneDotFiles) {
     # clone dotfiles
     mkdir $HOME\dev
@@ -87,7 +95,6 @@ if ($All -or $CloneDotFiles) {
 }
 
 if ($All -or $InstallPaths) {
-    & .\gitsetup.ps1
     & .\paths.ps1
 
     # Setup powershell profile
