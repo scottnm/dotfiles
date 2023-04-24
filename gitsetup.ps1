@@ -17,3 +17,5 @@ git config --global core.editor "C:/tools/vim/vim82/gvim.exe"
 git config --global push.default current
 # each repo requires its own credentials (enable multiple credentials one machine)
 git config --global credential.github.com.useHttpPath true
+# disable line-ending conversions
+git config --global core.autocrlf false
