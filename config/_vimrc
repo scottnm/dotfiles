@@ -221,6 +221,7 @@ if !has('nvim')
     syntax on
 endif
 au BufReadPost *.txt set syntax=note
+au BufReadPost *.fdt set syntax=fdt
 
 " XML and XML-based syntaxes get indent size of 2
 autocmd FileType xml set expandtab softtabstop=2 shiftwidth=2
