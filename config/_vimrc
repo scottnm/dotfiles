@@ -224,13 +224,16 @@ au BufReadPost *.txt set syntax=note
 au BufReadPost *.fdt set syntax=fdt
 
 " XML and XML-based syntaxes get indent size of 2
-autocmd FileType xml set expandtab softtabstop=2 shiftwidth=2
-autocmd FileType vcxproj set expandtab softtabstop=2 shiftwidth=2
-autocmd FileType props set expandtab softtabstop=2 shiftwidth=2
+autocmd FileType xml setlocal expandtab softtabstop=2 shiftwidth=2
+autocmd FileType vcxproj setlocal expandtab softtabstop=2 shiftwidth=2
+autocmd FileType props setlocal expandtab softtabstop=2 shiftwidth=2
 
-autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0
-autocmd FileType gitconfig set noexpandtab shiftwidth=8 softtabstop=0
-autocmd BufRead *.csx set syntax=cs
+" Git config and make use tab-based formatting
+autocmd FileType make setlocal noexpandtab shiftwidth=8 softtabstop=0
+autocmd FileType gitconfig setlocal noexpandtab shiftwidth=8 softtabstop=0
+
+" interpret .csx files as c#
+autocmd BufRead *.csx setlocal syntax=cs
 
 " rust auto fmting
 let g:rustfmt_autosave = 1
