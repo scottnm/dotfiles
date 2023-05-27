@@ -217,7 +217,20 @@ function GitRenameTag
 
 function grc {
     pushd $env:GitRoot
-    gvim (git diff --name-only --diff-filter=U)
+    $conflictedFiles = @(git diff --name-only --diff-filter=U)
+    if ($conflictedFiles.Length -gt 0)
+    {
+        Write-Host "Opening $($conflictedFiles.Length) file(s) to resolve merge conflicts:"
+        foreach ($f in $conflictedFiles)
+        {
+            Write-Host "    $f"
+        }
+        gvim $conflictedFiles
+    }
+    else
+    {
+        Write-Host "No conflicting files"
+    }
     popd
 }
 function gc { & git commit -ev $args }
