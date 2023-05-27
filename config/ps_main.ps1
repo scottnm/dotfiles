@@ -709,3 +709,61 @@ function Test-Image {
         return $retval
     }
 }
+
+function Recolor-IARBuildOutput {
+    [cmdletbinding()]
+    param(
+    [parameter(Mandatory = $true, ValueFromPipeline = $true)]
+    $pipelineInput
+    )
+
+    Begin {
+        $warnCount = 0;
+        $errCount = 0;
+    }
+
+    Process {
+        ForEach ($input in $pipelineInput) {
+            $color = ""
+            if ($input.Contains("Warning["))
+            {
+                $color = "Yellow"
+                $warnCount += 1;
+            }
+            elseif ($input.Contains("Error["))
+            {
+                $color = "Red"
+                $errCount += 1;
+            }
+            else
+            {
+                $color = "White"
+            }
+
+            Write-Host $input -foregroundcolor $color
+        }
+    }
+
+    End {
+        Write-Host "-------------------------------------------------------------------------------"
+        if ($warnCount -gt 0) { Write-Host "Warnings: $warnCount" -ForegroundColor Yellow }
+        if ($errCount -gt 0) { Write-Host "Errors:   $errCount" -ForegroundColor Red }
+    }
+}
+
+function Git-GrepChanges
+{
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$StartHash,
+        [string]$EndHash = "",
+        [Parameter(Mandatory=$true)]
+        [string]$Pattern,
+        [switch]$CaseSensitive,
+        [switch]$NameOnly
+        )
+
+    $CaseSensitiveOption = if ($CaseSensitive) { "" } else { "-i" }
+    $NameOnlyOption = if ($NameOnly) { "--name-only" } else { "" }
+    git diff --name-only "$StartHash..$EndHash" | %{ git grep $NameOnlyOption $CaseSensitiveOption $Pattern -- $_ }
+}
