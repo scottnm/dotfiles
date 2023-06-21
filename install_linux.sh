@@ -42,13 +42,29 @@ rm -f $VIM_CONFIG
 ln -s "$DOTFILES/config/_vimrc" $VIM_CONFIG
 echo "...vimrc linked"
 
-echo "linking nvim init.vim..."
+echo "linking gvimrc..."
+GVIM_CONFIG="$HOME/.gvimrc"
+rm -f $GVIM_CONFIG
+ln -s "$DOTFILES/config/.gvimrc" $GVIM_CONFIG
+echo "...gvimrc linked"
+
+echo "setting up nvim config..."
 NVIM_CONFIG_DIR="$HOME/.config/nvim"
-NVIM_CONFIG="$NVIM_CONFIG_DIR/init.vim"
 mkdir -p $NVIM_CONFIG_DIR
+
+echo "   linking nvim init.vim..."
+NVIM_CONFIG="$NVIM_CONFIG_DIR/init.vim"
 rm -f $NVIM_CONFIG
 ln -s "$DOTFILES/config/nvim_init.vim" $NVIM_CONFIG
-echo "...nvim init.vim linked"
+echo "    ...nvim init.vim linked"
+
+echo "   linking nvim ginit.vim..."
+NVIM_GCONFIG="$NVIM_CONFIG_DIR/ginit.vim"
+rm -f $NVIM_GCONFIG
+ln -s "$DOTFILES/config/nvim_ginit.vim" $NVIM_GCONFIG
+echo "    ...nvim ginit.vim linked"
+
+echo "...nvim config setup"
 
 # 5. symlink inputrc to our home directory
 echo "linking inputrc..."

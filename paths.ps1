@@ -16,14 +16,18 @@ $env:LocalWinTermPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8w
 # Vim paths
 $env:WindowsVimConfPath = "$home\_vimrc";
 $env:VimConfPath = "$env:DotFilesPath\config\_vimrc";
+$env:WindowsVimGConfPath = "$home\.gvimrc";
+$env:VimGConfPath = "$env:DotFilesPath\config\.gvimrc";
 $env:WindowsVimAfterPath = "$home\vimfiles\after"
 $env:WindowsVimSyntaxDir = "$env:WindowsVimAfterPath\syntax";
 $env:WindowsNVimConfPath = "$home\AppData\Local\nvim\init.vim";
 $env:NVimConfPath = "$env:DotFilesPath\config\nvim_init.vim";
+$env:WindowsNVimGConfPath = "$home\AppData\Local\nvim\ginit.vim";
+$env:NVimGConfPath = "$env:DotFilesPath\config\nvim_ginit.vim";
 
 # Setup GHCI profile
-$env:WindowsGhciConfPath = "$env:APPDATA\ghc\ghci.conf";
-$env:GhciConfPath = "$env:DotFilesPath\config\.ghci";
+# $env:WindowsGhciConfPath = "$env:APPDATA\ghc\ghci.conf";
+# $env:GhciConfPath = "$env:DotFilesPath\config\.ghci";
 
 # Install fonts
 $env:FontsPath = "$env:DotFilesPath\fonts";

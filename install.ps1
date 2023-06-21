@@ -106,7 +106,9 @@ if ($All -or $InstallPaths) {
 
     # Setup Vim profile
     cmd /c mklink $env:WindowsVimConfPath $env:VimConfPath
+    cmd /c mklink $env:WindowsVimGConfPath $env:VimGConfPath
     cmd /c mklink $env:WindowsNVimConfPath $env:NVimConfPath
+    cmd /c mklink $env:WindowsNVimGConfPath $env:NVimGConfPath
     mkdir -Force $env:WindowsVimAfterPath
     mkdir -Force $env:WindowsVimSyntaxDir
     $syntaxes = @("note", "cpp");
