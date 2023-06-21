@@ -373,6 +373,18 @@ function PruneSquashedBranches
     }
 }
 
+function Git-DeleteRemoteBranch
+{
+    [CmdletBinding( )]
+    Param(
+    [Parameter(Mandatory = $true)][string]$Branch,
+    [string]$Remote = "origin"
+    )
+
+    git push $Remote --delete $Branch
+
+}
+
 function howto-edit-git-exclude { echo "$GITROOT/.git/info/exclude" }
 
 ########
@@ -766,4 +778,91 @@ function Git-GrepChanges
     $CaseSensitiveOption = if ($CaseSensitive) { "" } else { "-i" }
     $NameOnlyOption = if ($NameOnly) { "--name-only" } else { "" }
     git diff --name-only "$StartHash..$EndHash" | %{ git grep $NameOnlyOption $CaseSensitiveOption $Pattern -- $_ }
+}
+
+function Git-RebaseTakeChanges
+{
+    [CmdletBinding( )]
+    param(
+    [Parameter(Mandatory)]
+    [ValidateSet("Base", "Topic")]
+    [string]$Changes,
+    [Parameter(Mandatory)]
+    [string]$Path
+    )
+
+    $changeSourceFlag = ""
+    if ($Changes -eq "Base")
+    {
+        $changeSourceFlag = "--ours"
+    }
+    elseif ($Changes -eq "Topic")
+    {
+        $changeSourceFlag = "--theirs"
+    }
+    else
+    {
+        throw "Invalid changes type '$Changes'"
+    }
+
+    git checkout $changeSourceFlag $Path
+    git add $Path
+
+    write-verbose "Took $Changes for $Path"
+}
+
+function Git-RebaseTakeChanges
+{
+    [CmdletBinding( )]
+    param(
+    [Parameter(Mandatory)]
+    [ValidateSet("Base", "Topic")]
+    [string]$Changes,
+    [Parameter(Mandatory)]
+    [string]$Path
+    )
+
+    $changeSourceFlag = ""
+    if ($Changes -eq "Base")
+    {
+        $changeSourceFlag = "--ours"
+    }
+    elseif ($Changes -eq "Topic")
+    {
+        $changeSourceFlag = "--theirs"
+    }
+    else
+    {
+        throw "Invalid changes type '$Changes'"
+    }
+
+    git checkout $changeSourceFlag $Path
+    git add $Path
+
+    write-verbose "Took $Changes for $Path"
+}
+
+function Git-RebaseTakeAllChanges
+{
+    [CmdletBinding( )]
+    param(
+    [Parameter(Mandatory)]
+    [ValidateSet("Base", "Topic")]
+    [string]$Changes
+    )
+
+    pushd $env:GitRoot
+    $conflictedFiles = @(git diff --name-only --diff-filter=U)
+    if ($conflictedFiles.Length -gt 0)
+    {
+        foreach ($f in $conflictedFiles)
+        {
+            Git-RebaseTakeChanges -Changes $Changes -Path $f
+        }
+    }
+    else
+    {
+        Write-Host "No conflicting files"
+    }
+    popd
 }
