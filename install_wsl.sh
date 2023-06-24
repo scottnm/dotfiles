@@ -15,23 +15,23 @@ echo "...set unix profile!"
 
 # 2. make sure that package repos are updated
 echo "updating package repos..."
-sudo apt update
+sudo apt -y update
 echo "...updated package repos!"
 
 # 3a. make sure that vim is installed
 echo "installing neovim..."
-sudo apt remove vim
-sudo apt install neovim
+sudo apt -y remove vim
+sudo apt -y install neovim
 echo "...neovim installed"
 
 # 3b. make sure that curl is installed
 echo "installing curl..."
-sudo apt install curl
+sudo apt -y install curl
 echo "...curl installed"
 
 # 3c. make sure that git is installed
 echo "installing git..."
-sudo apt install git
+sudo apt -y install git
 echo "...git installed"
 
 # 4. make sure that my vimrc is properly aliased so that it can be loaded
@@ -44,7 +44,6 @@ echo "...vimrc linked"
 echo "linking gvimrc..."
 GVIM_CONFIG="$HOME/.gvimrc"
 rm -f $GVIM_CONFIG
-ln -s "$DOTFILES/config/.gvimrc" $GVIM_CONFIG
 ln -s "/mnt/c/Users/$WINDOWS_USER/dev/dotfiles/config/.gvimrc" $GVIM_CONFIG
 echo "...gvimrc linked"
 

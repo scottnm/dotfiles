@@ -20,7 +20,7 @@ autocmd GUIEnter * set visualbell t_vb=
 set guioptions-=r " prevent window movement when vsplit
 set guioptions-=L " prevent window movement when vsplit
 
-if g:in_gui_window
+if has('nvim') || g:in_gui_window
     color lucius
     set background=dark
 endif
