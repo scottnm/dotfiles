@@ -766,18 +766,24 @@ function Recolor-IARBuildOutput {
 function Git-GrepChanges
 {
     param(
-        [Parameter(Mandatory=$true)]
-        [string]$StartHash,
-        [string]$EndHash = "",
+        [string]$Start,
+        [string]$End = "",
         [Parameter(Mandatory=$true)]
         [string]$Pattern,
         [switch]$CaseSensitive,
         [switch]$NameOnly
         )
 
+    if (!$Start)
+    {
+        $remotePrefixLength = (git remote).Length+1
+        $baseRemoteBranchName = (git symbolic-ref --short refs/remotes/origin/HEAD)
+        $Start = $baseRemoteBranchName.substring($remotePrefixLength) # e.g. origin/master -> master
+    }
+
     $CaseSensitiveOption = if ($CaseSensitive) { "" } else { "-i" }
     $NameOnlyOption = if ($NameOnly) { "--name-only" } else { "" }
-    git diff --name-only "$StartHash..$EndHash" | %{ git grep $NameOnlyOption $CaseSensitiveOption $Pattern -- $_ }
+    git diff --name-only "$Start..$End" | %{ git grep $NameOnlyOption $CaseSensitiveOption $Pattern -- $_ }
 }
 
 function Git-RebaseTakeChanges
@@ -865,4 +871,27 @@ function Git-RebaseTakeAllChanges
         Write-Host "No conflicting files"
     }
     popd
+}
+
+function View-Json {
+    param(
+        [string]$File,
+        [string]$StrInput,
+        [int]$Depth = 2
+    )
+
+    if (!$File -and !$StrInput) {
+        throw "One of `$File or `$StrInput required"
+    }
+
+    if ($File -and $StrInput) {
+        throw "Only one of `$File or `$StrInput allowed"
+    }
+
+    $data = $StrInput
+    if (!$data) {
+        $data = Get-Content $File
+    }
+
+    write-output $data |  ConvertFrom-Json | ConvertTo-Json -Depth $Depth
 }

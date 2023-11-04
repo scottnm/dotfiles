@@ -308,3 +308,9 @@ if has('unix')
 else " windows
     source $HOME\.gvimrc
 endif
+
+
+"""""""""""""""""""""""""""""""""""""
+"           COMMANDS                "
+"""""""""""""""""""""""""""""""""""""
+command FocusNote :Goyo110x90% | :set linebreak | :set breakindent
