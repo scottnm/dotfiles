@@ -9,7 +9,11 @@ set noerrorbells
 if has('nvim')
     set guifont=Cascadia\ Mono:h8
 else " windows
-    set guifont=Cascadia\ Mono:h11
+    if has('unix')
+        set guifont=Cascadia\ Mono\ 11
+    else " windows
+        set guifont=Cascadia\ Mono:h11
+    endif
 endif
 if has('gui_running')
     set lines=40 columns=125
