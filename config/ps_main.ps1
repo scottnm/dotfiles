@@ -776,13 +776,18 @@ function Git-GrepChanges
 
     if (!$Start)
     {
-        $remotePrefixLength = (git remote).Length+1
-        $baseRemoteBranchName = (git symbolic-ref --short refs/remotes/origin/HEAD)
-        $Start = $baseRemoteBranchName.substring($remotePrefixLength) # e.g. origin/master -> master
+        if (!(git remote).Contains("origin"))
+        {
+            throw "remote named 'origin' not found (non-origin remotes not yet supported)"
+        }
+
+        $remote = "origin"
+        $baseRemoteBranchName = (git symbolic-ref --short refs/remotes/$remote/HEAD)
+        $Start = $baseRemoteBranchName.substring("$remote/".Length) # e.g. origin/master -> master
     }
 
-    $CaseSensitiveOption = if ($CaseSensitive) { "" } else { "-i" }
-    $NameOnlyOption = if ($NameOnly) { "--name-only" } else { "" }
+    $CaseSensitiveOption = if (!$CaseSensitive) { "-i" } else { $null }
+    $NameOnlyOption = if ($NameOnly) { "--name-only" } else { $null }
     git diff --name-only "$Start..$End" | %{ git grep $NameOnlyOption $CaseSensitiveOption $Pattern -- $_ }
 }
 
