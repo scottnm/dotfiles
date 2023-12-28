@@ -55,10 +55,14 @@ if ($All -or $InstallDeps)
     ChocoInstallWithPrompt git
     ChocoInstallWithPrompt vim
     ChocoInstallWithPrompt neovim
-    ChocoInstallWithPrompt powertoys
+    # ChocoInstallWithPrompt powertoys
     ChocoInstallWithPrompt fzf
-    ChocoInstallWithPrompt firefox
+    # ChocoInstallWithPrompt firefox
     ChocoInstallWithPrompt sharpkeys
+
+    # TODO: replace above choco installs with winget
+    winget install Microsoft.VisualStudio.2022.Community
+    winget install Microsoft.VisualStudioCode
 
     # setup git after initial installation
     & .\gitsetup.ps1
