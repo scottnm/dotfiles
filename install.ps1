@@ -104,15 +104,39 @@ if ($All -or $InstallPaths) {
     # Setup powershell profile
     & .\SetupPwshProfiles.ps1
 
+    function IsSymLink {
+        param([string]$path)
+        $file = Get-Item $path -Force -ea SilentlyContinue
+        return [bool]($file.Attributes -band [IO.FileAttributes]::ReparsePoint)
+    }
+
+    function CreateSymLink {
+        param([string]$Target, [string]$Src)
+        if (Test-Path $Target)
+        {
+            if (IsSymLink $Target)
+            {
+                write-host -foregroundcolor darkgray "Deleting old symlink: $Target"
+            }
+            else
+            {
+                write-host -foregroundcolor yellow "Not creating symlink $Target <==> $Src! Target is non-symlink file"
+                return
+            }
+
+            rm -rec -for $Target | Out-Null
+        }
+        cmd /c mklink $Target $Src
+    }
+
     # Setup Windows Terminal profile
-    rm $env:LocalWinTermPath
-    cmd /c mklink $env:LocalWinTermPath $env:WinTermPath
+    # CreateSymLink -Target $env:LocalWinTermPath -Src $env:WinTermPath
 
     # Setup Vim profile
-    cmd /c mklink $env:WindowsVimConfPath $env:VimConfPath
-    cmd /c mklink $env:WindowsVimGConfPath $env:VimGConfPath
-    cmd /c mklink $env:WindowsNVimConfPath $env:NVimConfPath
-    cmd /c mklink $env:WindowsNVimGConfPath $env:NVimGConfPath
+    CreateSymLink -Target $env:WindowsVimConfPath -Src $env:VimConfPath
+    CreateSymLink -Target $env:WindowsVimGConfPath -Src $env:VimGConfPath
+    CreateSymLink -Target $env:WindowsNVimConfPath -Src $env:NVimConfPath
+    CreateSymLink -Target $env:WindowsNVimGConfPath -Src $env:NVimGConfPath
     mkdir -Force $env:WindowsVimAfterPath
     mkdir -Force $env:WindowsVimSyntaxDir
     $syntaxes = @("note", "cpp");
@@ -122,12 +146,12 @@ if ($All -or $InstallPaths) {
         $VimSyntaxPath = "$env:DotFilesPath\config\$syntax.vim";
         echo $WindowsVimSyntaxPath
         echo $VimSyntaxPath
-        cmd /c mklink $WindowsVimSyntaxPath $VimSyntaxPath
+        CreateSymLink -Target $WindowsVimSyntaxPath -Src $VimSyntaxPath
     }
 
     # Setup GHCI profile
     # mkdir Split-Path $env:WindowsGhciConfPath -Parent
-    # cmd /c mklink $env:WindowsGhciConfPath $env:GhciConfPath
+    # CreateSymLink -Target $env:WindowsGhciConfPath -Src $env:GhciConfPath
 }
 
 if ($All -or $InstallFonts) {
