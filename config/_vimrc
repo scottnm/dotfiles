@@ -1,17 +1,19 @@
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "                                  VIM PLUG                                      "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-if has('unix')
-    if empty(glob('~/.vim/autoload/plug.vim'))
-        silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
-            \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-        autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
-    endif
-else " windows
-    if empty(glob('$HOME/vimfiles/autoload/plug.vim'))
-        silent !powershell.exe -Command "iwr -useb https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim | ni ~/vimfiles/autoload/plug.vim -Force"
-    endif
-endif
+" FIXME: why does this not work and seem to break every other time I have to setup a new environment
+" for now just force do manual install from vimplug homepage
+" if has('unix')
+"     if empty(glob('~/.vim/autoload/plug.vim'))
+"         silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+"             \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+"         autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+"     endif
+" else " windows
+"     if empty(glob('$HOME/vimfiles/autoload/plug.vim'))
+"         silent !powershell.exe -Command "iwr -useb https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim | ni ~/vimfiles/autoload/plug.vim -Force"
+"     endif
+" endif
 
 call plug#begin('~/.vim/plugged')
 
