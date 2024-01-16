@@ -49,6 +49,8 @@ Plug 'jonathanfilip/vim-lucius'
 " line differ
 Plug 'AndrewRadev/linediff.vim'
 
+Plug 'ctrlpvim/ctrlp.vim'
+
 " Unused Plugins
 " Kql
 " Plug 'christianrondeau/vim-azure-log-analytics'
@@ -112,6 +114,11 @@ else
     set completeopt=longest,menuone,preview
 endif
 
+" For neovim, don't move the cursor when right clicking
+if has('nvim')
+    set mousemodel=popup
+endif
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "                                 REMAP KEYS                                     "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -126,7 +133,8 @@ nnoremap j gj
 nnoremap k gk
 
 " shortcuts
-nnoremap   <C-p>  :bprev<CR>|                " prev buffer
+nnoremap   <C-p>  :CtrlP<CR>|                " Run CtrlP
+nnoremap   <C-l>  :bprev<CR>|                " prev buffer
 nnoremap   <C-n>  :bnext<CR>|                " next buffer
 nnoremap   <C-f>  :A<CR>|                    " flip buffer using a.vim
 nnoremap   <C-h>  :noh<CR>|                  " clear search

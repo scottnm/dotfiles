@@ -12,7 +12,8 @@ else " windows
     if has('unix')
         set guifont=Cascadia\ Mono\ 11
     else " windows
-        set guifont=Cascadia\ Mono:h11
+        " set guifont=Cascadia\ Mono:h11
+        set guifont=Consolas:h10:cANSI:qDRAFT " try out a different font for gvim to more closely match vscode
     endif
 endif
 if has('gui_running')
