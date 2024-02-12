@@ -371,6 +371,8 @@ function PruneSquashedBranches
             }
         }
     }
+
+    git fetch --all --prune
 }
 
 function Git-DeleteRemoteBranch
@@ -787,8 +789,20 @@ function Git-GrepChanges
     }
 
     $CaseSensitiveOption = if (!$CaseSensitive) { "-i" } else { $null }
-    $NameOnlyOption = if ($NameOnly) { "--name-only" } else { $null }
-    git diff --name-only "$Start..$End" | %{ git grep $NameOnlyOption $CaseSensitiveOption $Pattern -- $_ }
+
+    if ($NameOnly)
+    {
+        git diff --name-only "$Start..$End" | %{ git grep --name-only $CaseSensitiveOption $Pattern -- $_ }
+    }
+    else
+    {
+
+        git diff --name-only "$Start..$End" | %{ git grep --line-number  $CaseSensitiveOption $Pattern -- $_ }
+            | %{
+                $m=(sls -InputObject $_ -Pattern "(\S+:)\s+(\S.*)").Matches;
+                "$($m.Groups[1].Value)`n$($m.Groups[2].Value)`n";
+                }
+    }
 }
 
 function Git-RebaseTakeChanges
