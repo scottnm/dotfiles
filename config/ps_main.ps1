@@ -917,6 +917,7 @@ function View-Json {
     write-output $data |  ConvertFrom-Json | ConvertTo-Json -Depth $Depth
 }
 
+<<<<<<< HEAD
 function rsls {
     param(
         [Parameter(Mandatory=$true)]
@@ -934,4 +935,42 @@ function OpensslDumpCert {
         [string]$PemFilePath
     )
     openssl x509 -in $PemFilePath -noout -text
+}
+
+function New-OneDriveGitRepo {
+    param(
+    [Parameter(Mandatory=$true)]
+    [string]$reponame,
+    [string]$onedrivelocation = $null
+    )
+
+    if (!$onedrivelocation)
+    {
+        $onedrivelocation = "$env:OneDrive\projects"
+    }
+
+    function diag($msg) { Write-Host -foregroundcolor cyan $msg }
+
+    diag "Creating onedrive bare repo @ $(Join-Path $onedrivelocation $reponame)..."
+    pushd $onedrivelocation
+    mkdir $reponame
+    cd $reponame
+    git init --bare
+    git symbolic-ref HEAD refs/heads/main
+    popd
+    diag "...created"
+
+    diag "Creating local repo @ $(Join-Path $pwd $reponame)..."
+    mkdir $reponame
+    cd $reponame
+    git init
+    diag "    ...setting branch and remote"
+    git branch -m main
+    git remote add onedrive file://"$(Join-Path $onedrivelocation $reponame)"
+    diag "    ...creating first commit and pushing"
+    echo "" > .gitignore
+    git add .gitignore
+    git commit -m "first commit"
+    git push
+    diag "...done"
 }
