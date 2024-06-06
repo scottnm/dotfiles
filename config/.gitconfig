@@ -9,4 +9,18 @@
 	aa = !git add -A
 	cm = !git commit -m
 	d  = !git diff
+	list-modified = !git diff --name-only --diff-filter=M
+	list-conflicts = !git diff --name-only --diff-filter=U
+	grep-ls = !git grep --name-only
 	recent-branches = for-each-ref --sort=-committerdate --count=10 --format='%(refname:short)' refs/heads/
+	df = !git diff --name-status
+	dfc = !git diff --cached --name-status
+	count-lines = "! git log --author=\"$1\" --pretty=tformat: --numstat | awk '{ add += $1; subs += $2; loc += $1 - $2 } END { printf \"added lines: %s, removed lines: %s, total lines: %s\\n\", add, subs, loc }' #"
+	browse = !git config --get remote.origin.url
+[diff]
+	colorMoved = default
+	algorithm = histogram
+[branch]
+	sort = -committerdate
+[merge]
+	conflictstyle = zdiff3
