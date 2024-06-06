@@ -917,7 +917,6 @@ function View-Json {
     write-output $data |  ConvertFrom-Json | ConvertTo-Json -Depth $Depth
 }
 
-<<<<<<< HEAD
 function rsls {
     param(
         [Parameter(Mandatory=$true)]
