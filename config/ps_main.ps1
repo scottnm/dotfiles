@@ -798,11 +798,12 @@ function Git-GrepChanges
     else
     {
 
-        git diff --name-only "$Start..$End" | %{ git grep --line-number  $CaseSensitiveOption $Pattern -- $_ }
-            | %{
+        git diff --name-only "$Start..$End" |
+            % { git grep --line-number  $CaseSensitiveOption $Pattern -- $_ } |
+            % {
                 $m=(sls -InputObject $_ -Pattern "(\S+:)\s*(\S.*)").Matches;
                 "$($m.Groups[1].Value)`n$($m.Groups[2].Value)`n";
-                }
+            }
     }
 }
 
