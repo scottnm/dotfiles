@@ -322,6 +322,7 @@ function PruneSquashedBranches
     }
 
     git checkout -q $BaseBranch
+    git pull -q
 
     function PruneInternal
     {
@@ -797,11 +798,12 @@ function Git-GrepChanges
     else
     {
 
-        git diff --name-only "$Start..$End" | %{ git grep --line-number  $CaseSensitiveOption $Pattern -- $_ }
-            | %{
-                $m=(sls -InputObject $_ -Pattern "(\S+:)\s+(\S.*)").Matches;
+        git diff --name-only "$Start..$End" |
+            % { git grep --line-number  $CaseSensitiveOption $Pattern -- $_ } |
+            % {
+                $m=(sls -InputObject $_ -Pattern "(\S+:)\s*(\S.*)").Matches;
                 "$($m.Groups[1].Value)`n$($m.Groups[2].Value)`n";
-                }
+            }
     }
 }
 
@@ -913,6 +915,25 @@ function View-Json {
     }
 
     write-output $data |  ConvertFrom-Json | ConvertTo-Json -Depth $Depth
+}
+
+function rsls {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$FilePattern,
+        [Parameter(Mandatory=$true)]
+        [string]$SearchPattern
+    )
+
+    dir $FilePattern -rec | %{sls -InputObject $_ -Pattern $SearchPattern }
+}
+
+function OpensslDumpCert {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$PemFilePath
+    )
+    openssl x509 -in $PemFilePath -noout -text
 }
 
 function New-OneDriveGitRepo {

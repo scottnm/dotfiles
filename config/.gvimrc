@@ -10,7 +10,8 @@ if has('nvim')
     set guifont=Cascadia\ Mono:h8
 else " windows
     if has('unix')
-        set guifont=Cascadia\ Mono\ 11
+        set guifont=Cascadia\ Code\ 11
+        "set guifont=Mono\ 11
     else " windows
         " set guifont=Cascadia\ Mono:h11
         set guifont=Consolas:h10:cANSI:qDRAFT " try out a different font for gvim to more closely match vscode
