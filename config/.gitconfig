@@ -1,8 +1,12 @@
-[credential]
-	helper = /mnt/c/Program\\ Files/Git/mingw64/libexec/git-core/git-credential-manager.exe
+[core]
+	autocrlf = false
 [user]
 	email = scottnmunro@gmail.com
 	name = Scott Munro
+[diff]
+	algorithm = histogram
+[init]
+	defaultBranch = main
 [alias]
 	st = !git status
 	co = !git checkout
@@ -10,3 +14,11 @@
 	cm = !git commit -m
 	d  = !git diff
 	recent-branches = for-each-ref --sort=-committerdate --count=10 --format='%(refname:short)' refs/heads/
+[merge]
+	conflictstyle = zdiff3
+[commit]
+	verbose = true
+[rerere]
+	enabled = true
+[branch]
+	sort = -comitterdate
