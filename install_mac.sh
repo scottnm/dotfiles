@@ -97,6 +97,12 @@ rm -f $INPUT_RC
 ln -s "$DOTFILES/config/.inputrc" $INPUT_RC
 echo "    ...inputrc linked"
 
+# echo "linking powershell profile..."
+# POWERSHELL_PROFILE="$HOME/.config/powershell/Microsoft.PowerShell_profile.ps1"
+# rm -f $POWERSHELL_PROFILE
+# ln -s "$DOTFILES/config/ps_main.ps1" $POWERSHELL_PROFILE
+# echo "    ...powershell profile linked"
+
 #
 # Setup VIM config
 #
