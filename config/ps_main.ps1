@@ -985,3 +985,59 @@ function New-OneDriveGitRepo {
     git push
     diag "...done"
 }
+
+function SlsObjectMap {
+    param(
+    [Parameter(Mandatory)]
+    [System.Text.RegularExpressions.Match]$MatchResult,
+
+    [string[]]$Names,
+
+    [ValidateSet("int", "string")]
+    [string[]]$Types
+    )
+
+
+    if ($Names.Length -lt $Types.Length)
+    {
+        throw "Must have at least as many `$Names as `$Types"
+    }
+
+    $mappedObj = @{}
+    for ($groupIndex = 1; $groupIndex -lt $MatchResult.Groups.Count; $groupIndex++)
+    {
+        $i = $groupIndex-1
+        $name = "Group_$i"
+        if ($Names.Length -gt $i)
+        {
+            $name = $Names[$i]
+        }
+
+        $type = [string]
+        if ($Types.Length -gt $i)
+        {
+            $type = $Types[$i]
+        }
+
+        $valueStr = $MatchResult.Groups[$i+1].Value
+        $value = $valueStr
+        if ($Types.Length -gt $i)
+        {
+            $type = $Types[$i]
+            if ($type -eq "int")
+            {
+                $value = [int]$valueStr;
+            }
+        }
+
+        $mappedObj.add($name, $value)
+    }
+
+    return [pscustomobject]$mappedObj
+}
+
+function Do-PCap {
+    netsh trace start "capture=yes"
+    Read-Host "Run your scenario. Hit any key to stop the trace"
+    netsh trace stop
+}
