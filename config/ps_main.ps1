@@ -928,12 +928,24 @@ function rsls {
     dir $FilePattern -rec | %{sls -InputObject $_ -Pattern $SearchPattern }
 }
 
+function OpensslPem2Der {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$FilePath,
+        [Parameter(Mandatory=$true)]
+        [string]$OutPath
+    )
+
+    openssl x509 -inform PEM -in $FilePath -outform DER -out $OutPath -text
+}
+
 function OpensslDumpCert {
     param(
         [Parameter(Mandatory=$true)]
-        [string]$PemFilePath
+        [string]$FilePath
     )
-    openssl x509 -in $PemFilePath -noout -text
+
+    openssl x509 -in $FilePath -noout -text
 }
 
 function New-OneDriveGitRepo {
