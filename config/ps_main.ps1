@@ -36,22 +36,89 @@ function Ensure-Module
 
 . $env:SideProfilePath
 
-# vim aliases
-new-alias vim nvim-qt -Force -Option AllScope
-new-alias nvim nvim-qt -Force -Option AllScope
+$PlatformPaths = @{
+    HostsFilePath = @{ Default="/etc/hosts"; Windows="c:\windows\system32\drivers\etc\hosts" };
+}
+
+$PlatformPaths.Keys | % {
+    $varName = $_
+    $varValue = $null
+
+    $varPlatformData = $PlatformPaths[$varName]
+
+    if ($IsLinux) {
+        if ($varPlatformData.Contains("Linux")) {
+            $varValue = $varPlatformData["Linux"];
+        } else {
+            $varValue = $varPlatformData["Default"];
+        }
+    }
+    elseif ($IsMacOS) {
+        if ($varPlatformData.Contains("MacOS")) {
+            $varValue = $varPlatformData["MacOS"];
+        } else {
+            $varValue = $varPlatformData["Default"];
+        }
+    }
+    else { # Windows; don't bother doing IsWindows check for Powershell5 compat
+        if ($varPlatformData.Contains("Windows")) {
+            $varValue = $varPlatformData["Windows"];
+        } else {
+            $varValue = $varPlatformData["Default"];
+        }
+    }
+
+    Set-Item -Path "Env:\$varName" -Value $varValue
+}
+
+$PlatformAliases = @{
+    tedit = @{ Default="vim"; Windows="gvim" };
+    dvim = @{ Default="vim"; Windows="gvim" };
+}
+
+$PlatformAliases.Keys | % {
+    $varName = $_
+    $varValue = $null
+
+    $varPlatformData = $PlatformAliases[$varName]
+
+    if ($IsLinux) {
+        if ($varPlatformData.Contains("Linux")) {
+            $varValue = $varPlatformData["Linux"];
+        } else {
+            $varValue = $varPlatformData["Default"];
+        }
+    }
+    elseif ($IsMacOS) {
+        if ($varPlatformData.Contains("MacOS")) {
+            $varValue = $varPlatformData["MacOS"];
+        } else {
+            $varValue = $varPlatformData["Default"];
+        }
+    }
+    else { # Windows; don't bother doing IsWindows check for Powershell5 compat
+        if ($varPlatformData.Contains("Windows")) {
+            $varValue = $varPlatformData["Windows"];
+        } else {
+            $varValue = $varPlatformData["Default"];
+        }
+    }
+
+    New-Alias -Name $varName -Value $varValue -Force -Option AllScope
+}
 
 # DevEnv edit paths
-function Edit-Profile { gvim $profile $env:SideProfilePath }
-function Edit-Vimrc { gvim $HOME\_vimrc }
-function Edit-GhciConf { gvim $env:APPDATA\ghc\ghci.conf }
-function Edit-Hosts { gvim c:\windows\system32\drivers\etc\hosts }
+function Edit-Profile { dvim $profile $env:SideProfilePath }
+function Edit-Vimrc { dvim $HOME\_vimrc }
+function Edit-GhciConf { tedit $env:APPDATA\ghc\ghci.conf }
+function Edit-Hosts { tedit c:\windows\system32\drivers\etc\hosts }
 function Edit-GitConfig {
     Param([switch]$Global) $globalFlag = if ($Global) { "--global" } else { "" }
     git config $globalFlag -e
 }
 function Edit-TopicNotes {
     $path = Join-Path -path $env:TopicNotesDir -ChildPath "${env:GitTopic}_notes.md"
-    gvim $path
+    dvim $path
 }
 function Get-Version { $PSVersionTable.PSVersion }
 
@@ -225,7 +292,7 @@ function grc {
         {
             Write-Host "    $f"
         }
-        gvim $conflictedFiles
+        dvim $conflictedFiles
     }
     else
     {
@@ -564,7 +631,7 @@ function GitGrepToVim
         [string]$Pattern
         )
 
-    gvim (git grep --name-only -i $Pattern)
+    dvim (git grep --name-only -i $Pattern)
 }
 
 function PixClipboardToCsv
@@ -670,11 +737,11 @@ function Journal
 
         if ($AddEntry)
         {
-            gvim $journalPath -c "call NewJournalEntry()"
+            dvim $journalPath -c "call NewJournalEntry()"
         }
         else
         {
-            gvim $journalPath
+            dvim $journalPath
         }
     }
 }

@@ -1,8 +1,9 @@
+[user]
+	name = Scott Munro
+	email = scottnmunro@gmail.com
 [core]
 	autocrlf = false
-[user]
-	email = scottnmunro@gmail.com
-	name = Scott Munro
+	defaultBranch = main
 [diff]
 	algorithm = histogram
 	colorMoved = default
@@ -29,4 +30,4 @@
 [rerere]
 	enabled = true
 [branch]
-	sort = -comitterdate
+	sort = -committerdate

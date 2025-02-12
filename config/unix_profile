@@ -28,6 +28,8 @@ if [ -d "$HOME/.local/bin" ] ; then
 fi
 
 alias lsc='ls --color -la'
+alias gd='git diff'
+alias gst='git status'
 
 # enable to use fish-shell
 # fish
