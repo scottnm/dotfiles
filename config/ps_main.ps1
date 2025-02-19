@@ -1108,3 +1108,37 @@ function Do-PCap {
     Read-Host "Run your scenario. Hit any key to stop the trace"
     netsh trace stop
 }
+
+function Mirror-Copy {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Source,
+        [string]$Destination,
+        [switch]$NoCompress,
+        [switch]$Purge
+        )
+
+    if (!($Destination))
+    {
+        $Destination = Split-Path $Source -Leaf
+        $Destination = Join-Path $pwd $Destination
+        write-host -foregroundcolor darkgray "Default copying to $Destination"
+    }
+
+    $args = New-Object System.Collections.Generic.List[System.Object]
+    $args.Add($Source)
+    $args.Add($Destination)
+    $args.Add("/S")
+    if (!$NoCompress)
+    {
+        $args.Add("/COMPRESS")
+    }
+
+    if ($Purge)
+    {
+        $args.Add("/PURGE")
+    }
+
+    write-host -foregroundcolor darkgray "robocopy $args"
+    robocopy @args
+}
