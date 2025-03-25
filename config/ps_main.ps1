@@ -354,6 +354,7 @@ function gtui
 }
 function gst { & git status $args }
 function gstr { gst --no-renames --no-breaks }
+function glp { & git logp $args }
 
 function gsql
 {

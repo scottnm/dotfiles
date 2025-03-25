@@ -15,6 +15,7 @@
 	aa = !git add -A
 	cm = !git commit -m
 	d  = !git diff
+	logp = "!git log --pretty=format:'%C(yellow)%h%Creset - %C(green)%an%Creset, %ar:%n%s%n'"
 	list-modified = !git diff --name-only --diff-filter=M
 	list-conflicts = !git diff --name-only --diff-filter=U
 	grep-ls = !git grep --name-only
