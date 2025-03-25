@@ -1162,3 +1162,9 @@ function Mirror-Copy {
     write-host -foregroundcolor darkgray "robocopy $args"
     robocopy @args
 }
+
+# [l][s][s]imple
+function lss {
+    param([string[]]$Props = @("Name", "LastWriteTime"))
+    get-childitem @args | select-object $Props
+}
