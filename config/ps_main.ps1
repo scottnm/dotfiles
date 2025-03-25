@@ -1116,13 +1116,22 @@ function Mirror-Copy {
         [string]$Source,
         [string]$Destination,
         [switch]$NoCompress,
-        [switch]$Purge
+        [switch]$Purge,
+        [int]$MinFileSizeBytes,
+        [int]$MaxFileSizeBytes
         )
 
     if (!($Destination))
     {
-        $Destination = Split-Path $Source -Leaf
-        $Destination = Join-Path $pwd $Destination
+        $cwdLeaf = Split-Path ($pwd.Path) -Leaf
+        $defaultDestination = Split-Path $Source -Leaf
+        if ($cwdLeaf -eq $defaultDestination)
+        {
+            write-host -foregroundcolor yellow "WARNING: Mirror copy nesting detected!"
+            Read-Host "Press [enter] to proceed or Ctrl-C to quit"
+        }
+
+        $Destination = Join-Path $pwd $defaultDestination
         write-host -foregroundcolor darkgray "Default copying to $Destination"
     }
 
@@ -1138,6 +1147,16 @@ function Mirror-Copy {
     if ($Purge)
     {
         $args.Add("/PURGE")
+    }
+
+    if ($MinFileSizeBytes)
+    {
+        $args.Add("/MIN:$MinFileSizeBytes")
+    }
+
+    if ($MaxFileSizeBytes)
+    {
+        $args.Add("/MAX:$MaxFileSizeBytes")
     }
 
     write-host -foregroundcolor darkgray "robocopy $args"
