@@ -204,6 +204,8 @@ function Colored
 
 function prompt
 {
+    $savedLastExitCode = if ($LASTEXITCODE) { $LASTEXITCODE } else { 0 }
+
     RefreshCwdSensitiveState;
     Write-Host("")
 
@@ -222,14 +224,22 @@ function prompt
         $branchPrompt = Colored -Text $env:GitBranch -Color Green
         $statusLine += " :: $branchPrompt"
     }
-    $statusLine += " :: $(Get-Date)
+    $statusLine += " :: $(Get-Date)"
+
+    $exitCodeText = $savedLastExitCode
+    if ($savedLastExitCode -ne 0)
+    {
+        $exitCodeText = (Colored -Text $savedLastExitCode -Color Red)
+    }
+
+    $statusLine += " :: ($exitCodeText)
  "
 
     UpdateWindowTitle;
 
     Write-Host $statusLine -nonewline
-    $prompt = "λ"
-    return "$(Colored -Text $prompt -Color Yellow) "
+    $prompt = (Colored -Text "λ " -Color Yellow)
+    return $prompt
 }
 
 ###############
