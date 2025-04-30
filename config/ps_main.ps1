@@ -1192,3 +1192,60 @@ function lss {
     param([string[]]$Props = @("Name", "LastWriteTime"))
     get-childitem @args | select-object $Props
 }
+
+function Get-LineEndingType {
+    param(
+        [string]$FilePath
+        )
+
+    $content = Get-Content -Path $FilePath -AsByteStream
+    if ($content -contains 13) {
+        if ($content -contains 10) {
+            return "DOS (CRLF)"
+        } else {
+            return "Classic Mac (CR)"
+        }
+    } else {
+        if ($content -contains 10){
+            return "Unix (LF)"
+        } else {
+            return "File is empty or contains no line breaks"
+        }
+    }
+}
+
+function Filter-LineEndingType {
+    param(
+        [string]$FilePath,
+        [ValidateSet("DOS","Unix","MacClassic")]
+        [string]$LineEndingType
+        )
+
+    $content = Get-Content -Path $FilePath -AsByteStream
+    if ($content -contains 13) {
+        if ($content -contains 10) {
+            return $LineEndingType -eq "DOS"
+        } else {
+            return $LineEndingType -eq "MacClassic"
+        }
+    } else {
+        if ($content -contains 10){
+            return $LineEndingType -eq "Unix"
+        } else {
+            return $false
+        }
+    }
+}
+
+function Convert-WinFileTimeTimestampToUnixTime
+{
+    param([System.Int64]$WinFileTime)
+
+    $WINDOWS_TICK = 10000000
+    $SEC_TO_UNIX_EPOCH = 11644473600
+    $unixTime = ([System.Int64]($WinFileTime / $WINDOWS_TICK) - $SEC_TO_UNIX_EPOCH)
+    $datetime = [datetimeoffset]::FromUnixTimeSeconds($unixTime)
+
+    write-host "Unix time: $unixTime"
+    write-host "datetime:  $datetime"
+}
