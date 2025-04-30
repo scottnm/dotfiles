@@ -4,6 +4,7 @@
 [core]
 	autocrlf = false
 	defaultBranch = main
+	longPaths = true
 [diff]
 	algorithm = histogram
 	colorMoved = default
@@ -15,7 +16,7 @@
 	aa = !git add -A
 	cm = !git commit -m
 	d  = !git diff
-	logp = "!git log --pretty=format:'%C(yellow)%h%Creset - %C(green)%an%Creset, %ar:%n%s%n'"
+	logp = "!git log --pretty=format:'%C(yellow)%h%Creset %C(green)%an%Creset (%ar):%n%s%n'"
 	list-modified = !git diff --name-only --diff-filter=M
 	list-conflicts = !git diff --name-only --diff-filter=U
 	grep-ls = !git grep --name-only
@@ -24,6 +25,8 @@
 	dfc = !git diff --cached --name-status
 	count-lines = "! git log --author=\"$1\" --pretty=tformat: --numstat | awk '{ add += $1; subs += $2; loc += $1 - $2 } END { printf \"added lines: %s, removed lines: %s, total lines: %s\\n\", add, subs, loc }' #"
 	browse = !git config --get remote.origin.url
+	addnw = !sh -c 'git diff -U0 -w --no-color --src-prefix=a/ --dst-prefix=b/ "$@" | git apply --cached --ignore-whitespace --unidiff-zero -'
+	pullother = "!git fetch $(git remote) $1:$1"
 [merge]
 	conflictstyle = zdiff3
 [commit]
