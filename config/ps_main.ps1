@@ -340,9 +340,23 @@ function gcp
     }
 
     $diffArgs = $args[0..($args.Length - 2)]
-    $cmdString = "git diff $diffArgs > $patchDirectory\$($args[-1])"
-    cmd /c $cmdString
-    echo $cmdString
+    if ($diffArgs.Count -eq 1)
+    {
+        $diffArg = $diffArgs[0]
+        if ($diffArg -match '^[a-zA-Z0-9]+$')
+        {
+            $commitHash = $diffArg
+            $diffArgs = @( "$($commitHash)^..$($commitHash)" )
+        }
+    }
+
+    $patchPath = Join-Path $patchDirectory $args[-1]
+
+    write-host -foregroundcolor DarkGray "git diff $diffArgs > $patchPath"
+    git diff @diffArgs > $patchPath
+
+    write-host -foregroundcolor DarkGray ""
+    Get-Content $patchPath | write-host -foregroundcolor DarkGray
 }
 function gti
 {
