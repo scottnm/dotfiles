@@ -113,8 +113,12 @@ function Edit-Vimrc { dvim $HOME\_vimrc }
 function Edit-GhciConf { tedit $env:APPDATA\ghc\ghci.conf }
 function Edit-Hosts { tedit c:\windows\system32\drivers\etc\hosts }
 function Edit-GitConfig {
-    Param([switch]$Global) $globalFlag = if ($Global) { "--global" } else { "" }
-    git config $globalFlag -e
+    Param([switch]$Global)
+    $editArgs = [System.Collections.ArrayList]@()
+    if ($Global) { $editArgs.Add("--global") | Out-Null }
+    $editArgs.Add("-e") | Out-Null
+    write-host -foregroundcolor darkgray "git config $editArgs"
+    git config @editArgs
 }
 function Edit-TopicNotes {
     $path = Join-Path -path $env:TopicNotesDir -ChildPath "${env:GitTopic}_notes.md"
@@ -357,7 +361,10 @@ function gcp
 
     write-host -foregroundcolor DarkGray ""
     Get-Content $patchPath | write-host -foregroundcolor DarkGray
+
+    write-host -foregroundcolor cyan "new patch @ $patchPath"
 }
+
 function gti
 {
     [CmdletBinding( )]
@@ -486,7 +493,8 @@ function howto-edit-git-exclude { echo "$GITROOT/.git/info/exclude" }
 # MISC #
 ########
 new-alias pd pushd -Force -Option AllScope
-function grep($pattern) { git grep -r --ignore-case $pattern }
+function ggrep($pattern) { git grep -r --ignore-case $pattern }
+function grep { param([string]$filesPattern,[string]$pattern) sls -path $filesPattern -pattern $pattern }
 
 function edit-hosts { Start-Process -FilePath vim -ArgumentList c:\windows\system32\drivers\etc\hosts -Verb RunAs }
 function type-hosts { type c:\windows\system32\drivers\etc\hosts | sls "^\w" -NoEmphasis }
@@ -1248,4 +1256,81 @@ function Convert-WinFileTimeTimestampToUnixTime
 
     write-host "Unix time: $unixTime"
     write-host "datetime:  $datetime"
+}
+
+function Convert-UnixTimeToClock
+{
+    param(
+        [Parameter(Mandatory)]
+        [int]$UnixTime
+        )
+
+    [datetimeoffset]::FromUnixTimeMilliseconds(1000 * $UnixTime)
+}
+
+new-alias Launch-AndroidEmulator $env:ANDROID_SDK_ROOT\emulator\emulator.exe -Force -Option AllScope
+
+        <#
+        Common Options:
+Create: tar.exe -c [options] [<file> | <dir> | @<archive> | -C <dir> ]
+  <file>, <dir>  add these items to archive
+  -z, -j, -J, --lzma  Compress archive with gzip/bzip2/xz/lzma
+  --format {ustar|pax|cpio|shar}  Select archive format
+  --exclude <pattern>  Skip files that match pattern
+  -C <dir>  Change to <dir> before processing remaining files
+  @<archive>  Add entries from <archive> to output
+List: tar.exe -t [options] [<patterns>]
+  <patterns>  If specified, list only entries that match
+Extract: tar.exe -x [options] [<patterns>]
+  <patterns>  If specified, extract only entries that match
+  -k    Keep (don't overwrite) existing files
+  -m    Don't restore modification times
+  -O    Write entries to stdout, don't restore to disk
+  -p    Restore permissions (including ACLs, owner, file flags)
+  #>
+function Expand-Tar {
+    [CmdletBinding( )]
+    param(
+        [Parameter(Mandatory)]
+        [string]$Path,
+        [string]$DestDir,
+        [Parameter(Mandatory)]
+        [ValidateSet("Create", "ReplaceAdd", "List", "Update", "Extract")]
+        [string]$Mode,
+        [switch]$Use512ByteRecords,
+        [switch]$Interactive
+        )
+
+    $localVerbose = ($PSCmdlet.MyInvocation.BoundParameters["Verbose"].IsPresent -eq $true)
+
+    if (!$DestDir)
+    {
+        $DestDir = (Join-Path "."  ((Get-Item $Path).BaseName + "_tar"))
+    }
+
+    switch ($Mode)
+    {
+        "Create" { $ModeArg = "-c" }
+        "ReplaceAdd" { $ModeArg = "-r" }
+        "List" { $ModeArg = "-t" }
+        "Update" { $ModeArg = "-u" }
+        "Extract" { $ModeArg = "-x" }
+    }
+    $tarArgs = [System.Collections.ArrayList]@()
+    $tarArgs.Add("-f") | Out-Null
+    $tarArgs.Add($Path) | Out-Null
+    $tarArgs.Add($ModeArg) | Out-Null
+    if ($localVerbose) { $tarArgs.Add("-v") | Out-Null }
+    if ($Interactive) { $tarArgs.Add("-w") | Out-Null }
+    if ($Use512ByteRecords) { $tarArgs.Add("-b") }
+
+    if ($Mode -eq "Extract")
+    {
+        mkdir -force $DestDir | Out-Null
+        $tarArgs.Add("-C") | Out-Null
+        $tarArgs.Add($DestDir) | Out-Null
+    }
+
+    write-host -foregroundcolor darkgray "tar $tarArgs"
+    tar @tarArgs
 }
