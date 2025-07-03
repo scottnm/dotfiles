@@ -4,12 +4,23 @@
 function VerifyEnvironmentVariable
 {
     Param(
-        [string]$Name
+        [string]$Name,
+        [string]$EnvSkipKey
         )
 
     if (! (Get-Item -path "Env:$Name" -ErrorAction SilentlyContinue) )
     {
-        Write-Error "`$env:$Name not set! Set in system path variables"
+        if ($EnvSkipKey)
+        {
+            if (! (Get-Item -path "Env:$EnvSkipKey" -ErrorAction SilentlyContinue) )
+            {
+                Write-Error "`$env:$Name not set and `$env:$EnvSkipKey not found! Set in system path variables"
+            }
+        }
+        else
+        {
+            Write-Error "`$env:$Name not set! Set in system path variables"
+        }
     }
 }
 
