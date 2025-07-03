@@ -4,12 +4,23 @@
 function VerifyEnvironmentVariable
 {
     Param(
-        [string]$Name
+        [string]$Name,
+        [string]$EnvSkipKey
         )
 
     if (! (Get-Item -path "Env:$Name" -ErrorAction SilentlyContinue) )
     {
-        Write-Error "`$env:$Name not set! Set in system path variables"
+        if ($EnvSkipKey)
+        {
+            if (! (Get-Item -path "Env:$EnvSkipKey" -ErrorAction SilentlyContinue) )
+            {
+                Write-Error "`$env:$Name not set and `$env:$EnvSkipKey not found! Set in system path variables"
+            }
+        }
+        else
+        {
+            Write-Error "`$env:$Name not set! Set in system path variables"
+        }
     }
 }
 
@@ -36,22 +47,93 @@ function Ensure-Module
 
 . $env:SideProfilePath
 
-# vim aliases
-new-alias vim nvim-qt -Force -Option AllScope
-new-alias nvim nvim-qt -Force -Option AllScope
+$PlatformPaths = @{
+    HostsFilePath = @{ Default="/etc/hosts"; Windows="c:\windows\system32\drivers\etc\hosts" };
+}
+
+$PlatformPaths.Keys | % {
+    $varName = $_
+    $varValue = $null
+
+    $varPlatformData = $PlatformPaths[$varName]
+
+    if ($IsLinux) {
+        if ($varPlatformData.Contains("Linux")) {
+            $varValue = $varPlatformData["Linux"];
+        } else {
+            $varValue = $varPlatformData["Default"];
+        }
+    }
+    elseif ($IsMacOS) {
+        if ($varPlatformData.Contains("MacOS")) {
+            $varValue = $varPlatformData["MacOS"];
+        } else {
+            $varValue = $varPlatformData["Default"];
+        }
+    }
+    else { # Windows; don't bother doing IsWindows check for Powershell5 compat
+        if ($varPlatformData.Contains("Windows")) {
+            $varValue = $varPlatformData["Windows"];
+        } else {
+            $varValue = $varPlatformData["Default"];
+        }
+    }
+
+    Set-Item -Path "Env:\$varName" -Value $varValue
+}
+
+$PlatformAliases = @{
+    tedit = @{ Default="vim"; Windows="gvim" };
+    dvim = @{ Default="vim"; Windows="gvim" };
+}
+
+$PlatformAliases.Keys | % {
+    $varName = $_
+    $varValue = $null
+
+    $varPlatformData = $PlatformAliases[$varName]
+
+    if ($IsLinux) {
+        if ($varPlatformData.Contains("Linux")) {
+            $varValue = $varPlatformData["Linux"];
+        } else {
+            $varValue = $varPlatformData["Default"];
+        }
+    }
+    elseif ($IsMacOS) {
+        if ($varPlatformData.Contains("MacOS")) {
+            $varValue = $varPlatformData["MacOS"];
+        } else {
+            $varValue = $varPlatformData["Default"];
+        }
+    }
+    else { # Windows; don't bother doing IsWindows check for Powershell5 compat
+        if ($varPlatformData.Contains("Windows")) {
+            $varValue = $varPlatformData["Windows"];
+        } else {
+            $varValue = $varPlatformData["Default"];
+        }
+    }
+
+    New-Alias -Name $varName -Value $varValue -Force -Option AllScope
+}
 
 # DevEnv edit paths
-function Edit-Profile { gvim $profile $env:SideProfilePath }
-function Edit-Vimrc { gvim $HOME\_vimrc }
-function Edit-GhciConf { gvim $env:APPDATA\ghc\ghci.conf }
-function Edit-Hosts { gvim c:\windows\system32\drivers\etc\hosts }
+function Edit-Profile { dvim $profile $env:SideProfilePath }
+function Edit-Vimrc { dvim $HOME\_vimrc }
+function Edit-GhciConf { tedit $env:APPDATA\ghc\ghci.conf }
+function Edit-Hosts { tedit c:\windows\system32\drivers\etc\hosts }
 function Edit-GitConfig {
-    Param([switch]$Global) $globalFlag = if ($Global) { "--global" } else { "" }
-    git config $globalFlag -e
+    Param([switch]$Global)
+    $editArgs = [System.Collections.ArrayList]@()
+    if ($Global) { $editArgs.Add("--global") | Out-Null }
+    $editArgs.Add("-e") | Out-Null
+    write-host -foregroundcolor darkgray "git config $editArgs"
+    git config @editArgs
 }
 function Edit-TopicNotes {
     $path = Join-Path -path $env:TopicNotesDir -ChildPath "${env:GitTopic}_notes.md"
-    gvim $path
+    dvim $path
 }
 function Get-Version { $PSVersionTable.PSVersion }
 
@@ -137,6 +219,8 @@ function Colored
 
 function prompt
 {
+    $savedLastExitCode = if ($LASTEXITCODE) { $LASTEXITCODE } else { 0 }
+
     RefreshCwdSensitiveState;
     Write-Host("")
 
@@ -155,14 +239,22 @@ function prompt
         $branchPrompt = Colored -Text $env:GitBranch -Color Green
         $statusLine += " :: $branchPrompt"
     }
-    $statusLine += " :: $(Get-Date)
+    $statusLine += " :: $(Get-Date)"
+
+    $exitCodeText = $savedLastExitCode
+    if ($savedLastExitCode -ne 0)
+    {
+        $exitCodeText = (Colored -Text $savedLastExitCode -Color Red)
+    }
+
+    $statusLine += " :: ($exitCodeText)
  "
 
     UpdateWindowTitle;
 
     Write-Host $statusLine -nonewline
-    $prompt = "λ"
-    return "$(Colored -Text $prompt -Color Yellow) "
+    $prompt = (Colored -Text "λ " -Color Yellow)
+    return $prompt
 }
 
 ###############
@@ -225,7 +317,7 @@ function grc {
         {
             Write-Host "    $f"
         }
-        gvim $conflictedFiles
+        dvim $conflictedFiles
     }
     else
     {
@@ -263,10 +355,27 @@ function gcp
     }
 
     $diffArgs = $args[0..($args.Length - 2)]
-    $cmdString = "git diff $diffArgs > $patchDirectory\$($args[-1])"
-    cmd /c $cmdString
-    echo $cmdString
+    if ($diffArgs.Count -eq 1)
+    {
+        $diffArg = $diffArgs[0]
+        if ($diffArg -match '^[a-zA-Z0-9]+$')
+        {
+            $commitHash = $diffArg
+            $diffArgs = @( "$($commitHash)^..$($commitHash)" )
+        }
+    }
+
+    $patchPath = Join-Path $patchDirectory $args[-1]
+
+    write-host -foregroundcolor DarkGray "git diff $diffArgs > $patchPath"
+    git diff @diffArgs > $patchPath
+
+    write-host -foregroundcolor DarkGray ""
+    Get-Content $patchPath | write-host -foregroundcolor DarkGray
+
+    write-host -foregroundcolor cyan "new patch @ $patchPath"
 }
+
 function gti
 {
     [CmdletBinding( )]
@@ -287,6 +396,7 @@ function gtui
 }
 function gst { & git status $args }
 function gstr { gst --no-renames --no-breaks }
+function glp { & git logp $args }
 
 function gsql
 {
@@ -394,7 +504,8 @@ function howto-edit-git-exclude { echo "$GITROOT/.git/info/exclude" }
 # MISC #
 ########
 new-alias pd pushd -Force -Option AllScope
-function grep($pattern) { git grep -r --ignore-case $pattern }
+function ggrep($pattern) { git grep -r --ignore-case $pattern }
+function grep { param([string]$filesPattern,[string]$pattern) sls -path $filesPattern -pattern $pattern }
 
 function edit-hosts { Start-Process -FilePath vim -ArgumentList c:\windows\system32\drivers\etc\hosts -Verb RunAs }
 function type-hosts { type c:\windows\system32\drivers\etc\hosts | sls "^\w" -NoEmphasis }
@@ -564,7 +675,7 @@ function GitGrepToVim
         [string]$Pattern
         )
 
-    gvim (git grep --name-only -i $Pattern)
+    dvim (git grep --name-only -i $Pattern)
 }
 
 function PixClipboardToCsv
@@ -670,11 +781,11 @@ function Journal
 
         if ($AddEntry)
         {
-            gvim $journalPath -c "call NewJournalEntry()"
+            dvim $journalPath -c "call NewJournalEntry()"
         }
         else
         {
-            gvim $journalPath
+            dvim $journalPath
         }
     }
 }
@@ -928,12 +1039,24 @@ function rsls {
     dir $FilePattern -rec | %{sls -InputObject $_ -Pattern $SearchPattern }
 }
 
+function OpensslPem2Der {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$FilePath,
+        [Parameter(Mandatory=$true)]
+        [string]$OutPath
+    )
+
+    openssl x509 -inform PEM -in $FilePath -outform DER -out $OutPath -text
+}
+
 function OpensslDumpCert {
     param(
         [Parameter(Mandatory=$true)]
-        [string]$PemFilePath
+        [string]$FilePath
     )
-    openssl x509 -in $PemFilePath -noout -text
+
+    openssl x509 -in $FilePath -noout -text
 }
 
 function New-OneDriveGitRepo {
@@ -972,4 +1095,253 @@ function New-OneDriveGitRepo {
     git commit -m "first commit"
     git push
     diag "...done"
+}
+
+function SlsObjectMap {
+    param(
+    [Parameter(Mandatory)]
+    [System.Text.RegularExpressions.Match]$MatchResult,
+
+    [string[]]$Names,
+
+    [ValidateSet("int", "string")]
+    [string[]]$Types
+    )
+
+
+    if ($Names.Length -lt $Types.Length)
+    {
+        throw "Must have at least as many `$Names as `$Types"
+    }
+
+    $mappedObj = @{}
+    for ($groupIndex = 1; $groupIndex -lt $MatchResult.Groups.Count; $groupIndex++)
+    {
+        $i = $groupIndex-1
+        $name = "Group_$i"
+        if ($Names.Length -gt $i)
+        {
+            $name = $Names[$i]
+        }
+
+        $type = [string]
+        if ($Types.Length -gt $i)
+        {
+            $type = $Types[$i]
+        }
+
+        $valueStr = $MatchResult.Groups[$i+1].Value
+        $value = $valueStr
+        if ($Types.Length -gt $i)
+        {
+            $type = $Types[$i]
+            if ($type -eq "int")
+            {
+                $value = [int]$valueStr;
+            }
+        }
+
+        $mappedObj.add($name, $value)
+    }
+
+    return [pscustomobject]$mappedObj
+}
+
+function Do-PCap {
+    netsh trace start "capture=yes"
+    Read-Host "Run your scenario. Hit any key to stop the trace"
+    netsh trace stop
+}
+
+function Mirror-Copy {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Source,
+        [string]$Destination,
+        [switch]$NoCompress,
+        [switch]$Purge,
+        [int]$MinFileSizeBytes,
+        [int]$MaxFileSizeBytes
+        )
+
+    if (!($Destination))
+    {
+        $cwdLeaf = Split-Path ($pwd.Path) -Leaf
+        $defaultDestination = Split-Path $Source -Leaf
+        if ($cwdLeaf -eq $defaultDestination)
+        {
+            write-host -foregroundcolor yellow "WARNING: Mirror copy nesting detected!"
+            Read-Host "Press [enter] to proceed or Ctrl-C to quit"
+        }
+
+        $Destination = Join-Path $pwd $defaultDestination
+        write-host -foregroundcolor darkgray "Default copying to $Destination"
+    }
+
+    $args = New-Object System.Collections.Generic.List[System.Object]
+    $args.Add($Source)
+    $args.Add($Destination)
+    $args.Add("/S")
+    if (!$NoCompress)
+    {
+        $args.Add("/COMPRESS")
+    }
+
+    if ($Purge)
+    {
+        $args.Add("/PURGE")
+    }
+
+    if ($MinFileSizeBytes)
+    {
+        $args.Add("/MIN:$MinFileSizeBytes")
+    }
+
+    if ($MaxFileSizeBytes)
+    {
+        $args.Add("/MAX:$MaxFileSizeBytes")
+    }
+
+    write-host -foregroundcolor darkgray "robocopy $args"
+    robocopy @args
+}
+
+# [l][s][s]imple
+function lss {
+    param([string[]]$Props = @("Name", "LastWriteTime"))
+    get-childitem @args | select-object $Props
+}
+
+function Get-LineEndingType {
+    param(
+        [string]$FilePath
+        )
+
+    $content = Get-Content -Path $FilePath -AsByteStream
+    if ($content -contains 13) {
+        if ($content -contains 10) {
+            return "DOS (CRLF)"
+        } else {
+            return "Classic Mac (CR)"
+        }
+    } else {
+        if ($content -contains 10){
+            return "Unix (LF)"
+        } else {
+            return "File is empty or contains no line breaks"
+        }
+    }
+}
+
+function Filter-LineEndingType {
+    param(
+        [string]$FilePath,
+        [ValidateSet("DOS","Unix","MacClassic")]
+        [string]$LineEndingType
+        )
+
+    $content = Get-Content -Path $FilePath -AsByteStream
+    if ($content -contains 13) {
+        if ($content -contains 10) {
+            return $LineEndingType -eq "DOS"
+        } else {
+            return $LineEndingType -eq "MacClassic"
+        }
+    } else {
+        if ($content -contains 10){
+            return $LineEndingType -eq "Unix"
+        } else {
+            return $false
+        }
+    }
+}
+
+function Convert-WinFileTimeTimestampToUnixTime
+{
+    param([System.Int64]$WinFileTime)
+
+    $WINDOWS_TICK = 10000000
+    $SEC_TO_UNIX_EPOCH = 11644473600
+    $unixTime = ([System.Int64]($WinFileTime / $WINDOWS_TICK) - $SEC_TO_UNIX_EPOCH)
+    $datetime = [datetimeoffset]::FromUnixTimeSeconds($unixTime)
+
+    write-host "Unix time: $unixTime"
+    write-host "datetime:  $datetime"
+}
+
+function Convert-UnixTimeToClock
+{
+    param(
+        [Parameter(Mandatory)]
+        [int]$UnixTime
+        )
+
+    [datetimeoffset]::FromUnixTimeMilliseconds(1000 * $UnixTime)
+}
+
+new-alias Launch-AndroidEmulator $env:ANDROID_SDK_ROOT\emulator\emulator.exe -Force -Option AllScope
+
+        <#
+        Common Options:
+Create: tar.exe -c [options] [<file> | <dir> | @<archive> | -C <dir> ]
+  <file>, <dir>  add these items to archive
+  -z, -j, -J, --lzma  Compress archive with gzip/bzip2/xz/lzma
+  --format {ustar|pax|cpio|shar}  Select archive format
+  --exclude <pattern>  Skip files that match pattern
+  -C <dir>  Change to <dir> before processing remaining files
+  @<archive>  Add entries from <archive> to output
+List: tar.exe -t [options] [<patterns>]
+  <patterns>  If specified, list only entries that match
+Extract: tar.exe -x [options] [<patterns>]
+  <patterns>  If specified, extract only entries that match
+  -k    Keep (don't overwrite) existing files
+  -m    Don't restore modification times
+  -O    Write entries to stdout, don't restore to disk
+  -p    Restore permissions (including ACLs, owner, file flags)
+  #>
+function Expand-Tar {
+    [CmdletBinding( )]
+    param(
+        [Parameter(Mandatory)]
+        [string]$Path,
+        [string]$DestDir,
+        [Parameter(Mandatory)]
+        [ValidateSet("Create", "ReplaceAdd", "List", "Update", "Extract")]
+        [string]$Mode,
+        [switch]$Use512ByteRecords,
+        [switch]$Interactive
+        )
+
+    $localVerbose = ($PSCmdlet.MyInvocation.BoundParameters["Verbose"].IsPresent -eq $true)
+
+    if (!$DestDir)
+    {
+        $DestDir = (Join-Path "."  ((Get-Item $Path).BaseName + "_tar"))
+    }
+
+    switch ($Mode)
+    {
+        "Create" { $ModeArg = "-c" }
+        "ReplaceAdd" { $ModeArg = "-r" }
+        "List" { $ModeArg = "-t" }
+        "Update" { $ModeArg = "-u" }
+        "Extract" { $ModeArg = "-x" }
+    }
+    $tarArgs = [System.Collections.ArrayList]@()
+    $tarArgs.Add("-f") | Out-Null
+    $tarArgs.Add($Path) | Out-Null
+    $tarArgs.Add($ModeArg) | Out-Null
+    if ($localVerbose) { $tarArgs.Add("-v") | Out-Null }
+    if ($Interactive) { $tarArgs.Add("-w") | Out-Null }
+    if ($Use512ByteRecords) { $tarArgs.Add("-b") }
+
+    if ($Mode -eq "Extract")
+    {
+        mkdir -force $DestDir | Out-Null
+        $tarArgs.Add("-C") | Out-Null
+        $tarArgs.Add($DestDir) | Out-Null
+    }
+
+    write-host -foregroundcolor darkgray "tar $tarArgs"
+    tar @tarArgs
 }

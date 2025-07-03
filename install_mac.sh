@@ -1,41 +1,113 @@
 #!/bin/sh
 
 # to download this remotely use...
-# wget https://raw.githubusercontent.com/scottnm/dotfiles/master/install_linux.sh -O ~/Downloads/install_linux.sh && chmod +x ~/Downloads/install_linux
+# wget https://raw.githubusercontent.com/scottnm/dotfiles/master/install_mac.sh -O ~/Downloads/install_mac.sh && chmod +x ~/Downloads/install_mac.sh
 
 set -e
 
-# make sure that package repos are updated
-echo "updating package repos..."
-sudo apt update
-echo "...updated package repos!"
+path_contains() {
+    if [[ ":$PATH:" == *":$1:"* ]]; then
+        true
+        return
+    else
+        false
+        return
+    fi
+}
 
-# install dependencies
+command_exists() {
+    command_name=$1
+    if command -v $command_name 2>&1 >/dev/null
+    then
+        true
+        return
+    else
+        false
+        return
+    fi
+}
+
+brew_install_if_missing() {
+    package_name=$1
+    package_command_name=$2
+    package_repr="$package_name ($package_command_name)"
+    if [ -z "$package_command_name" ]; then
+        package_command_name=$package_name
+        package_repr="$package_name"
+    fi
+
+    if command_exists "$package_command_name"; then
+        echo "$package_repr already installed"
+    else
+        echo "installing $package_repr"
+        brew install $package_name
+    fi
+}
+
+#
+# Main tools
+#
 echo "Installing main tools..."
-echo "    * git"
-sudo apt install git
-echo "    * neovim"
-sudo apt install neovim
-echo "    * curl"
-sudo apt install curl
-echo "...main tools installed"
+if command_exists "brew"; then
+    echo "brew already installed"
+elif command_exists "/opt/homebrew/bin/brew"; then
+    echo "brew already installed"
+else
+    echo "installing brew"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
 
-# setup the dev and dotfiles directories
-echo "Setting up dotfiles..."
+if path_contains "/opt/homebrew/bin"; then
+    echo "brew already in path"
+else
+    (echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> /Users/scottmunro/.zshrc
+    export PATH=$PATH:/opt/homebrew/bin/
+    echo "added brew to path"
+fi
+
+brew_install_if_missing "git"
+brew_install_if_missing "neovim"
+brew_install_if_missing "curl"
+
+#
+# Setup dev and dotfiles
+#
+echo "setting up dotfiles..."
+mkdir -p "$HOME/dev"
 DOTFILES="$HOME/dev/dotfiles"
-rm -rf $DOTFILES
-mkdir -p ~/dev
-git clone https://github.com/scottnm/dotfiles $DOTFILES
-echo "...dotfile setup"
+if [ -d "$DOTFILES" ]; then
+    echo "dotfiles already exists"
+else
+    git clone https://github.com/scottnm/dotfiles $DOTFILES
+fi
 
+#
+# Setting up unix environment
+#
 # make sure that my .profile is set
-echo "seting unix profile..."
+echo "setting up unix profiles..."
 UNIX_PROFILE="$HOME/.profile"
 rm -f $UNIX_PROFILE
 ln -s "$DOTFILES/config/unix_profile" $UNIX_PROFILE
-echo "...set unix profile!"
+echo "    ...set unix .profile!"
 
-# 4. make sure that my vimrc is properly aliased so that it can be loaded
+echo "linking inputrc..."
+INPUT_RC="$HOME/.inputrc"
+rm -f $INPUT_RC
+ln -s "$DOTFILES/config/.inputrc" $INPUT_RC
+echo "    ...inputrc linked"
+
+# echo "linking powershell profile..."
+# POWERSHELL_PROFILE="$HOME/.config/powershell/Microsoft.PowerShell_profile.ps1"
+# rm -f $POWERSHELL_PROFILE
+# ln -s "$DOTFILES/config/ps_main.ps1" $POWERSHELL_PROFILE
+# echo "    ...powershell profile linked"
+
+#
+# Setup VIM config
+#
+echo "setting up vim config"
+echo ""
 echo "linking vimrc..."
 VIM_CONFIG="$HOME/.vimrc"
 rm -f $VIM_CONFIG
@@ -66,9 +138,6 @@ echo "    ...nvim ginit.vim linked"
 
 echo "...nvim config setup"
 
-# 5. symlink inputrc to our home directory
-echo "linking inputrc..."
-INPUT_RC="$HOME/.inputrc"
-rm -f $INPUT_RC
-ln -s "$DOTFILES/config/.inputrc" $INPUT_RC
-echo "...inputrc linked"
+echo "Installing extra tools..."
+brew_install_if_missing "visual-studio-code" "code"
+brew_install_if_missing "iterm2"
