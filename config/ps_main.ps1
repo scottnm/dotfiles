@@ -1345,3 +1345,5 @@ function Expand-Tar {
     write-host -foregroundcolor darkgray "tar $tarArgs"
     tar @tarArgs
 }
+
+$MaximumHistoryCount = 32767 # max amount of powershell history
