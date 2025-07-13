@@ -512,8 +512,14 @@ function type-hosts { type c:\windows\system32\drivers\etc\hosts | sls "^\w" -No
 
 # net stop beep
 
-function setnetsh {netsh winhttp set proxy 127.0.0.1:8888 "<-loopback>"}
-function clearnetsh {netsh winhttp reset proxy }
+function setnetsh {
+    write-host -foregroundcolor darkgray 'netsh winhttp set proxy 127.0.0.1:8888 "<-loopback>"'
+    netsh winhttp set proxy 127.0.0.1:8888 "<-loopback>"
+    }
+function clearnetsh {
+    write-host -foregroundcolor darkgray 'netsh winhttp reset proxy'
+    netsh winhttp reset proxy
+    }
 
 function RenameLowerCase($dir)
 {
