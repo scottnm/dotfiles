@@ -1355,3 +1355,22 @@ function Expand-Tar {
 }
 
 $MaximumHistoryCount = 32767 # max amount of powershell history
+
+function Update-PathVar
+{
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$newPath,
+        [ValidateSet("User", "Machine", "Process")]
+        [string]$PathScope = "User"
+        )
+
+    $currentPath = [Environment]::GetEnvironmentVariable("Path", $PathScope)
+    if (-not ($currentPath -like "*$newPath*")) {
+        $updatedPath = $currentPath + ";" + $newPath
+        [Environment]::SetEnvironmentVariable("Path", $updatedPath, $PathScope)
+        Write-Host "Path added successfully to $PathScope path. Restart applications or the system for full effect."
+    } else {
+        Write-Host "$newPath already exists in $PathScope path"
+    }
+}
