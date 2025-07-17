@@ -1356,21 +1356,56 @@ function Expand-Tar {
 
 $MaximumHistoryCount = 32767 # max amount of powershell history
 
-function Update-PathVar
+function Update-SystemPath
 {
     param(
         [Parameter(Mandatory=$true)]
-        [string]$newPath,
+        [string]$AdditionalPath,
         [ValidateSet("User", "Machine", "Process")]
         [string]$PathScope = "User"
         )
 
     $currentPath = [Environment]::GetEnvironmentVariable("Path", $PathScope)
-    if (-not ($currentPath -like "*$newPath*")) {
-        $updatedPath = $currentPath + ";" + $newPath
-        [Environment]::SetEnvironmentVariable("Path", $updatedPath, $PathScope)
-        Write-Host "Path added successfully to $PathScope path. Restart applications or the system for full effect."
-    } else {
-        Write-Host "$newPath already exists in $PathScope path"
+    if (($currentPath -like "*$newPath*"))
+    {
+        Write-Host -ForegroundColor DarkYellow "$newPath already exists in $PathScope path"
+        return;
+    }
+
+    $updatedPath = $currentPath + ";" + $newPath
+    [Environment]::SetEnvironmentVariable("Path", $updatedPath, $PathScope)
+    Write-Host "Path added successfully to $PathScope path. Restart applications or the system for full effect."
+    if ($PathScope -ne "Process")
+    {
+        [Environment]::SetEnvironmentVariable("Path", $updatedPath, "Process")
+    }
+}
+
+function Set-SystemEnvVar
+{
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$VarName,
+        [Parameter(Mandatory=$true)]
+        [string]$VarValue,
+        [ValidateSet("User", "Machine", "Process")]
+        [string]$PathScope = "User",
+        [switch]$Force
+        )
+
+    $currentVar = [Environment]::GetEnvironmentVariable($VarName, $PathScope)
+    if ($currentVar)
+    {
+        if (!$Force)
+        {
+            throw "$VarName already has value '$currentVar'"
+        }
+
+        Write-Host -ForegroundColor DarkYellow "$VarName already has value '$currentVar'. Overwriting..."
+    }
+    [Environment]::SetEnvironmentVariable($VarName, $VarValue, $PathScope)
+    if ($PathScope -ne "Process")
+    {
+        [Environment]::SetEnvironmentVariable($VarName, $VarValue, "Process")
     }
 }

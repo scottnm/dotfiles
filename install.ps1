@@ -28,7 +28,7 @@ pushd .
 
 if ($All -or $InstallDeps)
 {
-    # - chocolatey
+    # Install chocolatey; not needed for 
     if (!(Get-Command choco -ErrorAction SilentlyContinue))
     {
         Set-ExecutionPolicy Bypass -Scope Process -Force;
@@ -36,33 +36,28 @@ if ($All -or $InstallDeps)
         iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
     }
 
-    function ChocoInstallWithPrompt {
-        param(
-            [string]$package
-        )
-        if (!$SkipInstallPrompt) {
-            $installYorN = Read-Host "Install $($package)? [y/n]"
-            if ($installYorN.ToLower().Substring(0,1) -ne "y") {
-                write-host -foregroundcolor yellow "Skipping '$package' install"
-                return;
-            }
+    function Install-WithWinget
+    {
+        param([string]$Pkg)
+
+        Write-Host -ForegroundColor Cyan "Installing $Pkg via WinGet"
+        $extraWinGetInstallArgs = @()
+        if ($SkipInstallPrompt)
+        {
+            $extraWinGetInstallArgs = @("--disable-interactivity", "--silent", "--accept-source-agreements", "--accept-package-agreements")
         }
-        choco install $package -y
+        winget install $Pkg @extraWinGetInstallArgs
     }
 
-    ChocoInstallWithPrompt powershell-core
-    ChocoInstallWithPrompt microsoft-windows-terminal
-    ChocoInstallWithPrompt git
-    ChocoInstallWithPrompt vim
-    ChocoInstallWithPrompt neovim
-    # ChocoInstallWithPrompt powertoys
-    ChocoInstallWithPrompt fzf
-    # ChocoInstallWithPrompt firefox
-    ChocoInstallWithPrompt sharpkeys
 
-    # TODO: replace above choco installs with winget
-    winget install Microsoft.VisualStudio.2022.Community
-    winget install Microsoft.VisualStudioCode
+    Install-WithWinget git.git 
+    Install-WithWinget pwsh 
+    Install-WithWinget vim.vim 
+    Install-WithWinget neovim.neovim 
+    Install-WithWinget Microsoft.VisualStudioCode 
+    Install-WithWinget Microsoft.VisualStudio.2022.Enterprise
+    Install-WithWinget junegunn.fzf 
+    Install-WithWinget RandyRants.SharpKeys 
 
     # setup git after initial installation
     & .\gitsetup.ps1
