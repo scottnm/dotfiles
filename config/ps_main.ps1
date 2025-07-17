@@ -1362,22 +1362,28 @@ function Update-SystemPath
         [Parameter(Mandatory=$true)]
         [string]$AdditionalPath,
         [ValidateSet("User", "Machine", "Process")]
-        [string]$PathScope = "User"
+        [string]$PathScope = "User",
+        [switch]$Quiet
         )
 
     $currentPath = [Environment]::GetEnvironmentVariable("Path", $PathScope)
-    if (($currentPath -like "*$newPath*"))
+    $pathChunks = ($currentPath -split ";").trim("\\");
+    if ($pathChunks.Contains($AdditionalPath.trim("\\")))
     {
-        Write-Host -ForegroundColor DarkYellow "$newPath already exists in $PathScope path"
+        if (! $Quiet)
+        {
+            Write-Host -ForegroundColor DarkYellow "$AdditionalPath already exists in $PathScope path"
+        }
         return;
     }
 
-    $updatedPath = $currentPath + ";" + $newPath
+    $updatedPath = $currentPath + ";" + $AdditionalPath
     [Environment]::SetEnvironmentVariable("Path", $updatedPath, $PathScope)
-    Write-Host "Path added successfully to $PathScope path. Restart applications or the system for full effect."
+    Write-Host "Path added successfully to $PathScope path."
+
     if ($PathScope -ne "Process")
     {
-        [Environment]::SetEnvironmentVariable("Path", $updatedPath, "Process")
+        Update-SystemPath -Quiet -AdditionalPath:$AdditionalPath -PathScope:"Process"
     }
 }
 
