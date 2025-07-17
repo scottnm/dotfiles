@@ -733,6 +733,7 @@ function Journal
     Param(
         [switch]$AddEntry,
         [switch]$Alt,
+        [string]$Search,
         [string]$EntryText,
         [string[]]$EntryTags
         )
@@ -780,13 +781,14 @@ function Journal
             Out-File -InputObject $tagsline -Append -FilePath $journalPath -NoNewLine
         }
     }
-    else
-    {
-        if ($EntryTags)
-        {
-            throw "Can't supply `$EntryTags without `$EntryText!";
-        }
 
+    if ($Search)
+    {
+        select-string -Path $journalPath -Pattern $Search
+    }
+
+    if ((!$EntryText) -and (!$Search))
+    {
         if ($AddEntry)
         {
             dvim $journalPath -c "call NewJournalEntry()"
