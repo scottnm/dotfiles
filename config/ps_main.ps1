@@ -1289,7 +1289,23 @@ function Convert-UnixTimeToClock
     [datetimeoffset]::FromUnixTimeMilliseconds(1000 * $UnixTime)
 }
 
-new-alias Launch-AndroidEmulator $env:ANDROID_SDK_ROOT\emulator\emulator.exe -Force -Option AllScope
+$AndroidEmulatorExe = "$env:ANDROID_HOME\emulator\emulator.exe"
+new-alias Launch-AndroidEmulatorRaw $AndroidEmulatorExe -Force -Option AllScope
+function Launch-AndroidEmulator
+{
+    param(
+        [string]$DeviceName
+        )
+
+    if ($DeviceName)
+    {
+        Start-Process $AndroidEmulatorExe -ArgumentList @("-avd", $DeviceName)
+    }
+    else
+    {
+        Launch-AndroidEmulatorRaw "-list-avds"
+    }
+}
 
         <#
         Common Options:
