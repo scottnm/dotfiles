@@ -1473,5 +1473,5 @@ function ReadElfSectionScan
 }
 
 function Unlock-MacOsKeychain {
-    security unlock-keychain "~/Library/Keychains/login.keychain"
+    security unlock-keychain "$HOME/Library/Keychains/login.keychain"
 }
