@@ -50,6 +50,7 @@ Plug 'AndrewRadev/linediff.vim'
 
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'tpope/vim-abolish'
+Plug 'MattesGroeger/vim-bookmarks'
 
 " Unused Plugins
 " Kql
@@ -105,7 +106,7 @@ let g:netrw_list_hide= '.*\.wav$,.*\.etl$'
 
 " Update vim command 'tab' autocompletion to only complete the common bits
 " i.e. :e R<tab> with items Red.cpp and Read.cpp would tab complete to :e Re
-set wildmode=longest,list
+set wildmode=list:full
 if has('nvim')
     set completeopt=longest,menuone,preview "menuone,noinsert,noselect
     let g:compleion_enable_auto_popup = 1
@@ -201,6 +202,9 @@ let g:fzf_preview_window = []
 
 " source file processors
 autocmd BufWritePre *.odin,*.zig,*.lua,*.py,*.rs,*.c,*.cpp,*.h,*.bat,*.ps1,*.cmd,*.cs,*.csx %s/\s\+$//e
+function! NoTrimSrcFile()
+    autocmd! BufWritePre *.odin,*.zig,*.lua,*.py,*.rs,*.c,*.cpp,*.h,*.bat,*.ps1,*.cmd,*.cs,*.csx
+endfunction
 
 " syntax highlighting
 if !has('nvim')

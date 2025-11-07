@@ -431,8 +431,15 @@ function PruneSquashedBranches
         Write-Host "Defaulting to compare against branch [$BaseBranch]"
     }
 
-    git checkout -q $BaseBranch
+    $CurrentBranch = git rev-parse --abbrev-ref HEAD
+    if ($CurrentBranch -ne $BaseBranch)
+    {
+        git checkout -q $BaseBranch
+        write-verbose "git checkout -q $BaseBranch"
+    }
+
     git pull -q
+    write-verbose "git pull -q"
 
     function PruneInternal
     {
@@ -443,16 +450,25 @@ function PruneSquashedBranches
         $mergeBase = (git merge-base $BaseBranch $TargetBranch)
 
         Write-Host -foregroundcolor cyan "Testing $BaseBranch <- $TargetBranch"
+
         $gitTree = (git rev-parse "$TargetBranch^{tree}")
+        write-verbose "git rev-parse `"$TargetBranch^{tree}`""
+
         $gitCherry = (git cherry $BaseBranch "$(git commit-tree $gitTree -p $mergeBase -m _)")
+        write-verbose "git cherry $BaseBranch $(git commit-tree $gitTree -p $mergeBase -m _)"
+
         $squashMerged = $gitCherry[0] -eq '-'
+        write-verbose "`$gitCherry[0] -eq '-' = $squashMerged"
+
         $topicHead = (git rev-parse --short $TargetBranch)
+        write-verbose "git rev-parse --short $TargetBranch = $topicHead"
 
         if ($squashMerged)
         {
             if (!$WhatIf)
             {
                 (git branch -D $TargetBranch) | Out-Null
+                write-verbose "(git branch -D $TargetBranch) | Out-Null"
             }
 
             $deleteMsg = if (!$WhatIf) { "    DELETED" } else { "WILL DELETE"}
@@ -483,6 +499,7 @@ function PruneSquashedBranches
         }
     }
 
+    write-verbose "git fetch --all --prune"
     git fetch --all --prune
 }
 
@@ -512,8 +529,16 @@ function type-hosts { type c:\windows\system32\drivers\etc\hosts | sls "^\w" -No
 
 # net stop beep
 
-function setnetsh {netsh winhttp set proxy 127.0.0.1:8888 "<-loopback>"}
-function clearnetsh {netsh winhttp reset proxy }
+function Set-WinHttpProxy
+{
+    write-host -foregroundcolor darkgray 'netsh winhttp set proxy 127.0.0.1:8888 "<-loopback>"'
+    netsh winhttp set proxy 127.0.0.1:8888 "<-loopback>"
+}
+function Clear-WinHttpProxy
+{
+    write-host -foregroundcolor darkgray 'netsh winhttp reset proxy'
+    netsh winhttp reset proxy
+}
 
 function RenameLowerCase($dir)
 {
@@ -725,6 +750,7 @@ function Journal
     Param(
         [switch]$AddEntry,
         [switch]$Alt,
+        [string]$Search,
         [string]$EntryText,
         [string[]]$EntryTags
         )
@@ -772,13 +798,14 @@ function Journal
             Out-File -InputObject $tagsline -Append -FilePath $journalPath -NoNewLine
         }
     }
-    else
-    {
-        if ($EntryTags)
-        {
-            throw "Can't supply `$EntryTags without `$EntryText!";
-        }
 
+    if ($Search)
+    {
+        select-string -Path $journalPath -Pattern $Search
+    }
+
+    if ((!$EntryText) -and (!$Search))
+    {
         if ($AddEntry)
         {
             dvim $journalPath -c "call NewJournalEntry()"
@@ -902,14 +929,15 @@ function Git-GrepChanges
 
     $CaseSensitiveOption = if (!$CaseSensitive) { "-i" } else { $null }
 
+    $filesChanged = @(git diff --name-only "$Start..$End")
     if ($NameOnly)
     {
-        git diff --name-only "$Start..$End" | %{ git grep --name-only $CaseSensitiveOption $Pattern -- $_ }
+        $filesChanged | %{ git grep --name-only $CaseSensitiveOption $Pattern -- $_ }
     }
     else
     {
 
-        git diff --name-only "$Start..$End" |
+        $filesChanged |
             % { git grep --line-number  $CaseSensitiveOption $Pattern -- $_ } |
             % {
                 $m=(sls -InputObject $_ -Pattern "(\S+:)\s*(\S.*)").Matches;
@@ -1279,7 +1307,23 @@ function Convert-UnixTimeToClock
     [datetimeoffset]::FromUnixTimeMilliseconds(1000 * $UnixTime)
 }
 
-new-alias Launch-AndroidEmulator $env:ANDROID_SDK_ROOT\emulator\emulator.exe -Force -Option AllScope
+$AndroidEmulatorExe = "$env:ANDROID_HOME\emulator\emulator.exe"
+new-alias Launch-AndroidEmulatorRaw $AndroidEmulatorExe -Force -Option AllScope
+function Launch-AndroidEmulator
+{
+    param(
+        [string]$DeviceName
+        )
+
+    if ($DeviceName)
+    {
+        Start-Process $AndroidEmulatorExe -ArgumentList @("-avd", $DeviceName)
+    }
+    else
+    {
+        Launch-AndroidEmulatorRaw "-list-avds"
+    }
+}
 
         <#
         Common Options:
@@ -1344,4 +1388,90 @@ function Expand-Tar {
 
     write-host -foregroundcolor darkgray "tar $tarArgs"
     tar @tarArgs
+}
+
+$MaximumHistoryCount = 32767 # max amount of powershell history
+
+function Update-SystemPath
+{
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$AdditionalPath,
+        [ValidateSet("User", "Machine", "Process")]
+        [string]$PathScope = "User",
+        [switch]$Quiet
+        )
+
+    $currentPath = [Environment]::GetEnvironmentVariable("Path", $PathScope)
+    $pathChunks = ($currentPath -split ";").trim("\\");
+    if ($pathChunks.Contains($AdditionalPath.trim("\\")))
+    {
+        if (! $Quiet)
+        {
+            Write-Host -ForegroundColor DarkYellow "$AdditionalPath already exists in $PathScope path"
+        }
+        return;
+    }
+
+    $updatedPath = $currentPath + ";" + $AdditionalPath
+    [Environment]::SetEnvironmentVariable("Path", $updatedPath, $PathScope)
+    Write-Host "Path added successfully to $PathScope path."
+
+    if ($PathScope -ne "Process")
+    {
+        Update-SystemPath -Quiet -AdditionalPath:$AdditionalPath -PathScope:"Process"
+    }
+}
+
+function Set-SystemEnvVar
+{
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$VarName,
+        [Parameter(Mandatory=$true)]
+        [string]$VarValue,
+        [ValidateSet("User", "Machine", "Process")]
+        [string]$PathScope = "User",
+        [switch]$Force
+        )
+
+    $currentVar = [Environment]::GetEnvironmentVariable($VarName, $PathScope)
+    if ($currentVar)
+    {
+        if (!$Force)
+        {
+            throw "$VarName already has value '$currentVar'"
+        }
+
+        Write-Host -ForegroundColor DarkYellow "$VarName already has value '$currentVar'. Overwriting..."
+    }
+    [Environment]::SetEnvironmentVariable($VarName, $VarValue, $PathScope)
+    if ($PathScope -ne "Process")
+    {
+        [Environment]::SetEnvironmentVariable($VarName, $VarValue, "Process")
+    }
+}
+
+function ReadElfSectionScan
+{
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$FileGlob,
+        [Parameter(Mandatory=$true)]
+        [string]$Pattern,
+        [switch]$NoRecurse
+        )
+
+    $Recurse = ! $NoRecurse
+    $files = dir $FileGlob -Recurse:$Recurse
+    foreach ($file in $files)
+    {
+        readelf -S $file | sls -Pattern $Pattern | %{
+            write-host "$($file): $_"
+        }
+    }
+}
+
+function Unlock-MacOsKeychain {
+    security unlock-keychain "~/Library/Keychains/login.keychain"
 }
