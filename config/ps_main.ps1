@@ -431,8 +431,15 @@ function PruneSquashedBranches
         Write-Host "Defaulting to compare against branch [$BaseBranch]"
     }
 
-    git checkout -q $BaseBranch
+    $CurrentBranch = git rev-parse --abbrev-ref HEAD
+    if ($CurrentBranch -ne $BaseBranch)
+    {
+        git checkout -q $BaseBranch
+        write-verbose "git checkout -q $BaseBranch"
+    }
+
     git pull -q
+    write-verbose "git pull -q"
 
     function PruneInternal
     {
@@ -443,16 +450,25 @@ function PruneSquashedBranches
         $mergeBase = (git merge-base $BaseBranch $TargetBranch)
 
         Write-Host -foregroundcolor cyan "Testing $BaseBranch <- $TargetBranch"
+
         $gitTree = (git rev-parse "$TargetBranch^{tree}")
+        write-verbose "git rev-parse `"$TargetBranch^{tree}`""
+
         $gitCherry = (git cherry $BaseBranch "$(git commit-tree $gitTree -p $mergeBase -m _)")
+        write-verbose "git cherry $BaseBranch $(git commit-tree $gitTree -p $mergeBase -m _)"
+
         $squashMerged = $gitCherry[0] -eq '-'
+        write-verbose "`$gitCherry[0] -eq '-' = $squashMerged"
+
         $topicHead = (git rev-parse --short $TargetBranch)
+        write-verbose "git rev-parse --short $TargetBranch = $topicHead"
 
         if ($squashMerged)
         {
             if (!$WhatIf)
             {
                 (git branch -D $TargetBranch) | Out-Null
+                write-verbose "(git branch -D $TargetBranch) | Out-Null"
             }
 
             $deleteMsg = if (!$WhatIf) { "    DELETED" } else { "WILL DELETE"}
@@ -483,6 +499,7 @@ function PruneSquashedBranches
         }
     }
 
+    write-verbose "git fetch --all --prune"
     git fetch --all --prune
 }
 
@@ -912,14 +929,15 @@ function Git-GrepChanges
 
     $CaseSensitiveOption = if (!$CaseSensitive) { "-i" } else { $null }
 
+    $filesChanged = @(git diff --name-only "$Start..$End")
     if ($NameOnly)
     {
-        git diff --name-only "$Start..$End" | %{ git grep --name-only $CaseSensitiveOption $Pattern -- $_ }
+        $filesChanged | %{ git grep --name-only $CaseSensitiveOption $Pattern -- $_ }
     }
     else
     {
 
-        git diff --name-only "$Start..$End" |
+        $filesChanged |
             % { git grep --line-number  $CaseSensitiveOption $Pattern -- $_ } |
             % {
                 $m=(sls -InputObject $_ -Pattern "(\S+:)\s*(\S.*)").Matches;
@@ -1432,4 +1450,28 @@ function Set-SystemEnvVar
     {
         [Environment]::SetEnvironmentVariable($VarName, $VarValue, "Process")
     }
+}
+
+function ReadElfSectionScan
+{
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$FileGlob,
+        [Parameter(Mandatory=$true)]
+        [string]$Pattern,
+        [switch]$NoRecurse
+        )
+
+    $Recurse = ! $NoRecurse
+    $files = dir $FileGlob -Recurse:$Recurse
+    foreach ($file in $files)
+    {
+        readelf -S $file | sls -Pattern $Pattern | %{
+            write-host "$($file): $_"
+        }
+    }
+}
+
+function Unlock-MacOsKeychain {
+    security unlock-keychain "~/Library/Keychains/login.keychain"
 }

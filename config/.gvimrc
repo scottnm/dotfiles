@@ -20,6 +20,8 @@ endif
 if has('gui_running')
     set lines=40 columns=125
     winpos 300 300
+else
+    set termguicolors
 endif
 set visualbell t_vb=
 autocmd GUIEnter * set visualbell t_vb=
