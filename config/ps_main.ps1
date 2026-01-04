@@ -1029,39 +1029,60 @@ function OpensslDumpCert {
 function New-OneDriveGitRepo {
     param(
     [Parameter(Mandatory=$true)]
-    [string]$reponame,
-    [string]$onedrivelocation = $null
+    [string]$RepoName,
+    [string]$OneDriveHome,
+    [string]$OneDriveRepoRoot = "projects",
+    [string]$OneDriveGitRemoteName = "onedrive",
+    [string]$DefaultGitBranchName = "main"
     )
 
-    if (!$onedrivelocation)
+    if (!$OneDriveHome)
     {
-        $onedrivelocation = "$env:OneDrive\projects"
+        if (!$env:OneDrive)
+        {
+            throw "Must specify -OneDriveHome if `$env:OneDrive not defined"
+        }
+        $OneDriveHome = $env:OneDriveHome
     }
+
+
+    $OneDriveRepoPath = (Join-Path $OneDriveHome $OneDriveRepoRoot)
+    $OneDriveRepoPath = (Get-Item $OneDriveRepoPath).FullName # avoid any problems with ~ references
 
     function diag($msg) { Write-Host -foregroundcolor cyan $msg }
 
-    diag "Creating onedrive bare repo @ $(Join-Path $onedrivelocation $reponame)..."
-    pushd $onedrivelocation
-    mkdir $reponame
-    cd $reponame
-    git init --bare
-    git symbolic-ref HEAD refs/heads/main
-    popd
-    diag "...created"
+    $originalLocation = Get-Location
 
-    diag "Creating local repo @ $(Join-Path $pwd $reponame)..."
-    mkdir $reponame
-    cd $reponame
-    git init
-    diag "    ...setting branch and remote"
-    git branch -m main
-    git remote add onedrive file://"$(Join-Path $onedrivelocation $reponame)"
-    diag "    ...creating first commit and pushing"
-    echo "" > .gitignore
-    git add .gitignore
-    git commit -m "first commit"
-    git push
-    diag "...done"
+    try
+    {
+        cd $OneDriveRepoPath
+        diag "Creating onedrive bare repo @ $(Join-Path $OneDriveRepoPath $RepoName)..."
+        mkdir $RepoName
+        cd $RepoName
+        git init --bare
+        git symbolic-ref HEAD "refs/heads/$DefaultGitBranchName"
+        diag "...created"
+
+        Set-Location $originalLocation
+        diag "Creating local repo @ $(Join-Path $pwd $RepoName)..."
+        mkdir $RepoName
+        cd $RepoName
+        git init
+        diag "    ...setting branch and remote"
+        git branch -m $DefaultGitBranchName
+        git remote add $OneDriveGitRemoteName file://"$(Join-Path $OneDriveRepoPath $RepoName)"
+        diag "    ...creating first commit and pushing"
+        echo "" > .gitignore
+        git add .gitignore
+        git commit -m "first commit"
+        git push -u $OneDriveGitRemoteName $DefaultGitBranchName
+        diag "...done"
+    }
+    finally
+    {
+        Set-Location $originalLocation
+    }
+
 }
 
 function SlsObjectMap {
@@ -1177,4 +1198,12 @@ function Mirror-Copy {
 function lss {
     param([string[]]$Props = @("Name", "LastWriteTime"))
     get-childitem @args | select-object $Props
+}
+
+function Get-1PasswordValue {
+    param(
+        [string]$ItemName,
+        [string]$FieldName
+        )
+    (op item get $ItemName --format json --fields $FieldName | ConvertFrom-Json).value
 }
