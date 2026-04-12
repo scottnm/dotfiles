@@ -1496,3 +1496,11 @@ function ReadElfSectionScan
 function Unlock-MacOsKeychain {
     security unlock-keychain "$HOME/Library/Keychains/login.keychain"
 }
+
+function Get-1PasswordValue {
+    param(
+        [string]$ItemName,
+        [string]$FieldName = "password"
+        )
+    (op item get $ItemName --format json --fields $FieldName | ConvertFrom-Json).value
+}
