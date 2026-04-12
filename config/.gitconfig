@@ -24,6 +24,19 @@
 	dfc = !git diff --cached --name-status
 	count-lines = "! git log --author=\"$1\" --pretty=tformat: --numstat | awk '{ add += $1; subs += $2; loc += $1 - $2 } END { printf \"added lines: %s, removed lines: %s, total lines: %s\\n\", add, subs, loc }' #"
 	browse = !git config --get remote.origin.url
+
+	# 
+	# From https://piechowski.io/post/git-commands-before-reading-code/?utm_source=bonobopress&utm_medium=newsletter&utm_campaign=2254
+	#
+	
+	# The 20 most-changed files in the last year. The file at the top is almost always the one people warn me about. “Oh yeah, that file. Everyone’s afraid to touch it.”
+	most-changed-files = "!git log --format=format: --name-only --since=\"1 year ago\" | sort | uniq -c | sort -nr | head -20"
+	# Every contributor ranked by commit count. If one person accounts for 60% or more, that’s your bus factor.
+	most-active-contributors = "!git shortlog -sn --no-merges"
+	# Same shape as the churn command, filtered to commits with bug-related keywords.
+	show-bugchurn-files = "!git log -i -E --grep=\"fix|bug|broken\" --name-only --format='' | sort | uniq -c | sort -nr | head -20"
+	# Commit count by month, for the entire history of the repo. I scan the output looking for shapes. A steady rhythm is healthy. But what does it look like when the count drops by half in a single month? Usually someone left.
+	show-project-accel = "!git log --format='%ad' --date=format:'%Y-%m' | sort | uniq -c"
 [merge]
 	conflictstyle = zdiff3
 [commit]
