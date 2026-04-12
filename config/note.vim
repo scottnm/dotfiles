@@ -13,6 +13,12 @@ syn match passed '\[Passed.*$'
 syn match info '\[Info\s\+\]'
 syn match warning '\[Warning\s\+\]'
 syn match trace '\[Trace\s\+\]'
+syn match failed '\[E\].*$'
+syn match error '\[E\].*$'
+syn match passed '\[P\].*$'
+syn match info '\[I\].*$'
+syn match warning '\[W\].*$'
+syn match trace '\[V\].*$'
 
 highlight unansweredQuestion ctermfg=Red guifg=Red
 highlight answeredQuestion ctermfg=LightGreen guifg=LightGreen

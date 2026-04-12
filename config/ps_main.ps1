@@ -4,12 +4,23 @@
 function VerifyEnvironmentVariable
 {
     Param(
-        [string]$Name
+        [string]$Name,
+        [string]$EnvSkipKey
         )
 
     if (! (Get-Item -path "Env:$Name" -ErrorAction SilentlyContinue) )
     {
-        Write-Error "`$env:$Name not set! Set in system path variables"
+        if ($EnvSkipKey)
+        {
+            if (! (Get-Item -path "Env:$EnvSkipKey" -ErrorAction SilentlyContinue) )
+            {
+                Write-Error "`$env:$Name not set and `$env:$EnvSkipKey not found! Set in system path variables"
+            }
+        }
+        else
+        {
+            Write-Error "`$env:$Name not set! Set in system path variables"
+        }
     }
 }
 
@@ -113,8 +124,12 @@ function Edit-Vimrc { dvim $HOME\_vimrc }
 function Edit-GhciConf { tedit $env:APPDATA\ghc\ghci.conf }
 function Edit-Hosts { tedit c:\windows\system32\drivers\etc\hosts }
 function Edit-GitConfig {
-    Param([switch]$Global) $globalFlag = if ($Global) { "--global" } else { "" }
-    git config $globalFlag -e
+    Param([switch]$Global)
+    $editArgs = [System.Collections.ArrayList]@()
+    if ($Global) { $editArgs.Add("--global") | Out-Null }
+    $editArgs.Add("-e") | Out-Null
+    write-host -foregroundcolor darkgray "git config $editArgs"
+    git config @editArgs
 }
 function Edit-TopicNotes {
     $path = Join-Path -path $env:TopicNotesDir -ChildPath "${env:GitTopic}_notes.md"
@@ -340,10 +355,27 @@ function gcp
     }
 
     $diffArgs = $args[0..($args.Length - 2)]
-    $cmdString = "git diff $diffArgs > $patchDirectory\$($args[-1])"
-    cmd /c $cmdString
-    echo $cmdString
+    if ($diffArgs.Count -eq 1)
+    {
+        $diffArg = $diffArgs[0]
+        if ($diffArg -match '^[a-zA-Z0-9]+$')
+        {
+            $commitHash = $diffArg
+            $diffArgs = @( "$($commitHash)^..$($commitHash)" )
+        }
+    }
+
+    $patchPath = Join-Path $patchDirectory $args[-1]
+
+    write-host -foregroundcolor DarkGray "git diff $diffArgs > $patchPath"
+    git diff @diffArgs > $patchPath
+
+    write-host -foregroundcolor DarkGray ""
+    Get-Content $patchPath | write-host -foregroundcolor DarkGray
+
+    write-host -foregroundcolor cyan "new patch @ $patchPath"
 }
+
 function gti
 {
     [CmdletBinding( )]
@@ -399,8 +431,15 @@ function PruneSquashedBranches
         Write-Host "Defaulting to compare against branch [$BaseBranch]"
     }
 
-    git checkout -q $BaseBranch
+    $CurrentBranch = git rev-parse --abbrev-ref HEAD
+    if ($CurrentBranch -ne $BaseBranch)
+    {
+        git checkout -q $BaseBranch
+        write-verbose "git checkout -q $BaseBranch"
+    }
+
     git pull -q
+    write-verbose "git pull -q"
 
     function PruneInternal
     {
@@ -411,16 +450,25 @@ function PruneSquashedBranches
         $mergeBase = (git merge-base $BaseBranch $TargetBranch)
 
         Write-Host -foregroundcolor cyan "Testing $BaseBranch <- $TargetBranch"
+
         $gitTree = (git rev-parse "$TargetBranch^{tree}")
+        write-verbose "git rev-parse `"$TargetBranch^{tree}`""
+
         $gitCherry = (git cherry $BaseBranch "$(git commit-tree $gitTree -p $mergeBase -m _)")
+        write-verbose "git cherry $BaseBranch $(git commit-tree $gitTree -p $mergeBase -m _)"
+
         $squashMerged = $gitCherry[0] -eq '-'
+        write-verbose "`$gitCherry[0] -eq '-' = $squashMerged"
+
         $topicHead = (git rev-parse --short $TargetBranch)
+        write-verbose "git rev-parse --short $TargetBranch = $topicHead"
 
         if ($squashMerged)
         {
             if (!$WhatIf)
             {
                 (git branch -D $TargetBranch) | Out-Null
+                write-verbose "(git branch -D $TargetBranch) | Out-Null"
             }
 
             $deleteMsg = if (!$WhatIf) { "    DELETED" } else { "WILL DELETE"}
@@ -451,6 +499,7 @@ function PruneSquashedBranches
         }
     }
 
+    write-verbose "git fetch --all --prune"
     git fetch --all --prune
 }
 
@@ -472,15 +521,24 @@ function howto-edit-git-exclude { echo "$GITROOT/.git/info/exclude" }
 # MISC #
 ########
 new-alias pd pushd -Force -Option AllScope
-function grep($pattern) { git grep -r --ignore-case $pattern }
+function ggrep($pattern) { git grep -r --ignore-case $pattern }
+function grep { param([string]$filesPattern,[string]$pattern) sls -path $filesPattern -pattern $pattern }
 
 function edit-hosts { Start-Process -FilePath vim -ArgumentList c:\windows\system32\drivers\etc\hosts -Verb RunAs }
 function type-hosts { type c:\windows\system32\drivers\etc\hosts | sls "^\w" -NoEmphasis }
 
 # net stop beep
 
-function setnetsh {netsh winhttp set proxy 127.0.0.1:8888 "<-loopback>"}
-function clearnetsh {netsh winhttp reset proxy }
+function Set-WinHttpProxy
+{
+    write-host -foregroundcolor darkgray 'netsh winhttp set proxy 127.0.0.1:8888 "<-loopback>"'
+    netsh winhttp set proxy 127.0.0.1:8888 "<-loopback>"
+}
+function Clear-WinHttpProxy
+{
+    write-host -foregroundcolor darkgray 'netsh winhttp reset proxy'
+    netsh winhttp reset proxy
+}
 
 function RenameLowerCase($dir)
 {
@@ -692,6 +750,7 @@ function Journal
     Param(
         [switch]$AddEntry,
         [switch]$Alt,
+        [string]$Search,
         [string]$EntryText,
         [string[]]$EntryTags
         )
@@ -739,13 +798,14 @@ function Journal
             Out-File -InputObject $tagsline -Append -FilePath $journalPath -NoNewLine
         }
     }
-    else
-    {
-        if ($EntryTags)
-        {
-            throw "Can't supply `$EntryTags without `$EntryText!";
-        }
 
+    if ($Search)
+    {
+        select-string -Path $journalPath -Pattern $Search
+    }
+
+    if ((!$EntryText) -and (!$Search))
+    {
         if ($AddEntry)
         {
             dvim $journalPath -c "call NewJournalEntry()"
@@ -869,14 +929,15 @@ function Git-GrepChanges
 
     $CaseSensitiveOption = if (!$CaseSensitive) { "-i" } else { $null }
 
+    $filesChanged = @(git diff --name-only "$Start..$End")
     if ($NameOnly)
     {
-        git diff --name-only "$Start..$End" | %{ git grep --name-only $CaseSensitiveOption $Pattern -- $_ }
+        $filesChanged | %{ git grep --name-only $CaseSensitiveOption $Pattern -- $_ }
     }
     else
     {
 
-        git diff --name-only "$Start..$End" |
+        $filesChanged |
             % { git grep --line-number  $CaseSensitiveOption $Pattern -- $_ } |
             % {
                 $m=(sls -InputObject $_ -Pattern "(\S+:)\s*(\S.*)").Matches;
@@ -1029,60 +1090,39 @@ function OpensslDumpCert {
 function New-OneDriveGitRepo {
     param(
     [Parameter(Mandatory=$true)]
-    [string]$RepoName,
-    [string]$OneDriveHome,
-    [string]$OneDriveRepoRoot = "projects",
-    [string]$OneDriveGitRemoteName = "onedrive",
-    [string]$DefaultGitBranchName = "main"
+    [string]$reponame,
+    [string]$onedrivelocation = $null
     )
 
-    if (!$OneDriveHome)
+    if (!$onedrivelocation)
     {
-        if (!$env:OneDrive)
-        {
-            throw "Must specify -OneDriveHome if `$env:OneDrive not defined"
-        }
-        $OneDriveHome = $env:OneDriveHome
+        $onedrivelocation = "$env:OneDrive\projects"
     }
-
-
-    $OneDriveRepoPath = (Join-Path $OneDriveHome $OneDriveRepoRoot)
-    $OneDriveRepoPath = (Get-Item $OneDriveRepoPath).FullName # avoid any problems with ~ references
 
     function diag($msg) { Write-Host -foregroundcolor cyan $msg }
 
-    $originalLocation = Get-Location
+    diag "Creating onedrive bare repo @ $(Join-Path $onedrivelocation $reponame)..."
+    pushd $onedrivelocation
+    mkdir $reponame
+    cd $reponame
+    git init --bare
+    git symbolic-ref HEAD refs/heads/main
+    popd
+    diag "...created"
 
-    try
-    {
-        cd $OneDriveRepoPath
-        diag "Creating onedrive bare repo @ $(Join-Path $OneDriveRepoPath $RepoName)..."
-        mkdir $RepoName
-        cd $RepoName
-        git init --bare
-        git symbolic-ref HEAD "refs/heads/$DefaultGitBranchName"
-        diag "...created"
-
-        Set-Location $originalLocation
-        diag "Creating local repo @ $(Join-Path $pwd $RepoName)..."
-        mkdir $RepoName
-        cd $RepoName
-        git init
-        diag "    ...setting branch and remote"
-        git branch -m $DefaultGitBranchName
-        git remote add $OneDriveGitRemoteName file://"$(Join-Path $OneDriveRepoPath $RepoName)"
-        diag "    ...creating first commit and pushing"
-        echo "" > .gitignore
-        git add .gitignore
-        git commit -m "first commit"
-        git push -u $OneDriveGitRemoteName $DefaultGitBranchName
-        diag "...done"
-    }
-    finally
-    {
-        Set-Location $originalLocation
-    }
-
+    diag "Creating local repo @ $(Join-Path $pwd $reponame)..."
+    mkdir $reponame
+    cd $reponame
+    git init
+    diag "    ...setting branch and remote"
+    git branch -m main
+    git remote add onedrive file://"$(Join-Path $onedrivelocation $reponame)"
+    diag "    ...creating first commit and pushing"
+    echo "" > .gitignore
+    git add .gitignore
+    git commit -m "first commit"
+    git push
+    diag "...done"
 }
 
 function SlsObjectMap {
@@ -1200,10 +1240,238 @@ function lss {
     get-childitem @args | select-object $Props
 }
 
-function Get-1PasswordValue {
+function Get-LineEndingType {
     param(
-        [string]$ItemName,
-        [string]$FieldName
+        [string]$FilePath
         )
-    (op item get $ItemName --format json --fields $FieldName | ConvertFrom-Json).value
+
+    $content = Get-Content -Path $FilePath -AsByteStream
+    if ($content -contains 13) {
+        if ($content -contains 10) {
+            return "DOS (CRLF)"
+        } else {
+            return "Classic Mac (CR)"
+        }
+    } else {
+        if ($content -contains 10){
+            return "Unix (LF)"
+        } else {
+            return "File is empty or contains no line breaks"
+        }
+    }
+}
+
+function Filter-LineEndingType {
+    param(
+        [string]$FilePath,
+        [ValidateSet("DOS","Unix","MacClassic")]
+        [string]$LineEndingType
+        )
+
+    $content = Get-Content -Path $FilePath -AsByteStream
+    if ($content -contains 13) {
+        if ($content -contains 10) {
+            return $LineEndingType -eq "DOS"
+        } else {
+            return $LineEndingType -eq "MacClassic"
+        }
+    } else {
+        if ($content -contains 10){
+            return $LineEndingType -eq "Unix"
+        } else {
+            return $false
+        }
+    }
+}
+
+function Convert-WinFileTimeTimestampToUnixTime
+{
+    param([System.Int64]$WinFileTime)
+
+    $WINDOWS_TICK = 10000000
+    $SEC_TO_UNIX_EPOCH = 11644473600
+    $unixTime = ([System.Int64]($WinFileTime / $WINDOWS_TICK) - $SEC_TO_UNIX_EPOCH)
+    $datetime = [datetimeoffset]::FromUnixTimeSeconds($unixTime)
+
+    write-host "Unix time: $unixTime"
+    write-host "datetime:  $datetime"
+}
+
+function Convert-UnixTimeToClock
+{
+    param(
+        [Parameter(Mandatory)]
+        [int]$UnixTime
+        )
+
+    [datetimeoffset]::FromUnixTimeMilliseconds(1000 * $UnixTime)
+}
+
+$AndroidEmulatorExe = "$env:ANDROID_HOME\emulator\emulator.exe"
+new-alias Launch-AndroidEmulatorRaw $AndroidEmulatorExe -Force -Option AllScope
+function Launch-AndroidEmulator
+{
+    param(
+        [string]$DeviceName
+        )
+
+    if ($DeviceName)
+    {
+        Start-Process $AndroidEmulatorExe -ArgumentList @("-avd", $DeviceName)
+    }
+    else
+    {
+        Launch-AndroidEmulatorRaw "-list-avds"
+    }
+}
+
+        <#
+        Common Options:
+Create: tar.exe -c [options] [<file> | <dir> | @<archive> | -C <dir> ]
+  <file>, <dir>  add these items to archive
+  -z, -j, -J, --lzma  Compress archive with gzip/bzip2/xz/lzma
+  --format {ustar|pax|cpio|shar}  Select archive format
+  --exclude <pattern>  Skip files that match pattern
+  -C <dir>  Change to <dir> before processing remaining files
+  @<archive>  Add entries from <archive> to output
+List: tar.exe -t [options] [<patterns>]
+  <patterns>  If specified, list only entries that match
+Extract: tar.exe -x [options] [<patterns>]
+  <patterns>  If specified, extract only entries that match
+  -k    Keep (don't overwrite) existing files
+  -m    Don't restore modification times
+  -O    Write entries to stdout, don't restore to disk
+  -p    Restore permissions (including ACLs, owner, file flags)
+  #>
+function Expand-Tar {
+    [CmdletBinding( )]
+    param(
+        [Parameter(Mandatory)]
+        [string]$Path,
+        [string]$DestDir,
+        [Parameter(Mandatory)]
+        [ValidateSet("Create", "ReplaceAdd", "List", "Update", "Extract")]
+        [string]$Mode,
+        [switch]$Use512ByteRecords,
+        [switch]$Interactive
+        )
+
+    $localVerbose = ($PSCmdlet.MyInvocation.BoundParameters["Verbose"].IsPresent -eq $true)
+
+    if (!$DestDir)
+    {
+        $DestDir = (Join-Path "."  ((Get-Item $Path).BaseName + "_tar"))
+    }
+
+    switch ($Mode)
+    {
+        "Create" { $ModeArg = "-c" }
+        "ReplaceAdd" { $ModeArg = "-r" }
+        "List" { $ModeArg = "-t" }
+        "Update" { $ModeArg = "-u" }
+        "Extract" { $ModeArg = "-x" }
+    }
+    $tarArgs = [System.Collections.ArrayList]@()
+    $tarArgs.Add("-f") | Out-Null
+    $tarArgs.Add($Path) | Out-Null
+    $tarArgs.Add($ModeArg) | Out-Null
+    if ($localVerbose) { $tarArgs.Add("-v") | Out-Null }
+    if ($Interactive) { $tarArgs.Add("-w") | Out-Null }
+    if ($Use512ByteRecords) { $tarArgs.Add("-b") }
+
+    if ($Mode -eq "Extract")
+    {
+        mkdir -force $DestDir | Out-Null
+        $tarArgs.Add("-C") | Out-Null
+        $tarArgs.Add($DestDir) | Out-Null
+    }
+
+    write-host -foregroundcolor darkgray "tar $tarArgs"
+    tar @tarArgs
+}
+
+$MaximumHistoryCount = 32767 # max amount of powershell history
+
+function Update-SystemPath
+{
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$AdditionalPath,
+        [ValidateSet("User", "Machine", "Process")]
+        [string]$PathScope = "User",
+        [switch]$Quiet
+        )
+
+    $currentPath = [Environment]::GetEnvironmentVariable("Path", $PathScope)
+    $pathChunks = ($currentPath -split ";").trim("\\");
+    if ($pathChunks.Contains($AdditionalPath.trim("\\")))
+    {
+        if (! $Quiet)
+        {
+            Write-Host -ForegroundColor DarkYellow "$AdditionalPath already exists in $PathScope path"
+        }
+        return;
+    }
+
+    $updatedPath = $currentPath + ";" + $AdditionalPath
+    [Environment]::SetEnvironmentVariable("Path", $updatedPath, $PathScope)
+    Write-Host "Path added successfully to $PathScope path."
+
+    if ($PathScope -ne "Process")
+    {
+        Update-SystemPath -Quiet -AdditionalPath:$AdditionalPath -PathScope:"Process"
+    }
+}
+
+function Set-SystemEnvVar
+{
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$VarName,
+        [Parameter(Mandatory=$true)]
+        [string]$VarValue,
+        [ValidateSet("User", "Machine", "Process")]
+        [string]$PathScope = "User",
+        [switch]$Force
+        )
+
+    $currentVar = [Environment]::GetEnvironmentVariable($VarName, $PathScope)
+    if ($currentVar)
+    {
+        if (!$Force)
+        {
+            throw "$VarName already has value '$currentVar'"
+        }
+
+        Write-Host -ForegroundColor DarkYellow "$VarName already has value '$currentVar'. Overwriting..."
+    }
+    [Environment]::SetEnvironmentVariable($VarName, $VarValue, $PathScope)
+    if ($PathScope -ne "Process")
+    {
+        [Environment]::SetEnvironmentVariable($VarName, $VarValue, "Process")
+    }
+}
+
+function ReadElfSectionScan
+{
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$FileGlob,
+        [Parameter(Mandatory=$true)]
+        [string]$Pattern,
+        [switch]$NoRecurse
+        )
+
+    $Recurse = ! $NoRecurse
+    $files = dir $FileGlob -Recurse:$Recurse
+    foreach ($file in $files)
+    {
+        readelf -S $file | sls -Pattern $Pattern | %{
+            write-host "$($file): $_"
+        }
+    }
+}
+
+function Unlock-MacOsKeychain {
+    security unlock-keychain "$HOME/Library/Keychains/login.keychain"
 }
