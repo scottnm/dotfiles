@@ -325,3 +325,17 @@ endif
 "           COMMANDS                "
 """""""""""""""""""""""""""""""""""""
 command FocusNote :Goyo110x90% | :set linebreak | :set breakindent
+
+function! SavTmpBuffer()
+    let extension = expand('%:e')
+    if !empty(extension)
+        let extension = "." . extension
+    endif
+    let base_buffername = expand('%:t:r')
+    let time_id = strftime("%Y%m%d%H%M%S")
+    let new_scratch_path_name = "vim.tmp." . base_buffername . "." . time_id . extension
+    let tmp_path = expand('$TMP/') . new_scratch_path_name
+    execute 'sav' l:tmp_path
+endfunction
+
+command SavTmpBuffer :call SavTmpBuffer()

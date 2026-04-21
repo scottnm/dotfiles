@@ -8,19 +8,17 @@ function VerifyEnvironmentVariable
         [string]$EnvSkipKey
         )
 
-    if (! (Get-Item -path "Env:$Name" -ErrorAction SilentlyContinue) )
+    if (Test-Path "Env:$Name") { return; }
+
+    if ($EnvSkipKey)
     {
-        if ($EnvSkipKey)
-        {
-            if (! (Get-Item -path "Env:$EnvSkipKey" -ErrorAction SilentlyContinue) )
-            {
-                Write-Error "`$env:$Name not set and `$env:$EnvSkipKey not found! Set in system path variables"
-            }
-        }
-        else
-        {
-            Write-Error "`$env:$Name not set! Set in system path variables"
-        }
+        if (Test-Path "Env:$EnvSkipKey") { return; }
+
+        Write-Error "`$env:$Name not set and `$env:$EnvSkipKey not found! Set in system path variables"
+    }
+    else
+    {
+        Write-Error "`$env:$Name not set! Set in system path variables"
     }
 }
 
@@ -156,6 +154,12 @@ Set-PSReadlineKeyHandler -Key Tab -Function Complete
 
 function UpdateWindowTitle
 {
+    if ($env:OverrideWindowTitle)
+    {
+        [System.Console]::Title = $env:OverrideWindowTitle;
+        return;
+    }
+
     $title = "";
     if ($env:GitBranch)
     {
@@ -236,7 +240,8 @@ function prompt
 
     if ($env:GitBranch)
     {
-        $branchPrompt = Colored -Text $env:GitBranch -Color Green
+        $gitBranchColor = if ("$env:GitBranch".Contains("Detached:")) {"Yellow"} else {"Green"}
+        $branchPrompt = Colored -Text $env:GitBranch -Color $gitBranchColor
         $statusLine += " :: $branchPrompt"
     }
     $statusLine += " :: $(Get-Date)"
@@ -454,8 +459,12 @@ function PruneSquashedBranches
         $gitTree = (git rev-parse "$TargetBranch^{tree}")
         write-verbose "git rev-parse `"$TargetBranch^{tree}`""
 
-        $gitCherry = (git cherry $BaseBranch "$(git commit-tree $gitTree -p $mergeBase -m _)")
-        write-verbose "git cherry $BaseBranch $(git commit-tree $gitTree -p $mergeBase -m _)"
+        $gitCherryBase = git commit-tree $gitTree -p $mergeBase -m _
+        write-verbose "git commit-tree $gitTree -p $mergeBase -m _ = $gitCherryBase"
+
+        $gitCherry = (git cherry $BaseBranch $gitCherryBase)
+        write-verbose "git cherry $BaseBranch $gitCherryBase"
+        write-verbose "git cherry[0] = $($gitCherry[0])"
 
         $squashMerged = $gitCherry[0] -eq '-'
         write-verbose "`$gitCherry[0] -eq '-' = $squashMerged"
@@ -663,13 +672,30 @@ function CompareMeasureObject()
     PercentDiff -ValueName "StandardDeviation" -ValueA $ObjectA.StandardDeviation -ValueB $ObjectB.StandardDeviation
 }
 
-function DecodeBase64
+function Decode-Base64
 {
     Param(
     [Parameter(Mandatory = $true)]$Base64String
     )
 
     return [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($Base64String))
+}
+function Encode-Base64
+{
+    Param(
+    [string]$FilePath,
+    [Byte[]]$Bytes
+    )
+
+    if (-not ($FilePath -or $Bytes)) {
+        throw "Must provide filepath or raw bytes"
+    }
+
+    if ($FilePath) {
+        $Bytes = (Get-Content $FilePath -AsByteStream)
+    }
+
+    return [Convert]::ToBase64String($Bytes)
 }
 
 # Chocolatey profile
