@@ -4,7 +4,9 @@ set colored-stats On
 set completion-ignore-case On
 set bell-style none
 
-# display all possible matches for an ambiguous pattern at first tab
+# Complete the common prefix, then show matches
+set menu-complete-display-prefix on
+set show-all-if-unmodified on
 set show-all-if-ambiguous on
 
 # next tab(s) will cycle through matches

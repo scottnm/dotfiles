@@ -422,7 +422,9 @@ function gbrowse
     }
 }
 
-function PruneSquashedBranches
+# I've migrated this script to a proper git alias. Keep it around "just in case" but going forward I should try to use the git alias instead
+# Delete this at the next opportunity after July 1s 2026
+function PruneSquashedBranches-Deprecated
 {
     [CmdletBinding( )]
     Param(
@@ -432,19 +434,20 @@ function PruneSquashedBranches
     )
 
     if (!$BaseBranch) {
-        $BaseBranch = $env:GitBranch
+        $OriginHeadRef = (git symbolic-ref refs/remotes/origin/HEAD)
+        write-host "Default base branch refs: $OriginHeadRef" -foregroundcolor darkgray
+        $BaseBranch = $OriginHeadRef.Substring("refs/remotes/origin/".Length)
         Write-Host "Defaulting to compare against branch [$BaseBranch]"
     }
 
     $CurrentBranch = git rev-parse --abbrev-ref HEAD
-    if ($CurrentBranch -ne $BaseBranch)
-    {
+    if ($CurrentBranch -ne $BaseBranch) {
         git checkout -q $BaseBranch
         write-verbose "git checkout -q $BaseBranch"
     }
 
     git pull -q
-    write-verbose "git pull -q"
+    write-host "git pull -q" -foregroundcolor darkgray
 
     function PruneInternal
     {

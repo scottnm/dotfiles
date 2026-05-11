@@ -28,6 +28,7 @@
 	addnw = !sh -c 'git diff -U0 -w --no-color --src-prefix=a/ --dst-prefix=b/ "$@" | git apply --cached --ignore-whitespace --unidiff-zero -'
 	pullother = "!git fetch $(git remote) $1:$1"
 	submodclean = "!git submodule foreach --recursive 'git clean -ffdx .'"
+	whitespace-only = "!f() { git diff $1 --name-only | while read file; do git diff $1 --ignore-all-space --quiet -- \"$file\"&& echo \"$file\"; done; }; f"
 
 	# 
 	# From https://piechowski.io/post/git-commands-before-reading-code/?utm_source=bonobopress&utm_medium=newsletter&utm_campaign=2254
