@@ -75,6 +75,10 @@ call plug#end()
 "                                 CONFIG                                         "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
+" enable windows copy-paste commands
+source $VIMRUNTIME/mswin.vim
+behave mswin
+
 set nobackup
 set nowritebackup
 set noundofile
