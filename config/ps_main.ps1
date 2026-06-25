@@ -534,7 +534,7 @@ function howto-edit-git-exclude { echo "$GITROOT/.git/info/exclude" }
 ########
 new-alias pd pushd -Force -Option AllScope
 function ggrep($pattern) { git grep -r --ignore-case $pattern }
-function grep { param([string]$filesPattern,[string]$pattern) sls -path $filesPattern -pattern $pattern }
+function psgrep { param([string]$filesPattern,[string]$pattern) sls -path $filesPattern -pattern $pattern }
 
 function edit-hosts { Start-Process -FilePath vim -ArgumentList c:\windows\system32\drivers\etc\hosts -Verb RunAs }
 function type-hosts { type c:\windows\system32\drivers\etc\hosts | sls "^\w" -NoEmphasis }

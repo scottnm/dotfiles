@@ -77,8 +77,8 @@ git rev-parse --verify --quiet "$base^{commit}" >/dev/null 2>&1 || {
 
 # --- Fetch latest state ---
 info "${gray}Fetching...${reset}"
-git fetch --all --prune --quiet
 verbose "git fetch --all --prune --quiet"
+git fetch --all --prune --quiet
 
 # --- Resolve current branch (to avoid deleting it) ---
 current_branch=$(git branch --show-current 2>/dev/null || true)
