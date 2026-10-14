@@ -76,8 +76,11 @@ call plug#end()
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " enable windows copy-paste commands
-source $VIMRUNTIME/mswin.vim
-behave mswin
+if has('nvim')
+else
+    source $VIMRUNTIME/mswin.vim
+    behave mswin
+endif
 
 set nobackup
 set nowritebackup
@@ -343,3 +346,6 @@ function! SavTmpBuffer()
 endfunction
 
 command SavTmpBuffer :call SavTmpBuffer()
+
+command CopyClipBufferName let @+ = expand('%:p')
+
