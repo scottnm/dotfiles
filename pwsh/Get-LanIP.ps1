@@ -1,0 +1,1 @@
+(Get-NetIPConfiguration | Where-Object IPv4DefaultGateway | Select-Object -ExpandProperty IPv4Address).IPAddress
