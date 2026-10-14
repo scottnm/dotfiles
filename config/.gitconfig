@@ -1,10 +1,12 @@
 [user]
 	name = Scott Munro
-	email = scottnmunro@gmail.com
+	email = me@scottnm.com
 [core]
 	autocrlf = false
 	defaultBranch = main
 	longPaths = true
+	# set the git pager for case-insensitive searching
+	pager = less -I
 [diff]
 	algorithm = histogram
 	colorMoved = default
@@ -17,6 +19,7 @@
 	cm = !git commit -m
 	d  = !git diff
 	logp = "!git log --pretty=format:'%C(yellow)%h%Creset %C(green)%an%Creset (%ar):%n%s%n'"
+	list-untracked = !git ls-files --others --exclude-standard "$@"
 	list-modified = !git diff --name-only --diff-filter=M
 	list-conflicts = !git diff --name-only --diff-filter=U
 	grep-ls = !git grep --name-only
@@ -32,10 +35,10 @@
 	submodfullsync = "!git submodsync && git submodclean"
 	whitespace-only = "!f() { git diff $1 --name-only | while read file; do git diff $1 --ignore-all-space --quiet -- \"$file\"&& echo \"$file\"; done; }; f"
 
-	# 
+	#
 	# From https://piechowski.io/post/git-commands-before-reading-code/?utm_source=bonobopress&utm_medium=newsletter&utm_campaign=2254
 	#
-	
+
 	# The 20 most-changed files in the last year. The file at the top is almost always the one people warn me about. “Oh yeah, that file. Everyone’s afraid to touch it.”
 	most-changed-files = "!git log --format=format: --name-only --since=\"1 year ago\" | sort | uniq -c | sort -nr | head -20"
 	# Every contributor ranked by commit count. If one person accounts for 60% or more, that’s your bus factor.
@@ -44,6 +47,7 @@
 	show-bugchurn-files = "!git log -i -E --grep=\"fix|bug|broken\" --name-only --format='' | sort | uniq -c | sort -nr | head -20"
 	# Commit count by month, for the entire history of the repo. I scan the output looking for shapes. A steady rhythm is healthy. But what does it look like when the count drops by half in a single month? Usually someone left.
 	show-project-accel = "!git log --format='%ad' --date=format:'%Y-%m' | sort | uniq -c"
+	count-contributors = "!git log --format='%aN' -- $@ | sort | uniq -c | sort -nr"
 [merge]
 	conflictstyle = zdiff3
 [commit]
@@ -52,3 +56,9 @@
 	enabled = true
 [branch]
 	sort = -committerdate
+[credential "github.com"]
+	useHttpPath = true
+
+[include]
+	path = ~/.gitconfig.machinelocal
+
