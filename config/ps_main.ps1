@@ -116,8 +116,25 @@ $PlatformAliases.Keys | % {
     New-Alias -Name $varName -Value $varValue -Force -Option AllScope
 }
 
+function Exit-AlternateScreenBuffer {
+    echo "`e[?1049l"
+}
+New-Alias -Name Fix-ScrollWheelScrollingTerminalHistory -Value Exit-AlternateScreenBuffer -Force -Option AllScope
+New-Alias -Name FixScrollWheelScrollingTerminalHistory -Value Exit-AlternateScreenBuffer -Force -Option AllScope
+
 # DevEnv edit paths
-function Edit-Profile { dvim $profile $env:SideProfilePath }
+function Edit-Profile {
+    param(
+    [ValidateSet("gvim", "nvim", "code", "dvim")]
+    [string]$Editor = "dvim"
+    )
+    & $Editor (Get-Profiles)
+}
+
+function Get-Profiles {
+    return @($profile, $env:SideProfilePath)
+}
+
 function Edit-Vimrc { dvim $HOME\_vimrc }
 function Edit-GhciConf { tedit $env:APPDATA\ghc\ghci.conf }
 function Edit-Hosts { tedit c:\windows\system32\drivers\etc\hosts }
@@ -130,8 +147,22 @@ function Edit-GitConfig {
     git config @editArgs
 }
 function Edit-TopicNotes {
+    param(
+    [ValidateSet("gvim", "nvim")]
+    [string]$Editor = "nvim",
+    [string]$Topic
+    )
+
+    if (-not $Topic) {
+        $Topic = $env:GitTopic
+        if (-not $Topic)
+        {
+            throw "Topic not set: not implicit git topic branch and no `$Topic provided"
+        }
+    }
+
     $path = Join-Path -path $env:TopicNotesDir -ChildPath "${env:GitTopic}_notes.md"
-    dvim $path
+    & $Editor $path
 }
 function Get-Version { $PSVersionTable.PSVersion }
 
@@ -543,14 +574,17 @@ function type-hosts { type c:\windows\system32\drivers\etc\hosts | sls "^\w" -No
 
 function Set-WinHttpProxy
 {
-    write-host -foregroundcolor darkgray 'netsh winhttp set proxy 127.0.0.1:8888 "<-loopback>"'
-    netsh winhttp set proxy 127.0.0.1:8888 "<-loopback>"
+    param([switch]$Clear)
+    if ($Clear) {
+        write-host -foregroundcolor darkgray 'netsh winhttp reset proxy'
+        netsh winhttp reset proxy
+    } else {
+        write-host -foregroundcolor darkgray 'netsh winhttp set proxy 127.0.0.1:8888 "<-loopback>"'
+        netsh winhttp set proxy 127.0.0.1:8888 "<-loopback>"
+    }
 }
-function Clear-WinHttpProxy
-{
-    write-host -foregroundcolor darkgray 'netsh winhttp reset proxy'
-    netsh winhttp reset proxy
-}
+
+function Clear-WinHttpProxy { Set-WinHttpProxy -Clear }
 
 function RenameLowerCase($dir)
 {
@@ -592,7 +626,7 @@ function PrintNum
 {
     [CmdletBinding()]
     Param(
-    [Parameter(Mandatory = $true)][int64]$Value,
+    [Parameter(Mandatory = $true)][System.UInt64]$Value,
     [Parameter(Mandatory = $false)][switch]$AsHex,
     [Parameter(Mandatory = $false)][switch]$AsDec
     )
@@ -777,6 +811,8 @@ Function LaunchVs
 function Journal
 {
     Param(
+        [ValidateSet("gvim", "nvim")]
+        [string]$Editor = "nvim",
         [switch]$AddEntry,
         [switch]$Alt,
         [string]$Search,
@@ -837,11 +873,11 @@ function Journal
     {
         if ($AddEntry)
         {
-            dvim $journalPath -c "call NewJournalEntry()"
+            & $Editor $journalPath -c "call NewJournalEntry()"
         }
         else
         {
-            dvim $journalPath
+            & $Editor $journalPath
         }
     }
 }
@@ -1442,6 +1478,109 @@ function Expand-Tar {
 
 $MaximumHistoryCount = 32767 # max amount of powershell history
 
+function Remove-SystemPath
+{
+    [CmdletBinding(SupportsShouldProcess = $true)]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$OldPath,
+        [ValidateSet("User", "Machine", "Process")]
+        [string]$PathScope = "User",
+        [switch]$Quiet,
+        [switch]$NoParentScopes
+        )
+
+    function MatchesOldPath {
+        param([string]$Path)
+        return ($Path -eq $OldPath) -or ($Path -eq $OldPath.trim("\\"))
+    }
+
+
+    $scopesToTest = @($PathScope)
+    if ($PathScope -ne "Process" -and (-not $NoParentScopes))
+    {
+        $scopesToTest += "Process"
+    }
+
+    foreach ($nextScope in $scopesToTest) {
+        $currentPath = [Environment]::GetEnvironmentVariable("Path", $nextScope)
+        $pathChunks = ($currentPath -split ";").trim("\\");
+        $remainingPathChunks = $pathChunks | ? { -not (MatchesOldPath -Path $_) }
+        Write-Verbose "Path chunks remaining: $remainingPathChunks"
+        $removedPathChunks = $pathChunks | ? { MatchesOldPath -Path $_ }
+        Write-Verbose "Path chunks to remove: $removedPathChunks"
+        if (-not $removedPathChunks)
+        {
+            if (! $Quiet)
+            {
+                Write-Host -ForegroundColor DarkYellow "$OldPath does not exist in $nextScope path"
+            }
+            continue;
+        }
+
+        if ($PSCmdlet.ShouldProcess("Remove $removedPathChunks from `$PATH in scope $nextScope")) {
+            $newPath = $remainingPathChunks -join ";"
+            Write-Verbose "New Path: $newPath"
+            [Environment]::SetEnvironmentVariable("Path", $newPath, $nextScope)
+            Write-Host "Removed Path from $nextScope path."
+        }
+    }
+}
+
+function Clean-Path {
+    [CmdletBinding(SupportsShouldProcess = $true)]
+    param(
+        [ValidateSet("User", "Machine", "Process")]
+        [string]$PathScope = "User",
+        [switch]$Quiet,
+        [switch]$NoParentScopes
+        )
+
+    $scopesToTest = @($PathScope)
+    if ($PathScope -ne "Process" -and (-not $NoParentScopes))
+    {
+        $scopesToTest += "Process"
+    }
+
+    foreach ($nextScope in $scopesToTest) {
+        $currentPath = [Environment]::GetEnvironmentVariable("Path", $nextScope)
+        $pathChunks = ($currentPath -split ";") | %{ $_.trim("\\"); }
+        $newPathChunks = @()
+        $removedPathChunks = [System.Collections.Hashtable]@{}
+        $seenPathChunks = [System.Collections.Hashtable]@{}
+
+        foreach ($pathChunk in $pathChunks) {
+            if ($pathChunk.Trim() -eq "") {
+                continue
+            }
+
+            if ($seenPathChunks.Contains($pathChunk)) {
+                $removedPathChunks[$pathChunk] = $true
+                continue
+            }
+
+            $seenPathChunks[$pathChunk] = $true
+            $newPathChunks += $pathChunk
+        }
+
+        if (-not $removedPathChunks)
+        {
+            if (! $Quiet)
+            {
+                Write-Host -ForegroundColor DarkGray "$Path already clean in Scope: $nextScope"
+            }
+            continue;
+        }
+
+        if ($PSCmdlet.ShouldProcess("Remove $($removedPathChunks.Keys | %{"'$_'"}) from `$PATH in scope $nextScope")) {
+            $newPath = $newPathChunks -join ";"
+            Write-Verbose "New Path: $newPath"
+            [Environment]::SetEnvironmentVariable("Path", $newPath, $nextScope)
+            Write-Host "Cleaned Path in $nextScope scope."
+        }
+    }
+}
+
 function Update-SystemPath
 {
     param(
@@ -1861,4 +2000,15 @@ function Apply-ExeFirewall {
 
     Write-Host ''
     Write-Host "To remove later: $($PSCmdlet.MyInvocation.MyCommand.Name) -Remove" -ForegroundColor DarkGray
+}
+
+function Get-LanIP
+{
+    (Get-NetIPConfiguration | Where-Object IPv4DefaultGateway | Select-Object -ExpandProperty IPv4Address).IPAddress
+}
+
+function Test-IsAdministrator
+{
+    $user = [Security.Principal.WindowsIdentity]::GetCurrent();
+    (New-Object Security.Principal.WindowsPrincipal $user).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
 }
