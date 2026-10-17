@@ -27,9 +27,15 @@ if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
 
+if [ -d "$HOME/dev/dotfiles/git" ] ; then
+    PATH="$HOME/dev/dotfiles/git:$PATH"
+fi
+
 alias lsc='ls --color -la'
 alias gd='git diff'
 alias gst='git status'
 
 # enable to use fish-shell
 # fish
+
+. "$HOME/.local/bin/env"
