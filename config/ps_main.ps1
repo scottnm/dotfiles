@@ -418,7 +418,7 @@ function gcp
     write-host -foregroundcolor cyan "new patch @ $patchPath"
 }
 
-function gti
+function git-ti
 {
     [CmdletBinding( )]
     Param(
@@ -427,7 +427,7 @@ function gti
 
     & git update-index --assume-unchanged $Path
 }
-function gtui
+function git-tui
 {
     [CmdletBinding( )]
     Param(
