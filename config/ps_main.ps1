@@ -219,6 +219,10 @@ function Colored
         [string]$Color
         )
 
+    if ($PSVersionTable.PSVersion.Major -le 5) {
+        return $Text
+    }
+
     $code = 0
     if ($Color -eq "Gray")
     {
@@ -289,9 +293,11 @@ function prompt
     UpdateWindowTitle;
 
     Write-Host $statusLine -nonewline
-    $prompt = (Colored -Text "λ " -Color Yellow)
+    $prompt = (Colored -Text $PromptChar -Color Yellow)
     return $prompt
 }
+$PromptChar = if ($PSVersionTable.PSVersion.Major -le 5) { "$ " } else { "λ " }
+
 
 ###############
 # GIT ALIASES #
