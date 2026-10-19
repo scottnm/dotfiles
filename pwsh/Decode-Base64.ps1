@@ -5,11 +5,15 @@ Param(
 $tmpInputFile = New-TemporaryFile
 try
 {
-    $tmpOutputFile = New-TemporaryFile
+    $tmpOutputFile = (Join-Path $env:TEMP "$(new-guid)-b64.bin.tmp")
     try
     {
         Set-Content -Path $tmpInputFile -Value $Base64String -NoNewLine
-        certutil -decode $tmpInputFile $tmpOutputFile
+        $certUtilOutput = certutil -decode $tmpInputFile $tmpOutputFile
+        if ($LASTEXITCODE -ne 0) {
+            throw "Failed decode! $certUtilOutput"
+        }
+
         Get-Content $tmpOutputFile -Raw
     }
     finally {

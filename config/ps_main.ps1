@@ -715,31 +715,6 @@ function CompareMeasureObject()
     PercentDiff -ValueName "StandardDeviation" -ValueA $ObjectA.StandardDeviation -ValueB $ObjectB.StandardDeviation
 }
 
-function Decode-Base64
-{
-    Param(
-    [Parameter(Mandatory = $true)]$Base64String
-    )
-
-    return [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($Base64String))
-}
-function Encode-Base64
-{
-    Param(
-    [string]$FilePath,
-    [Byte[]]$Bytes
-    )
-
-    if (-not ($FilePath -or $Bytes)) {
-        throw "Must provide filepath or raw bytes"
-    }
-
-    if ($FilePath) {
-        $Bytes = (Get-Content $FilePath -AsByteStream)
-    }
-
-    return [Convert]::ToBase64String($Bytes)
-}
 
 # Chocolatey profile
 $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
