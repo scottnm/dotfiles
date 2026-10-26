@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+# Usage: git find-cherry-picks <commit-hash> [<branch-pattern>]
+# Finds cherry-picks of the given commit across branches.
+# If <branch-pattern> is provided, searches matching branches (supports remote patterns).
+# Examples:
+#   git find-cherry-picks abc123                    # all local branches
+#   git find-cherry-picks abc123 'origin/*'         # all origin remote branches
+#   git find-cherry-picks abc123 'release-*'        # local branches matching release-*
+#   git find-cherry-picks abc123 'refs/remotes/**'  # all remote branches
+
+set -euo pipefail
+
+if [ $# -lt 1 ] || [ $# -gt 2 ]; then
+    echo "Usage: git find-cherry-picks <commit-hash> [<branch-pattern>]" >&2
+    exit 1
+fi
+
+SOURCE="$1"
+BRANCH_PATTERN="${2:-}"
+
+# Resolve to full hash
+SOURCE_FULL=$(git rev-parse --verify "$SOURCE" 2>/dev/null) || {
+    echo "Error: '$SOURCE' is not a valid commit." >&2
+    exit 1
+}
+
+# Get the patch-id of the source commit
+PATCH_ID=$(git show "$SOURCE_FULL" | git patch-id --stable 2>/dev/null | cut -d' ' -f1)
+
+if [ -z "$PATCH_ID" ]; then
+    echo "Error: Could not compute patch-id for $SOURCE_FULL" >&2
+    exit 1
+fi
+
+SOURCE_BRANCH=$(git branch --contains "$SOURCE_FULL" --format="%(refname:short)" 2>/dev/null | head -n1)
+
+# Get the date of the source commit to limit search scope
+SOURCE_DATE=$(git log -1 --format='%ci' "$SOURCE_FULL")
+
+echo "Source commit: $SOURCE_FULL"
+echo "Patch-ID:      $PATCH_ID"
+echo "Source date:   $SOURCE_DATE"
+
+if [ -n "$BRANCH_PATTERN" ]; then
+    echo "Searching branches matching '$BRANCH_PATTERN' (commits on or after source date)..."
+else
+    echo "Searching local branches (commits on or after source date)..."
+fi
+echo ""
+
+found=0
+
+if [ -n "$BRANCH_PATTERN" ]; then
+    git for-each-ref --format="%(refname:short)" "refs/heads/$BRANCH_PATTERN" "refs/remotes/$BRANCH_PATTERN" 2>/dev/null
+else
+    git branch --format="%(refname:short)"
+fi | while read -r branch; do
+    # Skip branches that contain the source commit itself
+    echo "Checking branch: $branch"
+    if git merge-base --is-ancestor "$SOURCE_FULL" "$branch" 2>/dev/null; then
+        echo "... skipping (contains source commit)"
+        continue
+    fi
+    git log --format="%H" --since="$SOURCE_DATE" "$branch" | while read -r hash; do
+
+         id=$(git show "$hash" 2>/dev/null | git patch-id --stable 2>/dev/null | cut -d' ' -f1)
+         if [ "$id" = "$PATCH_ID" ]; then
+             echo "  $branch  $hash  $(git log -1 --format='%s' "$hash")"
+             found=1
+         fi
+     done
+ done
+
+ if [ "$found" -eq 0 ]; then
+     echo "No cherry-picks found."
+ fi

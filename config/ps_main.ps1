@@ -8,19 +8,17 @@ function VerifyEnvironmentVariable
         [string]$EnvSkipKey
         )
 
-    if (! (Get-Item -path "Env:$Name" -ErrorAction SilentlyContinue) )
+    if (Test-Path "Env:$Name") { return; }
+
+    if ($EnvSkipKey)
     {
-        if ($EnvSkipKey)
-        {
-            if (! (Get-Item -path "Env:$EnvSkipKey" -ErrorAction SilentlyContinue) )
-            {
-                Write-Error "`$env:$Name not set and `$env:$EnvSkipKey not found! Set in system path variables"
-            }
-        }
-        else
-        {
-            Write-Error "`$env:$Name not set! Set in system path variables"
-        }
+        if (Test-Path "Env:$EnvSkipKey") { return; }
+
+        Write-Error "`$env:$Name not set and `$env:$EnvSkipKey not found! Set in system path variables"
+    }
+    else
+    {
+        Write-Error "`$env:$Name not set! Set in system path variables"
     }
 }
 
@@ -118,8 +116,25 @@ $PlatformAliases.Keys | % {
     New-Alias -Name $varName -Value $varValue -Force -Option AllScope
 }
 
+function Exit-AlternateScreenBuffer {
+    echo "`e[?1049l"
+}
+New-Alias -Name Fix-ScrollWheelScrollingTerminalHistory -Value Exit-AlternateScreenBuffer -Force -Option AllScope
+New-Alias -Name FixScrollWheelScrollingTerminalHistory -Value Exit-AlternateScreenBuffer -Force -Option AllScope
+
 # DevEnv edit paths
-function Edit-Profile { dvim $profile $env:SideProfilePath }
+function Edit-Profile {
+    param(
+    [ValidateSet("gvim", "nvim", "code", "dvim")]
+    [string]$Editor = "dvim"
+    )
+    & $Editor (Get-Profiles)
+}
+
+function Get-Profiles {
+    return @($profile, $env:SideProfilePath)
+}
+
 function Edit-Vimrc { dvim $HOME\_vimrc }
 function Edit-GhciConf { tedit $env:APPDATA\ghc\ghci.conf }
 function Edit-Hosts { tedit c:\windows\system32\drivers\etc\hosts }
@@ -132,8 +147,22 @@ function Edit-GitConfig {
     git config @editArgs
 }
 function Edit-TopicNotes {
+    param(
+    [ValidateSet("gvim", "nvim")]
+    [string]$Editor = "nvim",
+    [string]$Topic
+    )
+
+    if (-not $Topic) {
+        $Topic = $env:GitTopic
+        if (-not $Topic)
+        {
+            throw "Topic not set: not implicit git topic branch and no `$Topic provided"
+        }
+    }
+
     $path = Join-Path -path $env:TopicNotesDir -ChildPath "${env:GitTopic}_notes.md"
-    dvim $path
+    & $Editor $path
 }
 function Get-Version { $PSVersionTable.PSVersion }
 
@@ -156,6 +185,12 @@ Set-PSReadlineKeyHandler -Key Tab -Function Complete
 
 function UpdateWindowTitle
 {
+    if ($env:OverrideWindowTitle)
+    {
+        [System.Console]::Title = $env:OverrideWindowTitle;
+        return;
+    }
+
     $title = "";
     if ($env:GitBranch)
     {
@@ -183,6 +218,10 @@ function Colored
         [ValidateSet("Gray", "Red", "Green", "Yellow", "Blue", "Pink", "Cyan")]
         [string]$Color
         )
+
+    if ($PSVersionTable.PSVersion.Major -le 5) {
+        return $Text
+    }
 
     $code = 0
     if ($Color -eq "Gray")
@@ -236,7 +275,8 @@ function prompt
 
     if ($env:GitBranch)
     {
-        $branchPrompt = Colored -Text $env:GitBranch -Color Green
+        $gitBranchColor = if ("$env:GitBranch".Contains("Detached:")) {"Yellow"} else {"Green"}
+        $branchPrompt = Colored -Text $env:GitBranch -Color $gitBranchColor
         $statusLine += " :: $branchPrompt"
     }
     $statusLine += " :: $(Get-Date)"
@@ -253,9 +293,11 @@ function prompt
     UpdateWindowTitle;
 
     Write-Host $statusLine -nonewline
-    $prompt = (Colored -Text "λ " -Color Yellow)
+    $prompt = (Colored -Text $PromptChar -Color Yellow)
     return $prompt
 }
+$PromptChar = if ($PSVersionTable.PSVersion.Major -le 5) { "$ " } else { "λ " }
+
 
 ###############
 # GIT ALIASES #
@@ -376,7 +418,7 @@ function gcp
     write-host -foregroundcolor cyan "new patch @ $patchPath"
 }
 
-function gti
+function git-ti
 {
     [CmdletBinding( )]
     Param(
@@ -385,7 +427,7 @@ function gti
 
     & git update-index --assume-unchanged $Path
 }
-function gtui
+function git-tui
 {
     [CmdletBinding( )]
     Param(
@@ -417,7 +459,9 @@ function gbrowse
     }
 }
 
-function PruneSquashedBranches
+# I've migrated this script to a proper git alias. Keep it around "just in case" but going forward I should try to use the git alias instead
+# Delete this at the next opportunity after July 1s 2026
+function PruneSquashedBranches-Deprecated
 {
     [CmdletBinding( )]
     Param(
@@ -427,12 +471,20 @@ function PruneSquashedBranches
     )
 
     if (!$BaseBranch) {
-        $BaseBranch = $env:GitBranch
+        $OriginHeadRef = (git symbolic-ref refs/remotes/origin/HEAD)
+        write-host "Default base branch refs: $OriginHeadRef" -foregroundcolor darkgray
+        $BaseBranch = $OriginHeadRef.Substring("refs/remotes/origin/".Length)
         Write-Host "Defaulting to compare against branch [$BaseBranch]"
     }
 
-    git checkout -q $BaseBranch
+    $CurrentBranch = git rev-parse --abbrev-ref HEAD
+    if ($CurrentBranch -ne $BaseBranch) {
+        git checkout -q $BaseBranch
+        write-verbose "git checkout -q $BaseBranch"
+    }
+
     git pull -q
+    write-host "git pull -q" -foregroundcolor darkgray
 
     function PruneInternal
     {
@@ -443,16 +495,29 @@ function PruneSquashedBranches
         $mergeBase = (git merge-base $BaseBranch $TargetBranch)
 
         Write-Host -foregroundcolor cyan "Testing $BaseBranch <- $TargetBranch"
+
         $gitTree = (git rev-parse "$TargetBranch^{tree}")
-        $gitCherry = (git cherry $BaseBranch "$(git commit-tree $gitTree -p $mergeBase -m _)")
+        write-verbose "git rev-parse `"$TargetBranch^{tree}`""
+
+        $gitCherryBase = git commit-tree $gitTree -p $mergeBase -m _
+        write-verbose "git commit-tree $gitTree -p $mergeBase -m _ = $gitCherryBase"
+
+        $gitCherry = (git cherry $BaseBranch $gitCherryBase)
+        write-verbose "git cherry $BaseBranch $gitCherryBase"
+        write-verbose "git cherry[0] = $($gitCherry[0])"
+
         $squashMerged = $gitCherry[0] -eq '-'
+        write-verbose "`$gitCherry[0] -eq '-' = $squashMerged"
+
         $topicHead = (git rev-parse --short $TargetBranch)
+        write-verbose "git rev-parse --short $TargetBranch = $topicHead"
 
         if ($squashMerged)
         {
             if (!$WhatIf)
             {
                 (git branch -D $TargetBranch) | Out-Null
+                write-verbose "(git branch -D $TargetBranch) | Out-Null"
             }
 
             $deleteMsg = if (!$WhatIf) { "    DELETED" } else { "WILL DELETE"}
@@ -483,6 +548,7 @@ function PruneSquashedBranches
         }
     }
 
+    write-verbose "git fetch --all --prune"
     git fetch --all --prune
 }
 
@@ -505,7 +571,7 @@ function howto-edit-git-exclude { echo "$GITROOT/.git/info/exclude" }
 ########
 new-alias pd pushd -Force -Option AllScope
 function ggrep($pattern) { git grep -r --ignore-case $pattern }
-function grep { param([string]$filesPattern,[string]$pattern) sls -path $filesPattern -pattern $pattern }
+function psgrep { param([string]$filesPattern,[string]$pattern) sls -path $filesPattern -pattern $pattern }
 
 function edit-hosts { Start-Process -FilePath vim -ArgumentList c:\windows\system32\drivers\etc\hosts -Verb RunAs }
 function type-hosts { type c:\windows\system32\drivers\etc\hosts | sls "^\w" -NoEmphasis }
@@ -514,14 +580,17 @@ function type-hosts { type c:\windows\system32\drivers\etc\hosts | sls "^\w" -No
 
 function Set-WinHttpProxy
 {
-    write-host -foregroundcolor darkgray 'netsh winhttp set proxy 127.0.0.1:8888 "<-loopback>"'
-    netsh winhttp set proxy 127.0.0.1:8888 "<-loopback>"
+    param([switch]$Clear)
+    if ($Clear) {
+        write-host -foregroundcolor darkgray 'netsh winhttp reset proxy'
+        netsh winhttp reset proxy
+    } else {
+        write-host -foregroundcolor darkgray 'netsh winhttp set proxy 127.0.0.1:8888 "<-loopback>"'
+        netsh winhttp set proxy 127.0.0.1:8888 "<-loopback>"
+    }
 }
-function Clear-WinHttpProxy
-{
-    write-host -foregroundcolor darkgray 'netsh winhttp reset proxy'
-    netsh winhttp reset proxy
-}
+
+function Clear-WinHttpProxy { Set-WinHttpProxy -Clear }
 
 function RenameLowerCase($dir)
 {
@@ -563,7 +632,7 @@ function PrintNum
 {
     [CmdletBinding()]
     Param(
-    [Parameter(Mandatory = $true)][int64]$Value,
+    [Parameter(Mandatory = $true)][System.UInt64]$Value,
     [Parameter(Mandatory = $false)][switch]$AsHex,
     [Parameter(Mandatory = $false)][switch]$AsDec
     )
@@ -646,14 +715,6 @@ function CompareMeasureObject()
     PercentDiff -ValueName "StandardDeviation" -ValueA $ObjectA.StandardDeviation -ValueB $ObjectB.StandardDeviation
 }
 
-function DecodeBase64
-{
-    Param(
-    [Parameter(Mandatory = $true)]$Base64String
-    )
-
-    return [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($Base64String))
-}
 
 # Chocolatey profile
 $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
@@ -731,6 +792,8 @@ Function LaunchVs
 function Journal
 {
     Param(
+        [ValidateSet("gvim", "nvim")]
+        [string]$Editor = "nvim",
         [switch]$AddEntry,
         [switch]$Alt,
         [string]$Search,
@@ -791,11 +854,11 @@ function Journal
     {
         if ($AddEntry)
         {
-            dvim $journalPath -c "call NewJournalEntry()"
+            & $Editor $journalPath -c "call NewJournalEntry()"
         }
         else
         {
-            dvim $journalPath
+            & $Editor $journalPath
         }
     }
 }
@@ -912,14 +975,15 @@ function Git-GrepChanges
 
     $CaseSensitiveOption = if (!$CaseSensitive) { "-i" } else { $null }
 
+    $filesChanged = @(git diff --name-only "$Start..$End")
     if ($NameOnly)
     {
-        git diff --name-only "$Start..$End" | %{ git grep --name-only $CaseSensitiveOption $Pattern -- $_ }
+        $filesChanged | %{ git grep --name-only $CaseSensitiveOption $Pattern -- $_ }
     }
     else
     {
 
-        git diff --name-only "$Start..$End" |
+        $filesChanged |
             % { git grep --line-number  $CaseSensitiveOption $Pattern -- $_ } |
             % {
                 $m=(sls -InputObject $_ -Pattern "(\S+:)\s*(\S.*)").Matches;
@@ -1049,62 +1113,63 @@ function rsls {
     dir $FilePattern -rec | %{sls -InputObject $_ -Pattern $SearchPattern }
 }
 
-function OpensslPem2Der {
-    param(
-        [Parameter(Mandatory=$true)]
-        [string]$FilePath,
-        [Parameter(Mandatory=$true)]
-        [string]$OutPath
-    )
-
-    openssl x509 -inform PEM -in $FilePath -outform DER -out $OutPath -text
-}
-
-function OpensslDumpCert {
-    param(
-        [Parameter(Mandatory=$true)]
-        [string]$FilePath
-    )
-
-    openssl x509 -in $FilePath -noout -text
-}
-
 function New-OneDriveGitRepo {
     param(
     [Parameter(Mandatory=$true)]
-    [string]$reponame,
-    [string]$onedrivelocation = $null
+    [string]$RepoName,
+    [string]$OneDriveHome,
+    [string]$OneDriveRepoRoot = "projects",
+    [string]$OneDriveGitRemoteName = "onedrive",
+    [string]$DefaultGitBranchName = "main"
     )
 
-    if (!$onedrivelocation)
+    if (!$OneDriveHome)
     {
-        $onedrivelocation = "$env:OneDrive\projects"
+        if (!$env:OneDrive)
+        {
+            throw "Must specify -OneDriveHome if `$env:OneDrive not defined"
+        }
+        $OneDriveHome = $env:OneDriveHome
     }
+
+
+    $OneDriveRepoPath = (Join-Path $OneDriveHome $OneDriveRepoRoot)
+    $OneDriveRepoPath = (Get-Item $OneDriveRepoPath).FullName # avoid any problems with ~ references
 
     function diag($msg) { Write-Host -foregroundcolor cyan $msg }
 
-    diag "Creating onedrive bare repo @ $(Join-Path $onedrivelocation $reponame)..."
-    pushd $onedrivelocation
-    mkdir $reponame
-    cd $reponame
-    git init --bare
-    git symbolic-ref HEAD refs/heads/main
-    popd
-    diag "...created"
+    $originalLocation = Get-Location
 
-    diag "Creating local repo @ $(Join-Path $pwd $reponame)..."
-    mkdir $reponame
-    cd $reponame
-    git init
-    diag "    ...setting branch and remote"
-    git branch -m main
-    git remote add onedrive file://"$(Join-Path $onedrivelocation $reponame)"
-    diag "    ...creating first commit and pushing"
-    echo "" > .gitignore
-    git add .gitignore
-    git commit -m "first commit"
-    git push
-    diag "...done"
+    try
+    {
+        cd $OneDriveRepoPath
+        diag "Creating onedrive bare repo @ $(Join-Path $OneDriveRepoPath $RepoName)..."
+        mkdir $RepoName
+        cd $RepoName
+        git init --bare
+        git symbolic-ref HEAD "refs/heads/$DefaultGitBranchName"
+        diag "...created"
+
+        Set-Location $originalLocation
+        diag "Creating local repo @ $(Join-Path $pwd $RepoName)..."
+        mkdir $RepoName
+        cd $RepoName
+        git init
+        diag "    ...setting branch and remote"
+        git branch -m $DefaultGitBranchName
+        git remote add $OneDriveGitRemoteName file://"$(Join-Path $OneDriveRepoPath $RepoName)"
+        diag "    ...creating first commit and pushing"
+        echo "" > .gitignore
+        git add .gitignore
+        git commit -m "first commit"
+        git push -u $OneDriveGitRemoteName $DefaultGitBranchName
+        diag "...done"
+    }
+    finally
+    {
+        Set-Location $originalLocation
+    }
+
 }
 
 function SlsObjectMap {
@@ -1374,6 +1439,109 @@ function Expand-Tar {
 
 $MaximumHistoryCount = 32767 # max amount of powershell history
 
+function Remove-SystemPath
+{
+    [CmdletBinding(SupportsShouldProcess = $true)]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$OldPath,
+        [ValidateSet("User", "Machine", "Process")]
+        [string]$PathScope = "User",
+        [switch]$Quiet,
+        [switch]$NoParentScopes
+        )
+
+    function MatchesOldPath {
+        param([string]$Path)
+        return ($Path -eq $OldPath) -or ($Path -eq $OldPath.trim("\\"))
+    }
+
+
+    $scopesToTest = @($PathScope)
+    if ($PathScope -ne "Process" -and (-not $NoParentScopes))
+    {
+        $scopesToTest += "Process"
+    }
+
+    foreach ($nextScope in $scopesToTest) {
+        $currentPath = [Environment]::GetEnvironmentVariable("Path", $nextScope)
+        $pathChunks = ($currentPath -split ";").trim("\\");
+        $remainingPathChunks = $pathChunks | ? { -not (MatchesOldPath -Path $_) }
+        Write-Verbose "Path chunks remaining: $remainingPathChunks"
+        $removedPathChunks = $pathChunks | ? { MatchesOldPath -Path $_ }
+        Write-Verbose "Path chunks to remove: $removedPathChunks"
+        if (-not $removedPathChunks)
+        {
+            if (! $Quiet)
+            {
+                Write-Host -ForegroundColor DarkYellow "$OldPath does not exist in $nextScope path"
+            }
+            continue;
+        }
+
+        if ($PSCmdlet.ShouldProcess("Remove $removedPathChunks from `$PATH in scope $nextScope")) {
+            $newPath = $remainingPathChunks -join ";"
+            Write-Verbose "New Path: $newPath"
+            [Environment]::SetEnvironmentVariable("Path", $newPath, $nextScope)
+            Write-Host "Removed Path from $nextScope path."
+        }
+    }
+}
+
+function Clean-Path {
+    [CmdletBinding(SupportsShouldProcess = $true)]
+    param(
+        [ValidateSet("User", "Machine", "Process")]
+        [string]$PathScope = "User",
+        [switch]$Quiet,
+        [switch]$NoParentScopes
+        )
+
+    $scopesToTest = @($PathScope)
+    if ($PathScope -ne "Process" -and (-not $NoParentScopes))
+    {
+        $scopesToTest += "Process"
+    }
+
+    foreach ($nextScope in $scopesToTest) {
+        $currentPath = [Environment]::GetEnvironmentVariable("Path", $nextScope)
+        $pathChunks = ($currentPath -split ";") | %{ $_.trim("\\"); }
+        $newPathChunks = @()
+        $removedPathChunks = [System.Collections.Hashtable]@{}
+        $seenPathChunks = [System.Collections.Hashtable]@{}
+
+        foreach ($pathChunk in $pathChunks) {
+            if ($pathChunk.Trim() -eq "") {
+                continue
+            }
+
+            if ($seenPathChunks.Contains($pathChunk)) {
+                $removedPathChunks[$pathChunk] = $true
+                continue
+            }
+
+            $seenPathChunks[$pathChunk] = $true
+            $newPathChunks += $pathChunk
+        }
+
+        if (-not $removedPathChunks)
+        {
+            if (! $Quiet)
+            {
+                Write-Host -ForegroundColor DarkGray "$Path already clean in Scope: $nextScope"
+            }
+            continue;
+        }
+
+        if ($PSCmdlet.ShouldProcess("Remove $($removedPathChunks.Keys | %{"'$_'"}) from `$PATH in scope $nextScope")) {
+            $newPath = $newPathChunks -join ";"
+            Write-Verbose "New Path: $newPath"
+            [Environment]::SetEnvironmentVariable("Path", $newPath, $nextScope)
+            Write-Host "Cleaned Path in $nextScope scope."
+        }
+    }
+}
+
 function Update-SystemPath
 {
     param(
@@ -1432,4 +1600,65 @@ function Set-SystemEnvVar
     {
         [Environment]::SetEnvironmentVariable($VarName, $VarValue, "Process")
     }
+}
+
+function ReadElfSectionScan
+{
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$FileGlob,
+        [Parameter(Mandatory=$true)]
+        [string]$Pattern,
+        [switch]$NoRecurse
+        )
+
+    $Recurse = ! $NoRecurse
+    $files = dir $FileGlob -Recurse:$Recurse
+    foreach ($file in $files)
+    {
+        readelf -S $file | sls -Pattern $Pattern | %{
+            write-host "$($file): $_"
+        }
+    }
+}
+
+function Unlock-MacOsKeychain {
+    security unlock-keychain "$HOME/Library/Keychains/login.keychain"
+}
+
+function Get-1PasswordValue {
+    param(
+        [string]$ItemName,
+        [string]$FieldName = "password"
+        )
+    (op item get $ItemName --format json --fields $FieldName | ConvertFrom-Json).value
+}
+
+function Log-App {
+    param(
+    [string]$AppNamePattern,
+    [switch]$SkipClear
+    )
+
+    $adbPids = @(adb shell ps | sls -pattern "\S+\s+(\d+).*$AppNamePattern" | %{[int]$_.Matches[0].Groups[1].value})
+    if ($adbPids.Count -eq 0) {
+        throw "test app not running!"
+    } elseif ($adbPids.Count -gt 1) {
+        throw "multiple test app instances running?"
+    }
+
+    $appPid = $adbPids[0]
+
+    clear;
+    if (! $SkipClear)
+    {
+        write-host -foregroundcolor darkgray "adb logcat --clear"
+        adb logcat --clear
+        if (!$?) {
+            throw "Failed to clear logcat"
+        }
+    }
+
+    write-host -foregroundcolor darkgray "adb logcat --pid=$appPid"
+    adb logcat --pid=$appPid
 }

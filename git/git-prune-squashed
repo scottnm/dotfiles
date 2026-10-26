@@ -1,0 +1,156 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<EOF
+Usage: git prune-squashed [OPTIONS] [<branch>...]
+
+Detect and delete local branches that have been squash-merged into a base branch.
+
+Options:
+  -b, --base <branch>   Base branch to compare against (default: auto-detect from origin/HEAD)
+  -n, --dry-run         Show what would be deleted without deleting
+  -v, --verbose         Show detailed git commands and output
+  -h, --help            Show this help message
+
+If no target branches are specified, all local branches (except base and current) are checked.
+EOF
+}
+
+# --- Color setup ---
+if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
+  cyan=$'\033[36m'
+  red=$'\033[31m'
+  gray=$'\033[90m'
+  reset=$'\033[0m'
+else
+  cyan='' red='' gray='' reset=''
+fi
+
+verbose() { [[ ${opt_verbose:-0} -eq 1 ]] && echo "${gray}$*${reset}" >&2 || true; }
+info()    { echo "$*"; }
+warn()    { echo "$*" >&2; }
+
+# --- Argument parsing ---
+opt_dry_run=0
+opt_verbose=0
+opt_base=""
+targets=()
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -n|--dry-run)  opt_dry_run=1; shift ;;
+    -v|--verbose)  opt_verbose=1; shift ;;
+    -b|--base)
+      [[ $# -ge 2 ]] || { warn "error: --base requires a value"; exit 1; }
+      opt_base="$2"; shift 2 ;;
+    -h|--help)     usage; exit 0 ;;
+    --)            shift; targets+=("$@"); break ;;
+    -*)            warn "error: unknown option: $1"; usage >&2; exit 1 ;;
+    *)             targets+=("$1"); shift ;;
+  esac
+done
+
+# --- Verify we're in a git repo ---
+git rev-parse --is-inside-work-tree >/dev/null 2>&1 || {
+  warn "error: not inside a Git repository"
+  exit 1
+}
+
+# --- Resolve base branch ---
+if [[ -n "$opt_base" ]]; then
+  base="$opt_base"
+else
+  origin_head=$(git symbolic-ref --quiet refs/remotes/origin/HEAD 2>/dev/null) || {
+    warn "error: cannot determine default branch (origin/HEAD not set)"
+    warn "hint: run 'git remote set-head origin --auto' or use --base <branch>"
+    exit 1
+  }
+  base="${origin_head#refs/remotes/}"
+  info "${gray}Auto-detected base: $base${reset}"
+fi
+
+git rev-parse --verify --quiet "$base^{commit}" >/dev/null 2>&1 || {
+  warn "error: base ref not found: $base"
+  exit 1
+}
+
+# --- Fetch latest state ---
+info "${gray}Fetching...${reset}"
+verbose "git fetch --all --prune --quiet"
+git fetch --all --prune --quiet
+
+# --- Resolve current branch (to avoid deleting it) ---
+current_branch=$(git branch --show-current 2>/dev/null || true)
+
+# --- Build target branch list ---
+if [[ ${#targets[@]} -eq 0 ]]; then
+  mapfile -t targets < <(git for-each-ref --format='%(refname:short)' refs/heads/)
+fi
+
+# --- Check each branch ---
+deleted=0
+checked=0
+
+for branch in "${targets[@]}"; do
+  # Resolve base short name for comparison
+  base_short="${base#origin/}"
+
+  # Skip base and current branch
+  if [[ "$branch" == "$base" || "$branch" == "$base_short" ]]; then
+    verbose "Skipping base branch: $branch"
+    continue
+  fi
+  if [[ -n "$current_branch" && "$branch" == "$current_branch" ]]; then
+    verbose "Skipping current branch: $branch"
+    continue
+  fi
+
+  # Validate branch exists
+  if ! git rev-parse --verify --quiet "refs/heads/$branch" >/dev/null 2>&1; then
+    warn "warning: branch not found: $branch"
+    continue
+  fi
+
+  checked=$((checked + 1))
+  info "${cyan}Testing $base <- $branch${reset}"
+
+  merge_base=$(git merge-base "$base" "$branch" 2>/dev/null) || {
+    warn "warning: could not find merge-base for $branch, skipping"
+    continue
+  }
+  verbose "merge-base = $merge_base"
+
+  tree=$(git rev-parse "refs/heads/${branch}^{tree}" 2>/dev/null) || {
+    warn "warning: could not resolve tree for $branch, skipping"
+    continue
+  }
+  verbose "tree = $tree"
+
+  synthetic_commit=$(git commit-tree "$tree" -p "$merge_base" -m _) || {
+    warn "warning: commit-tree failed for $branch, skipping"
+    continue
+  }
+  verbose "synthetic commit = $synthetic_commit"
+
+  cherry_line=$(git cherry "$base" "$synthetic_commit" 2>/dev/null | head -n1) || true
+  verbose "cherry = $cherry_line"
+
+  short_sha=$(git rev-parse --short "$branch")
+
+  if [[ "${cherry_line:0:1}" == "-" ]]; then
+    if [[ $opt_dry_run -eq 1 ]]; then
+      info "${red}WILL DELETE${reset} ... ($short_sha) $branch"
+    else
+      git branch -D "$branch" >/dev/null
+      info "${red}    DELETED${reset} ... ($short_sha) $branch"
+    fi
+    deleted=$((deleted + 1))
+  else
+    info " not merged ... ($short_sha) $branch"
+  fi
+done
+
+# --- Summary ---
+action=$( [[ $opt_dry_run -eq 1 ]] && echo "would be deleted" || echo "deleted" )
+info "${gray}Done. $checked checked, $deleted $action.${reset}"

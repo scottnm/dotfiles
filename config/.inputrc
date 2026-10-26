@@ -3,3 +3,13 @@ $include /etc/inputrc
 set colored-stats On
 set completion-ignore-case On
 set bell-style none
+
+# Complete the common prefix, then show matches
+set menu-complete-display-prefix on
+set show-all-if-unmodified on
+set show-all-if-ambiguous on
+
+# next tab(s) will cycle through matches
+TAB: menu-complete
+# shift tab cycles backward
+"\e[Z": menu-complete-backward
