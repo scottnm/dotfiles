@@ -1236,7 +1236,9 @@ function Mirror-Copy {
         [switch]$NoCompress,
         [switch]$Purge,
         [int]$MinFileSizeBytes,
-        [int]$MaxFileSizeBytes
+        [int]$MaxFileSizeBytes,
+        [string[]]$ExcludeDirectories,
+        [switch]$WhatIf
         )
 
     if (!($Destination))
@@ -1275,6 +1277,20 @@ function Mirror-Copy {
     if ($MaxFileSizeBytes)
     {
         $args.Add("/MAX:$MaxFileSizeBytes")
+    }
+
+    if ($ExcludeDirectories)
+    {
+        $args.Add("/XD")
+        foreach ($ed in $ExcludeDirectories)
+        {
+            $args.Add("$ed")
+        }
+    }
+
+    if ($WhatIf)
+    {
+        $args.Add("/L")
     }
 
     write-host -foregroundcolor darkgray "robocopy $args"
