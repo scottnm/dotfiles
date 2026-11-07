@@ -1678,3 +1678,4 @@ function Log-App {
     write-host -foregroundcolor darkgray "adb logcat --pid=$appPid"
     adb logcat --pid=$appPid
 }
+
