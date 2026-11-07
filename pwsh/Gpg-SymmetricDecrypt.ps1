@@ -1,6 +1,12 @@
 param(
     [Parameter(Mandatory)]
-    [string]$Path
+    [string]$Path,
+    [string]$OutputPath
     )
 
-gpg -d $Path
+$outputArgs = @()
+if ($OutputPath)
+{
+    $outputArgs += @("-o", $OutputPath)
+}
+gpg @outputArgs -d $Path

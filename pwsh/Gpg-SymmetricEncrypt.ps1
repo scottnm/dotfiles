@@ -1,8 +1,13 @@
 param(
     [Parameter(Mandatory)]
     [string]$Path,
-    [Parameter(Mandatory)]
+    [string]$OutputPath,
     [string]$CipherAlgo = "AES256"
     )
 
-gpg --symmetric --cipher-algo $CipherAlgo $Path
+$outputArgs = @()
+if ($OutputPath)
+{
+    $outputArgs += @("-o", $OutputPath)
+}
+gpg @outputArgs --symmetric --cipher-algo $CipherAlgo $Path
