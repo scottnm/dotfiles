@@ -135,7 +135,7 @@ function Get-Profiles {
     return @($profile, $env:SideProfilePath)
 }
 
-function Edit-Vimrc { dvim $HOME\_vimrc }
+function Edit-Vimrc { dvim (Join-Path $HOME "_vimrc") }
 function Edit-GhciConf { tedit $env:APPDATA\ghc\ghci.conf }
 function Edit-Hosts { tedit c:\windows\system32\drivers\etc\hosts }
 function Edit-GitConfig {

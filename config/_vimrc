@@ -27,6 +27,8 @@ Plug 'plasticboy/vim-markdown'   " markdown (better highlighting than default)
 Plug 'junegunn/goyo.vim' " Distraction free writing; usage :[!]Goyo
 Plug 'JMcKiern/vim-venter' " Vertically-centered code buffer
 
+Plug 'jamessan/vim-gnupg' " GPG file helpers
+
 " Vim Git Wrapper
 Plug 'tpope/vim-fugitive'
 " Toggle between header and source files
