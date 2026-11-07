@@ -833,15 +833,19 @@ function Journal
 
     if ($EntryText)
     {
-        $dateline = (Get-Date -Format "`n[ ddd d MMM yy - h:mm:ss tt ]`n")
+        if ($journalPath.Contains(".gpg")) {
+            throw "Can't append to GPG encrypted file. Open in vim with GPG decryption plugin"
+        } else {
+            $dateline = (Get-Date -Format "`n[ ddd d MMM yy - h:mm:ss tt ]`n")
 
-        Out-File -InputObject $dateline -Append -FilePath $journalPath  -NoNewline
-        Out-File -InputObject "$EntryText`n" -Append -FilePath $journalPath -NoNewline
+            Out-File -InputObject $dateline -Append -FilePath $journalPath  -NoNewline
+            Out-File -InputObject "$EntryText`n" -Append -FilePath $journalPath -NoNewline
 
-        if ($EntryTags)
-        {
-            $tagsline = "#" + ($EntryTags -Join "  #") + "`n"
-            Out-File -InputObject $tagsline -Append -FilePath $journalPath -NoNewLine
+            if ($EntryTags)
+            {
+                $tagsline = "#" + ($EntryTags -Join "  #") + "`n"
+                Out-File -InputObject $tagsline -Append -FilePath $journalPath -NoNewLine
+            }
         }
     }
 
